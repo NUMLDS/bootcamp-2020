@@ -6,13 +6,13 @@ You've learned quite a lot about R in a short time. Congratulations! This exerci
 
 #### Task 1: Import your data 
 
-Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from [WHAT IS THE SOURCE?], and the other is data on *counties* from the Census Burea. Review the codebook file so that you know what each variable name means in each dataset. 
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Sruvey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
 
 #### Task 2: Recoding and variable manipulation
 
 1. Deal with missing values, which are currently coded as `-99`.
 2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
-3. [ANY OTHER RECODING TASKS?]
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
 
 #### Task 3: Merge datasets
 
