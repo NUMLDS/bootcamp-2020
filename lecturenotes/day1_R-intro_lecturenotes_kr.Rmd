@@ -585,7 +585,7 @@ Note that we had to use a list for adding a row because there are different data
 
 # Reading data files
 
-## Working Directory [NEED TO FIGURE OUT HOW THIS WORKS WITH RSTUDIO SERVER]
+## Working Directory
 
 Before reading or writing files, it's often useful to set the working directory first so that you don't have specify complete file paths.  
 
@@ -595,6 +595,12 @@ You can go to the Files tab in the bottom right window in RStudio and find the d
 setwd("~/training/intror")  # ~ stands for your home directory
 setwd("/Users/username/Documents/workshop") # mac, absolute path example
 setwd("C:\Users\username\Documents\workshop") # windows, absolute path example
+```
+
+In our case, we are working out of the directory team/bootcamp/2018 in the base directory. So we can set our working directory as follows:
+
+```{r, eval=FALSE}
+setwd("~/team/bootcamp/2018")
 ```
 
 To check where your working directory is, use `getwd()`:
