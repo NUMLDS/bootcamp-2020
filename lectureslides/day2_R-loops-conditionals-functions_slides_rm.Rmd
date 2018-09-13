@@ -55,12 +55,19 @@ str(gapminder)
 # Don't repeart yourself--loop it! 
 
 ## Loops in R -- `for`, `while`, and the `apply` family
+
 - Loops allow you to repeat a function based on conditions
 - There are several flavors
   - `for`
   - `while`
-- Sneak peak: the `apply` family is often preferred to loops because the code is cleaner
+  - the `apply` family (often preferred to loops because the code is cleaner)
+- Sneak peak: `dplyr` and `data.table` offer better approaches to loops
 
+## A word of caution about loops
+
+- It is often a good idea at avoid loops when possible in R
+  - They are slow!
+- Try to find other solutions before looping
 
 ## The anatomy of a `for` loop
 
@@ -71,30 +78,51 @@ str(gapminder)
   
 ## The anatomy of a `for` loop
 
+- Let's recover the GDP for each country
+
 ```{r loop example}
 # create a vector of values that you want to repeat the function for
-conts <- unique(gapminder$continent)
+obs <- 1:nrow(gapminder)
 
 # initialize the for loop with `for (i in vector)` 
-for (i in conts) {
-  print(paste("Continent name:", i)) # the function to repeat is enclosed in braces {}
+for (i in obs) { # the function to repeat is enclosed in braces {}
+  gapminder[i, "gdp"] <- gapminder[i, "pop"] * gapminder[i, "gdpPercap"]
 }
 ```
 
 ## You try
 
-What are the country names in `gapminder`?
+Create a new variable that finds that natural log (`log`) of the GDP per capita and of population
+ - call them `log_gdpPercap` and `log_pop`
 
-## Country names in `gapminder`
+## Log gdp and log population
+
 ```{r loop exercise}
-# create a vector of values that you want to repeat the function for
-country <- unique(gapminder$country)
-
 # initialize the for loop with `for (i in vector)` 
-for (i in country[1:10]) {
-  print(paste("Country name:", i)) # the function to repeat is enclosed in braces {}
+for (i in obs) { # the function to repeat is enclosed in braces {}
+  gapminder[i, "log_gdpPercap"] <- log(gapminder[i, "gdpPercap"])
+  gapminder[i, "log_pop"] <- log(gapminder[i, "pop"])
 }
 ```
+
+
+## Log gdp and log population
+
+```{r log exercise}
+head(gapminder)
+```
+
+## Another word of caution -- used vectorized functions when possible
+
+- Everything in R is a vector!
+- It is quicker and easier to use vectorized functions when possible
+  - The function is applied to each item in the vector
+
+```{r vectorized}
+gapminder$vec_log_gdpPercap <- log(gapminder$gdpPercap)
+all(gapminder$vec_log_gdpPercap == gapminder$log_gdpPercap)
+```
+
 
 ## Let's try something a bit more substantive
 
@@ -105,10 +133,9 @@ for (i in country[1:10]) {
 years <- unique(gapminder$year)
 
 for (i in years) {
-  print(paste0(i, ": ", 
-               mean(gapminder$lifeExp[gapminder$year == i], 
-                    na.rm = T))
-        )
+  mean_le <- mean(gapminder$lifeExp[gapminder$year == i], 
+                  na.rm = T)
+  print(paste0(i, ": ", mean_le))
 }
 ```
 
@@ -122,9 +149,9 @@ for (i in years) {
 conts <- unique(gapminder$continent)
 
 for (i in conts) {
-  print(paste0(i, ": ",
-              mean(gapminder$lifeExp[gapminder$continent == i], 
-                   na.rm = T)))
+  mean_le <- mean(gapminder$lifeExp[gapminder$continent == i], 
+                  na.rm = T)
+  print(paste0(i, ": ", mean_le))
 }
 ```
 
@@ -355,7 +382,7 @@ if (random_year > 1977) {
 ## Putting it `for` and `if/else` together
 
 - We can add an `if`...`else` clause to a `for` loop
-- What is the mean GDP per capita for years <= 1977? What is the mean life expectancy for years > 1977?
+
 
 ```{r, eval = F}
 # initialize the `for` loop
@@ -366,29 +393,28 @@ for () {
     # function if condition is  not met
   }
 }
-
 ```
 
 
 ## Putting it `for` and `if/else` together
 
-```{r for loop with if else}
+Which continents have a mean life expectancy greater than 70 years?
 
-for (i in years) {
-  if (i > 1977) {
-    d <- mean(gapminder$lifeExp[gapminder$year == i])
-    print(paste("year:", i, 
-                 "life expectancy:", d))
-  } else {
-    d <- mean(gapminder$gdpPercap[gapminder$year == i])
-    print(paste("year:", i,
-                 "GDP per capita:", d))
-  }
+```{r for loop with if else}
+threshold <- 70
+
+for (i in unique(gapminder$continent)) {
+   tmp <- mean(gapminder$lifeExp[gapminder$continent==i])
+   
+   if (tmp < threshold) {
+       print(paste("Mean Life Expectancy in", i, "is less than", threshold))
+   } else {
+       print(paste("Mean Life Expectancy in", i, "is greater than", threshold))
+   }
 }
 ```
 
 # Writing functions
-
 
 ## Writing functions
 
@@ -484,6 +510,13 @@ viz_lm <-
   }
 ```
 
+## Running the function
+
+```{r running the function}
+viz_lm(gapminder, "lifeExp", "gdpPercap", 1977)
+```
+
+
 ## Loop it!
 
 ```{r}
@@ -500,3 +533,8 @@ for (i in years) {
 - Combine text (using the markdown language) and R code
 - Rmarkdown runs R code, compiles, and produces a report in chosen format
 - This presentation was created using Rmarkdown!
+
+## Day 2 Exercise
+
+1) Save your Rmarkdown file: "lastname_firstname_r_bootcamp_day2"
+2) Read in the gapminder data set
