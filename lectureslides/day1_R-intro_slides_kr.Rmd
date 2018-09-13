@@ -241,7 +241,15 @@ Let's take a break and return to learn two new skills: **reading files** and bas
 
 # Reading files
 
-## Working directories -- ASK LEWIS ABOUT HOW THIS WORKS IN RSTUDIO SERVER
+## Working directories
+
+The working directory is the folder where R scripts and projects look for files by default. It is a good idea to create a folder for any project and store all your R and data files in that directory.
+
+You can go to the Files tab in the bottom right window in RStudio and find the directory you want.  Then under the More menu, there is an option to set the current directory as the working directory.  Or you can use the `setwd` command like:
+
+```{r, eval=FALSE}
+setwd("~/team/bootcamp/2018")
+```
 
 ## Reading files: read.csv()
 
@@ -257,12 +265,16 @@ gapminder5 <- read.csv(file = "data/gapminder5.csv",
 
 ## Reading files: read_csv()
 
-- Load the `readr` package (it has already been installed for you as part of `tidyverse`)
-- Use `read_csv()` to load the gapminder data
+- Set your working directory using the code provided, and then check it.
+- Run the `read.csv()` code provided and see what happens.
+- Load the `readr` package.
+<small>(You don't need to install it as has already been installed as part of `tidyverse`)</small>
+- Use `read_csv()` to load the gapminder data.
 
 ## Reading files: read_csv()
 
-```{r read_csv pt2}
+```{r read_csv}
+getwd()
 library(readr)
 gapminder5 <- read_csv("data/gapminder5.csv")
 ```

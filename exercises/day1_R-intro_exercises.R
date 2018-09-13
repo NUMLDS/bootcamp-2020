@@ -126,6 +126,9 @@ data(mtcars)
 #### READING FILES ####
 
 # Set your working directory
+setwd("~/team/bootcamp/2018")
+
+# Check your working directory
 
 
 # Read gapminder data with read.csv()
