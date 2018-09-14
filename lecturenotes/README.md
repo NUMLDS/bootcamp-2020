@@ -11,7 +11,7 @@ For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio
     - Data visualization in base R
 2. Day 2
 3. Day 3
-    1. Part 1
-    2. Part 2
-    3. Part 3: Data visualization with ggplot
+    1. Part 1: Advanced manipulation and dplyr
+    2. Part 2: Advanced manipulation and data.table
+    3. Part 3: Advanced visualization with ggplot
     4. For the final exercise, [see instructions here](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_final-exercise-instructions.md).
