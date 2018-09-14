@@ -180,11 +180,12 @@ long_merged_energy %>%
 ```
 
 ```{r facet 3}
-long_merged_energy %>% 
+regroup %>% 
+  rename(source = type) %>%
+  merge(long_merged_energy, by = "source") %>% 
   filter(source!="imports") %>%
-  mutate(Type=recode(source, `wind`="Renewable", `solar`="Renewable", `small_hydro`="Hydro", `large_hydro`="Hydro", .default="Non-renewable")) %>% 
   ggplot() + 
-  geom_line(aes(x = datetime, y = output, col=Type)) + 
+  geom_line(aes(x = datetime, y = output, col=group)) + 
   facet_wrap(.~source, scales="free") + 
   labs(title = "Generation over time, Sep 3-9", x = "Hour", y = "Output") + 
   theme_minimal() + 
