@@ -4,7 +4,7 @@ The R sessions consist of presenter slides and accompanying exercises. The files
 
 For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio, or there is an html file you can view if you would like to follow along. Links to the HTML files for the easiest viewing are:
 
-1. [Day 1: Introduction](https://msia.github.io/bootcamp-2018/lecturenotes/day1_R-intro_lecturenotes_kr.html), covering:
+1. [Day 1: Introduction](https://msia.github.io/bootcamp-2018/lectureslides/day1_R-intro_slides_kr.html#/), covering:
     - Review of basics, data types, and data structures
     - Reading and writing files
     - Data manipulation in base R
