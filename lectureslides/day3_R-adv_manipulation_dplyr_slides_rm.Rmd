@@ -1,0 +1,226 @@
+---
+title: "Advanced R - Reshaping, merging, and dplyr"
+author: "Richard Paquin Morel"
+date: "`r Sys.Date()`"
+output: revealjs::revealjs_presentation
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# R Day 3 - Advanced manipulation and dplyr
+
+## A new dataset
+
+California energy data
+
+## Exploring the data
+
+## 
+
+# Reshaping data
+
+## Wide versus long
+
+## Using `reshape2`
+
+- `melt` --> make data long
+- `dcast` --> make data wide
+- `recast`--> melt then cast data
+
+## Reshaping CA energy data
+
+## You try - reshape the other dataframe
+
+# Merging data
+
+## Merging CA energy data
+
+- Sometimes you have data from two (or more) sources that you want to analyze 
+- Need to merge these dataframes together
+- To merge, need to chose the columns that have common values between the dataframes
+  - Usually a variable with ids or years, or both
+  
+## Merging the `merge`
+
+`merge(x, y, by = c("id", "year"))`
+- Key arguments: 
+  - `x`: first dataframe
+  - `y`: second dataframe
+  - `by`: variables to match (must have common name)
+
+## More `merge` arguments
+`merge(x, y, by.x = "id", by.y = "cd", all.x = T, all.y = T)`
+- Advanced arguments:
+  - Use `by.x` and `by.y` if the dataframes have different variable names
+  - Use `all.x = T` if you want to keep all the observation in the first dataframe (unmatched observations in `y` are dropped!)
+  - Use `all.y = T` if you want to keep all observations in the second dataframe (umatched observations in `x` are dropped!)
+  - Use both (or, simply `all = T`) to keep all observations!
+  - By **default** R will drop unmatched observations from **both** dataframe!
+
+## Merge by id
+
+## You try - merge by id and year
+
+## Always be sure to check your merge!
+
+# dplyr!
+
+
+## dplyr - an idiosyncratic approach to data manipulation
+
+- `dplyr` is an R package for data manipulation developed by Hadley Wickham with help from lots of other R developers
+- https://dplyr.tidyverse.org/
+- Principles: consistent syntax, meaningful naming conventions, fewer arguments/more functions 
+
+## `dplyr` verbs
+
+- `select` --> subset variables
+- `filter` --> subset observations based on conditions
+- `mutate` --> add new variables
+- `summarize` --> reduce multiple variables to a single value (e.g., find the mean)
+
+
+## Trying out `dplyr` verbs - `select`
+
+- `select` subsets variables (columns)
+  - select by name: `select(df, variable_1, variable_3, variable_10)`
+  - select by position: `select(df, c(1, 3, 10))`
+  - select by range: `select(df, variable_1:variable_10)` or `select(df, 1:10)`
+
+```{r select}
+df <- select(df, )
+names(df)
+```
+
+## select helpers
+
+- There are several "select helpers" that make subsetting variables very easy
+  - `one_of`, `contains`, `starts_with`, `ends_with`, `matches`
+
+```{r}
+df <- select(df, contains("XXXXX"))
+names(df)
+```
+
+## Trying out `dplyr` verbs - `filter`
+
+```{r intro to verbs}
+df <- filter(df, )
+```
+
+## Trying out `dplyr` verbs - `mutate`
+
+- `mutate` creates new variables
+
+```{r mutate}
+df <- mutate(df, log_x = log(x))
+```
+
+## Trying out `dplyr` verbs - `summarize`
+
+`summarize` reduces observations to a single value based on operations
+
+```{r summarize}
+# total energy consumption
+summarize(df, total = sum(x, na.rm = T))
+
+# mean energy consumption
+summarize(df, mean_cons = mean(x, na.rm = T))
+```
+
+
+## A new operator: the pipe `%>%`
+
+- The powerful `%>%` operator lets you chain together functions
+- It sends the result of one function to another function
+- Read `%>%` as "then"
+
+```{r introducing the pipe}
+# take df then filter it then select these variables
+# you do not need to repeat the name of the dataframe!
+df %>% filter() %>% select() %>% mutate() %>%  summarize()
+```
+
+## Piping functions
+
+- Once you start the pipe, refer to the dataframe as `.`
+  - This is the placeholder dataframe that is manipulated
+  - Your original dataframe _is not changed_
+  
+```{r referring to the dataframe}
+df %>% select() %>% filter()
+```
+
+## Try piping
+
+- Using the merged CA energy data do the following:
+  1. Subset observations
+  2. Create a new variable
+  3. Find the mean by day
+
+## Try piping
+
+```{r exercise}
+
+```
+
+## `group_by` and `summarize`
+
+- `group_by` is a powerful function that allows us to perform operations by groups of observations!
+  - Very useful with summarize!
+
+```{r group_by}
+df %>% 
+  group_by() %>% 
+  summarize()
+```
+
+## `group_by` versus `for` loops
+
+- Remember the `for` loop we wrote yesterday to find the mean life expectancy by year?
+- MUCH better in `dplyr`
+
+## `group_by` versus `for` loops
+
+```{r mean le}
+gapminder <- read.csv(here::here("data/gapminder5.csv"))
+
+gapminder %>% 
+  group_by(year) %>% 
+  summarize(mean_le = mean(lifeExp, na.rm = T),
+            sd_lf = sd(lifeExp, na.rm = T))
+```
+
+## Find the mean by hour
+
+- 
+
+## Find the mean by hour
+
+```{r exercise grouping}
+
+```
+
+
+## Merging in `dplyr` with `*_join` functions
+
+- `dplyr`'s philosophy is to have more functions with fewer options
+- `left_join` - keeps all observations in the first dataframe
+- `right_join` - keeps all observations in the second dataframe 
+- `full_join` - keeps all observations in both dataframes
+- `inner_join` - keeps only those observations that are matched in both datasets
+
+# Comparing `merge` and `semi_join`
+```{r merge and semi_join}
+merge()
+semi_join()
+```
+
