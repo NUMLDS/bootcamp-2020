@@ -100,19 +100,23 @@ ggplot(data = gapminder07) +
 
 As you can see, the grammar of graphics used in ggplot2 breaks down the information that goes into each graphic into several layers, each of which you can customize.
 
-# Preparing your data with dplyr
+# Preparing your data
 
-```{r filtering data pre-ggplot}
+Recall the role of pipes (`%>%`) in `dplyr` this morning. Since `dplyr` and `ggplot2` are both part of tidyverse, they are designed to work well together. You can use a series of pipes to prepare your data to be in the appropriate format, subset, etc before plotting. 
 
+For example, consider the above plot. Instead of specifying the data in the `ggplot()` function, we can supply the data through a pipe. Instead of using the subsetted `gapminder07` data, we can use the original `gapminder5` and use a `filter()` function to select the 2007 observations only.
+
+```{r piping and filtering}
+gapminder5 %>% 
+  filter(year == 2007) %>% 
+  ggplot() + 
+  geom_point(aes(x = gdpPercap, y = lifeExp)) + 
+  geom_hline(aes(yintercept = mean(lifeExp))) + 
+  labs(title = "Relationship between life expectancy and GDP per capita in 2007", 
+       x = "GDP per capita", y = "Life expectancy")
 ```
 
-```{r summarising data pre-ggplot}
-
-```
-
-```{r working in long format}
-
-```
+The above example is a straightforward one to motivate the principle that data may need to be manipulated before being supplied to a `ggplot()` function. Oftentimes, preparation involves more complicated data manipulation, and involves recoding, summarising, converting to long format, etc. In the next few sections, we will see several examples of this.
 
 # Aesthetics
 
@@ -147,6 +151,45 @@ As you can see, the grammar of graphics used in ggplot2 breaks down the informat
 ## Position adjustment
 
 ## Facets
+
+Let's say we are interested in examining hour-by-hour generation data by source. Using the position adjustment skills we learned in the previous subsection, we can generate a line plot as follows.
+
+```{r why facet}
+long_merged_energy %>% 
+  filter(source!="imports") %>%
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source, position="dodge"), size=1) + 
+  labs(title="Generation over time, by energy source", x="Hour", y="Output")
+```
+
+```{r facet 1}
+long_merged_energy %>% 
+  filter(source!="imports") %>%
+  ggplot() + 
+  geom_line(aes(x = datetime, y = output)) + 
+  facet_wrap(.~source)
+```
+
+```{r facet 2}
+long_merged_energy %>% 
+  filter(source!="imports") %>%
+  ggplot() + 
+  geom_line(aes(x = datetime, y = output)) + 
+  facet_wrap(.~source, scales="free") + 
+  labs(title = "Generation over time, Sep 3-9", x = "Hour", y = "Output")
+```
+
+```{r facet 3}
+long_merged_energy %>% 
+  filter(source!="imports") %>%
+  mutate(Type=recode(source, `wind`="Renewable", `solar`="Renewable", `small_hydro`="Hydro", `large_hydro`="Hydro", .default="Non-renewable")) %>% 
+  ggplot() + 
+  geom_line(aes(x = datetime, y = output, col=Type)) + 
+  facet_wrap(.~source, scales="free") + 
+  labs(title = "Generation over time, Sep 3-9", x = "Hour", y = "Output") + 
+  theme_minimal() + 
+  theme(legend.position = "bottom")
+```
 
 # Final notes
 
