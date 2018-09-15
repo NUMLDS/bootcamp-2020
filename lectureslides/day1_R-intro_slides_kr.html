@@ -508,10 +508,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li class="fragment">You will be using RStudio Server Pro</li>
 </ul>
 <aside class="notes">
-RStudio helps you organize your workflow and keep track of your work. The top-left pane is where you open, work on, and save script files. The bottom-left pane includes the console, which is where your code actually “runs” – you can run code here directly, or from a script file. The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
+RStudio helps you organize your workflow and keep track of your work. The top-left pane is where you open, work on, and save script files. The bottom-left pane includes the console, which is where your code actually “runs”. The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
 </aside>
 </section><section id="some-key-concepts" class="slide level2">
 <h2>Some key concepts</h2>
+<p>You will hear these terms often this week:</p>
 <ul>
 <li class="fragment">Objects</li>
 <li class="fragment">Packages</li>
@@ -520,7 +521,7 @@ RStudio helps you organize your workflow and keep track of your work. The top-le
 </ul>
 </section><section id="recall-your-datacamp-course" class="slide level2">
 <h2>Recall your DataCamp course</h2>
-<p>By now, you should all have completed the <em>Introduction to R</em> course on DataCamp. Congratulations! You already know quite a lot about how R works.</p>
+<p>By now, you have all completed the <em>Introduction to R</em> course on DataCamp. Congratulations! You already know quite a lot about how R works.</p>
 <p>To refresh, you covered the following material in your course:</p>
 <ul>
 <li class="fragment">Arithmetic with R</li>
@@ -534,13 +535,13 @@ Today, we will briefly review the above topics, and then turn to new material on
 </section></section>
 <section><section id="review-basics-and-data-types" class="titleslide slide level1"><h1>Review: Basics and data types</h1></section><section id="arithmetic" class="slide level2">
 <h2>Arithmetic</h2>
-<p>Open up the file <code>day1_exercises.R</code> in RStudio. Do the following tasks:</p>
+<p>Open up the file <code>day1_exercises.R</code> in RStudio. <br> Do the following tasks:</p>
 <ul>
-<li class="fragment">Pick a number; save it as <code>x</code></li>
-<li class="fragment">Multiply x by 3</li>
-<li class="fragment">Take the log of the above <small>(Hint, you need the function <code>log()</code> here)</small></li>
-<li class="fragment">Subtract 4 from the above</li>
-<li class="fragment">Square the above</li>
+<li>Pick a number; save it as <code>x</code></li>
+<li>Multiply x by 3</li>
+<li>Take the log of the above <br><small>(Hint, you need the function <code>log()</code> here)</small></li>
+<li>Subtract 4 from the above</li>
+<li>Square the above</li>
 </ul>
 </section><section id="arithmetic-1" class="slide level2">
 <h2>Arithmetic</h2>
@@ -556,11 +557,11 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="comparisons-and-logical-operators" class="slide level2">
 <h2>Comparisons and Logical Operators</h2>
 <ul>
-<li class="fragment">Check if 1 is bigger than 2</li>
-<li class="fragment">Check if 1 + 1 is equal to 2</li>
-<li class="fragment">Check if it is true that the strings “eat” and “drink” are not equal to each other</li>
-<li class="fragment">Check if it is true that 1 is equal to 1 <em>AND</em> 1 is equal to 2 <small>(Hint: remember what the operators <code>&amp;</code> and <code>|</code> do)</small></li>
-<li class="fragment">Check if it is true that 1 is equal to 1 <em>OR</em> 1 is equal to 2</li>
+<li>Check if 1 is bigger than 2</li>
+<li>Check if 1 + 1 is equal to 2</li>
+<li>Check if it is true that the strings “eat” and “drink” are not equal to each other</li>
+<li>Check if it is true that 1 is equal to 1 <em>AND</em> 1 is equal to 2 <br><small>(Hint: remember what the operators <code>&amp;</code> and <code>|</code> do)</small></li>
+<li>Check if it is true that 1 is equal to 1 <em>OR</em> 1 is equal to 2</li>
 </ul>
 </section><section id="comparisons-and-logical-operators-1" class="slide level2">
 <h2>Comparisons and Logical Operators</h2>
@@ -577,8 +578,11 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="packages" class="slide level2">
 <h2>Packages</h2>
 <ul>
-<li class="fragment">Load the package <code>tidyverse</code> (it has already been installed for you on the system-level)</li>
-<li class="fragment">Open the help file for the function <code>recode</code> <small>(Hint: remember what <code>?</code> does)</small></li>
+<li>Load the package <code>tidyverse</code>
+<ul>
+<li>(It has already been installed for you on the system-level)</li>
+</ul></li>
+<li>Open the help file for the function <code>recode</code> <br><small>(Hint: remember what <code>?</code> does)</small></li>
 </ul>
 </section><section id="packages-1" class="slide level2">
 <h2>Packages</h2>
@@ -590,11 +594,11 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="data-types" class="slide level2">
 <h2>Data types</h2>
 <ul>
-<li class="fragment"><strong>logical</strong>: <code>TRUE</code> or <code>FALSE</code> <small>(When co-coerced into numeric type, <code>TRUE</code>=<code>1</code> and <code>FALSE</code>=<code>0</code>)</small></li>
+<li class="fragment"><strong>logical</strong>: <code>TRUE</code> or <code>FALSE</code> <br><small>(When co&gt; -coerced into numeric type, <code>TRUE</code>=<code>1</code> and <code>FALSE</code>=<code>0</code>)</small></li>
 <li class="fragment"><strong>integer</strong>: a specific type; most numbers are numeric instead</li>
 <li class="fragment"><strong>numeric</strong>: real or decimal</li>
 <li class="fragment"><strong>complex</strong>: ex: <code>2+5i</code></li>
-<li class="fragment"><strong>character</strong>: <code>&quot;text data&quot;</code>, denoted with quotes <small>(<code>'single quotes'</code> and <code>&quot;double quotes&quot;</code> both work)</small></li>
+<li class="fragment"><strong>character</strong>: <code>&quot;text data&quot;</code>, denoted with quotes <br><small>(<code>'single quotes'</code> and <code>&quot;double quotes&quot;</code> both work)</small></li>
 <li class="fragment">Use <code>typeof()</code> on an object to check its type</li>
 </ul>
 </section></section>
@@ -611,12 +615,12 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 <h2>Vectors</h2>
 <p>Return to the exercise file and complete the following tasks:</p>
 <ul>
-<li class="fragment">Run the code to generate variables <code>x1</code> and <code>x2</code></li>
-<li class="fragment">Select the 3rd element in <code>x1</code></li>
-<li class="fragment">Select the elements of x1 that are less than 0</li>
-<li class="fragment">Select the elements of x2 that are greater than 1</li>
-<li class="fragment">Create x3 containing the first five elements of x2</li>
-<li class="fragment">Select all but the third element of x1</li>
+<li>Run the code to generate variables <code>x1</code> and <code>x2</code></li>
+<li>Select the 3rd element in <code>x1</code></li>
+<li>Select the elements of x1 that are less than 0</li>
+<li>Select the elements of x2 that are greater than 1</li>
+<li>Create x3 containing the first five elements of x2</li>
+<li>Select all but the third element of x1</li>
 </ul>
 </section><section id="vectors-2" class="slide level2">
 <h2>Vectors</h2>
@@ -672,7 +676,7 @@ For more on lists, see the lecture notes or data camp.
 <li class="fragment">Matrices are indexed as follows: <code>mat[row no, col no]</code>.</li>
 </ul>
 <aside class="notes">
-If you leave the row number blank in the index, R will return the entire column. If you leave the column number blank, it will return the entire row. We will see how this works with data frames in a moment. There is an example matrix for you to practice with in the exercises file, but we won’t do it together.
+There is an example matrix for you to practice with in the exercises file, but we won’t do it together.
 </aside>
 </section><section id="data-frames" class="slide level2">
 <h2>Data frames</h2>
@@ -680,19 +684,19 @@ If you leave the row number blank in the index, R will return the entire column.
 <li class="fragment">Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.</li>
 <li class="fragment">Data frames are <em>heterogenous</em>: the vectors in a data frames can each be of a different data type.</li>
 <li class="fragment">Columns are typically variables and rows are observations.</li>
-<li class="fragment">You can make make data frames by using the <code>data.frame()</code> function, or by combining vectors with <code>cbind()</code> or <code>rbind()</code>.</li>
+<li class="fragment">You can make make data frames with <code>data.frame()</code>, or by combining vectors with <code>cbind()</code> or <code>rbind()</code>.</li>
 <li class="fragment">Data frames can be indexed in the same way as matricies: <code>df[row no, col no]</code>.</li>
-<li class="fragment">Data frames can also be indexed by using variable/column names: <code>df[&quot;var&quot;]</code> or <code>df$var</code>.</li>
+<li class="fragment">Data frames can also be indexed by using variable/column names: <code>df$var</code> or <code>df[&quot;var&quot;]</code>.</li>
 </ul>
 </section><section id="data-frames-1" class="slide level2">
 <h2>Data frames</h2>
 <ul>
-<li class="fragment">Load the example data frame using the code provided</li>
-<li class="fragment">Identify the number of observations (rows) and number of variables (columns)</li>
-<li class="fragment">Identify the names of the variables</li>
-<li class="fragment">Select the variable <code>mpg</code></li>
-<li class="fragment">Select the 4th row</li>
-<li class="fragment">Square the value of the <code>cyl</code> variable and store this as a new variable <code>cylsq</code></li>
+<li>Load the example data frame using the code provided</li>
+<li>Identify the number of observations (rows) and number of variables (columns)</li>
+<li>Identify the names of the variables</li>
+<li>Select the variable <code>mpg</code></li>
+<li>Select the 4th row</li>
+<li>Square the value of the <code>cyl</code> variable and store this as a new variable <code>cylsq</code></li>
 </ul>
 </section><section id="data-frames-2" class="slide level2">
 <h2>Data frames</h2>
@@ -711,7 +715,7 @@ If you leave the row number blank in the index, R will return the entire column.
 <section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
 <h2>Working directories</h2>
 <p>The working directory is the folder where R scripts and projects look for files by default. It is a good idea to create a folder for any project and store all your R and data files in that directory.</p>
-<p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then under the More menu, there is an option to set the current directory as the working directory. Or you can use the <code>setwd</code> command like:</p>
+<p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then under the More menu, there is an option to set the current directory as the working directory. Or you can use the <code>setwd</code> command as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018&quot;</span>)</code></pre></div>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
@@ -719,13 +723,16 @@ If you leave the row number blank in the index, R will return the entire column.
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder5 &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
                        <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
                        <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<aside class="notes">
+The above code is what you will usually see and use. The below code breaks down what is going on inside.
+</aside>
 </section><section id="reading-files-read_csv" class="slide level2">
 <h2>Reading files: read_csv()</h2>
 <ul>
-<li class="fragment">Set your working directory using the code provided, and then check it.</li>
-<li class="fragment">Run the <code>read.csv()</code> code provided and see what happens.</li>
-<li class="fragment">Load the <code>readr</code> package. <small>(You don’t need to install it as has already been installed as part of <code>tidyverse</code>)</small></li>
-<li class="fragment">Use <code>read_csv()</code> to load the gapminder data.</li>
+<li>Set your working directory using the code provided, and then check it.</li>
+<li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
+<li>Load the <code>readr</code> package. <br><small>(It as has already been installed on the system-level as part of <code>tidyverse</code>)</small></li>
+<li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
 </ul>
 </section><section id="reading-files-read_csv-1" class="slide level2">
 <h2>Reading files: read_csv()</h2>
@@ -745,8 +752,8 @@ gapminder5 &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span 
 </section><section id="reading-files-1" class="slide level2">
 <h2>Reading files</h2>
 <ul>
-<li class="fragment">You can also read files from URLs or the full local path</li>
-<li class="fragment">You can import files using RStudio’s interface through the “Files” tab</li>
+<li class="fragment">You can also read files from the full local path or from URLs</li>
+<li class="fragment">You can read files using RStudio’s interface through the “Files” tab</li>
 <li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
 </ul>
 </section></section>
@@ -768,10 +775,10 @@ Notice that any data frames which have been read in or created, like all other o
 </section><section id="exploring-data-frames-1" class="slide level2">
 <h2>Exploring data frames</h2>
 <ul>
-<li class="fragment">Run <code>summary()</code> on the gapminder data</li>
-<li class="fragment">Find the mean of the variable <code>pop</code></li>
-<li class="fragment">Create a frequency table of the variable <code>year</code> <small>(Hint: use <code>table()</code>)</small></li>
-<li class="fragment">Create a proportion table of the variable <code>continent</code> <small>(Hint: use <code>prop.table()</code>)</small></li>
+<li>Run <code>summary()</code> on the gapminder data</li>
+<li>Find the mean of the variable <code>pop</code></li>
+<li>Create a frequency table of the variable <code>year</code> <br><small>(Hint: use <code>table()</code>)</small></li>
+<li>Create a proportion table of the variable <code>continent</code> <br><small>(Hint: use <code>prop.table()</code>)</small></li>
 </ul>
 </section><section id="exploring-data-frames-2" class="slide level2">
 <h2>Exploring data frames</h2>
@@ -805,14 +812,14 @@ Notice that any data frames which have been read in or created, like all other o
 <ul>
 <li class="fragment">One of the benefits of R is that we can work with multiple data frames at the same time</li>
 <li class="fragment">We will often want to <em>subset</em> a data frame, i.e. work with a portion of the data frame</li>
-<li class="fragment">There are several ways to subset a data frame
+<li class="fragment">There are two common ways to subset a data frame in base R
 <ul>
-<li class="fragment">You can write conditional statement in index brackets: <code>gapminder5[gapminder5$continent==&quot;Asia&quot;,]</code></li>
-<li class="fragment">You can use the <code>subset()</code> function: <code>subset(gapminder5, subset=continent==&quot;Asia&quot;)</code></li>
+<li class="fragment">Index the data frame: <code>gapminder5[gapminder5$continent==&quot;Asia&quot;,]</code></li>
+<li class="fragment">Use the <code>subset()</code> function: <code>subset(gapminder5, subset=continent==&quot;Asia&quot;)</code></li>
 </ul></li>
 </ul>
 <aside class="notes">
-The most obvious use case of subsetting is to create a separate, smaller data frame, which we will do shortly. But think also about how useful it is to quickly subset a data frame by condition: we can use subsets as inputs for statistical models, for example.
+The most obvious use case of subsetting is to create and store smaller data frame, which we will do shortly. But think also about how useful it is to quickly subset a data frame: we can use subsets as inputs for statistical models, for example.
 </aside>
 </section><section id="sorting" class="slide level2">
 <h2>Sorting</h2>
@@ -827,10 +834,10 @@ The most obvious use case of subsetting is to create a separate, smaller data fr
 </section><section id="subsetting-and-sorting" class="slide level2">
 <h2>Subsetting and Sorting</h2>
 <ul>
-<li class="fragment">Create a new data frame called <code>gapminder07</code> containing only those rows in the gapminder data where <code>year</code> is 2007</li>
-<li class="fragment">Created a sorted frequency table of the variable <code>continent</code> in <code>gapminder07</code> <small>(Hint: use <code>table()</code> and <code>sort()</code>)</small></li>
-<li class="fragment">Print out the population of Mexico in 2007</li>
-<li class="fragment">Try the bonus question if you have time</li>
+<li>Create a new data frame called <code>gapminder07</code> containing only those rows in the gapminder data where <code>year</code> is 2007</li>
+<li>Created a sorted frequency table of the variable <code>continent</code> in <code>gapminder07</code> <br><small>(Hint: use <code>table()</code> and <code>sort()</code>)</small></li>
+<li>Print out the population of Mexico in 2007</li>
+<li>Try the bonus question if you have time</li>
 </ul>
 </section><section id="subsetting-and-sorting-1" class="slide level2">
 <h2>Subsetting and Sorting</h2>
@@ -870,19 +877,19 @@ gapminder &lt;-<span class="st"> </span>gapminder[<span class="op">-</span><span
 <li class="fragment">A common task when cleaning/wrangling data is recoding variables.</li>
 <li class="fragment">Think about what the recoded variable should look like &amp; then decide on an approach.
 <ul>
-<li class="fragment">Sometimes, a single function can accomplish the recoding task needed. Then, the new vector can be assigned to a new column in the data frame.</li>
-<li class="fragment">If no single function comes to mind, we can initialize a new variable in the data frame, and assign values to it using indexes and conditional statements.</li>
-<li class="fragment">More complex recoding tasks can be accomplished with other packages like <code>dplyr</code>, which we will return to on Day 3 and which you can preview in the lecture notes.</li>
+<li class="fragment">Sometimes, a single function can accomplish the recoding task needed. The new vector can then be assigned to a new column in the data frame.</li>
+<li class="fragment">If no single function comes to mind, we can initialize a new variable in the data frame, and assign values using indexes and conditional statements.</li>
+<li class="fragment">More complex recoding tasks can be accomplished with other packages like <code>dplyr</code>, which you can preview in the lecture notes.</li>
 </ul></li>
 </ul>
 </section><section id="recoding-variables-1" class="slide level2">
 <h2>Recoding variables</h2>
-<p>Work with the data frame <code>gapminder07</code> throughout this exercise.</p>
+<p>Use the data frame <code>gapminder07</code> throughout this exercise.</p>
 <ul>
-<li class="fragment">Round the values of the variable <code>lifeExp</code> using <code>round()</code> and store this as a new variable <code>lifeExp_round</code></li>
-<li class="fragment">Print out the new variable to see what it looks like</li>
-<li class="fragment">Read through the code that creates the new variable <code>lifeExp_over70</code> and try to understand what it does.</li>
-<li class="fragment">Try to create a new variable <code>lifeExp_highlow</code> that has the value “High” when life expectancy is over the mean and the value “Low” when it is below the mean.</li>
+<li>Round the values of the variable <code>lifeExp</code> using <code>round()</code>, and store this as a new variable <code>lifeExp_round</code></li>
+<li>Print out the new variable to see what it looks like</li>
+<li>Read through the code that creates the new variable <code>lifeExp_over70</code> and try to understand what it does.</li>
+<li>Try to create a new variable <code>lifeExp_highlow</code> that has the value “High” when life expectancy is over the mean and the value “Low” when it is below the mean.</li>
 </ul>
 </section><section id="recoding-variables-2" class="slide level2">
 <h2>Recoding variables</h2>
@@ -926,20 +933,19 @@ gapminder07<span class="op">$</span>lifeExp_highlow[gapminder07<span class="op">
 </section><section id="statistics" class="slide level2">
 <h2>Statistics</h2>
 <ul>
-<li class="fragment">Here are some easy statistical analyses to conduct in R
-<ul>
+<li class="fragment">Here are some easy statistical analyses to conduct in R</li>
 <li class="fragment">Correlations: <code>cor()</code>; Covariance: <code>cov()</code></li>
 <li class="fragment">T-tests: <code>t.test(var1 ~ var2)</code>, where <code>var2</code> is the grouping variable</li>
 <li class="fragment">Linear regression: <code>lm(y ~ x1 + x2, data = df)</code></li>
-</ul></li>
 <li class="fragment">You can store the results of these functions in objects, which is especially useful for statistical models with many components.</li>
 </ul>
 </section><section id="statistics-1" class="slide level2">
 <h2>Statistics</h2>
-<p>Use <code>gapminder07</code> for all the below exercises. You’re using some new functions, so refer to help files whenever you get stuck.</p>
+<p>Use <code>gapminder07</code> for all the below exercises.</p>
+<p><small>You’re using some new functions, so refer to help files whenever you get stuck.</small></p>
 <ul>
-<li class="fragment">Calculate the correlation between <code>lifeExp</code> and <code>gdpPercap</code>.</li>
-<li class="fragment">Use a t-test to evaluate the difference between <code>gdpPercap</code> in “high” and “low” life expectancy countries. Store the results as <code>t1</code>, and then print out <code>t1</code>.</li>
+<li>Calculate the correlation between <code>lifeExp</code> and <code>gdpPercap</code>.</li>
+<li>Use a t-test to evaluate the difference between <code>gdpPercap</code> in “high” and “low” life expectancy countries. Store the results as <code>t1</code>, and then print out <code>t1</code>.</li>
 </ul>
 </section><section id="statistics-2" class="slide level2">
 <h2>Statistics</h2>
@@ -959,19 +965,17 @@ t1</code></pre></div>
 ## sample estimates:
 ## mean in group High  mean in group Low 
 ##          17944.685           2338.104</code></pre>
-<ul>
-<li class="fragment">Note that <code>t1</code> shows up in the environment as a list. You can now call up the components of the t-test when you need them.</li>
-</ul>
+<p><small>Note that <code>t1</code> is stored as a list. You can now call up the components of the t-test when you need them.</small></p>
 </section><section id="statistics-3" class="slide level2">
 <h2>Statistics</h2>
 <ul>
-<li class="fragment">Conduct a linear regression using <code>lm()</code> which predicts <code>lifeExp</code> as a function of <code>gdpPercap</code> and <code>pop</code>. Store the results as <code>reg1</code>.
+<li>Conduct a linear regression using <code>lm()</code> which predicts <code>lifeExp</code> as a function of <code>gdpPercap</code> and <code>pop</code>. Store the results as <code>reg1</code>.
 <ul>
-<li class="fragment">You can define all the variables using the <code>df$var</code> syntax, or you can just use variable names and identify the data frame in the <code>data =</code> argument.</li>
-<li class="fragment">Examples are shown at the bottom of the help file for <code>lm()</code></li>
+<li>You can define all the variables using the <code>df$var</code> syntax, or you can just use variable names and identify the data frame in the <code>data =</code> argument.</li>
+<li>Examples are shown at the bottom of the help file for <code>lm()</code></li>
 </ul></li>
-<li class="fragment">Print out <code>reg1</code>.</li>
-<li class="fragment">Run <code>summary()</code> on <code>reg1</code>.</li>
+<li>Print out <code>reg1</code>.</li>
+<li>Run <code>summary()</code> on <code>reg1</code>.</li>
 </ul>
 </section><section id="statistics-4" class="slide level2">
 <h2>Statistics</h2>
@@ -1009,8 +1013,8 @@ reg1</code></pre></div>
 <h2>Writing a data file</h2>
 <ul>
 <li class="fragment">Earlier, we created a new data frame, <code>gapminder07</code>, and added several new variables to it.</li>
-<li class="fragment">When we do more intensive data cleaning and wrangling tasks in R, we will often want to save the resulting data frame as a data file, so that it can be shared and used elsewhere easily.</li>
-<li class="fragment">You can use <code>write.csv()</code> in base R and <code>write_csv()</code> in the <code>readr</code> package to write data files.</li>
+<li class="fragment">When we do more intensive data cleaning and wrangling tasks in R, we will often want to save the resulting data frame as a data file.</li>
+<li class="fragment">You can use <code>write.csv()</code> from base R and <code>write_csv()</code> from <code>readr</code> to write data files.</li>
 <li class="fragment"><strong>Try it!</strong> Save the data frame <code>gapminder07</code> to your working directory using the <code>write.csv</code> function. Set the argument <code>row.names = FALSE</code>.</li>
 </ul>
 </section><section id="writing-a-data-file-1" class="slide level2">
@@ -1022,7 +1026,7 @@ reg1</code></pre></div>
 <li class="fragment">You can save all the objects in your workspace using the <code>save.image()</code> function or by clicking the save icon in the Environment tab in the top-right pane. You can load all objects back in using <code>load.image()</code> or opening the <code>.RData</code> file that is created.</li>
 <li class="fragment">You can save specific objects in an <code>.RData</code> file with the <code>save()</code> function.</li>
 <li class="fragment">If your script file is well-written, you should be able to retrieve all your objects just by running your code again.</li>
-<li class="fragment">If you have a project with code that takes a long time to run, I would recommend creating an R project, which will set your working directory and save/load your workspace every time you open an <code>.Rproj</code> file.</li>
+<li class="fragment">If you have a project with code that takes a long time to run, I would recommend using project files.</li>
 </ul>
 </section></section>
 <section><section id="data-visualization" class="titleslide slide level1"><h1>Data visualization</h1></section><section id="base-r-vs.ggplot2" class="slide level2">
@@ -1059,9 +1063,9 @@ reg1</code></pre></div>
 </section><section id="scatterplots-1" class="slide level2">
 <h2>Scatterplots</h2>
 <ul>
-<li class="fragment">Create a scatterplot with <code>lifeExp</code> on the y-axis and <code>gdpPercap</code> on the x-axis.</li>
-<li class="fragment">Add a title and axis labels.</li>
-<li class="fragment">Bonus: Add a horizontal line indicating the mean of <code>lifeExp</code> onto the plot using <code>abline()</code>.</li>
+<li>Create a scatterplot with <code>lifeExp</code> on the y-axis and <code>gdpPercap</code> on the x-axis.</li>
+<li>Add a title and axis labels.</li>
+<li>Bonus: Add a horizontal line indicating the mean of <code>lifeExp</code> onto the plot using <code>abline()</code>.</li>
 </ul>
 </section><section id="scatterplots-2" class="slide level2">
 <h2>Scatterplots</h2>
