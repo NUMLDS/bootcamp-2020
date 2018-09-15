@@ -4,7 +4,6 @@ author: "Kumar Ramanathan"
 date: "`r Sys.Date()`"
 output: 
   revealjs::revealjs_presentation:
-    theme: solarized
     incremental: true
     self_contained: false
     reveal_plugins: ["notes"]
