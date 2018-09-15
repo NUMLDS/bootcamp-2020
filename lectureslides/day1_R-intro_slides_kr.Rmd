@@ -107,8 +107,7 @@ log(x*3)-4
 
 ## Packages
 
-- Load the package `tidyverse`
-    - (It has already been installed for you on the system-level)
+- Load the package `tidyverse` <br><small>(It has already been installed for you on the system-level)</small>
 - Open the help file for the function `recode` <br><small>(Hint: remember what `?` does)</small>
 
 ## Packages
