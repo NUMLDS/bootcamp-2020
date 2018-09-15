@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo=answers, eval=answers,
                       cache = FALSE, tidy = FALSE)
 ```
 
-# Load the data
+## Load the data
 
 Load the `gapminder` dataset.
 
@@ -31,7 +31,7 @@ gapminder <- read.csv(here::here("data/gapminder5.csv"), stringsAsFactors=FALSE)
 ```
 
 
-# If Statement
+## If Statement
 
 Use an if() statement to print a suitable message reporting whether there are any records from 2002 in the gapminder dataset. Now do the same for 2012.
 
@@ -51,7 +51,7 @@ if(any(gapminder$year == year)){
 ```
 
 
-# Loop and If Statements
+## Loop and If Statements
 
 Write a script that finds the mean life expectancy by country for countries whose population is below the mean for the dataset
 
@@ -95,7 +95,7 @@ for (i in unique(gapminder$continent)){
 ```
 
 
-# Exercise: Write Functions
+## Writing Functions
 
 Create a function that given a data frame will print the name of each column and the class of data it contains. Use the gapminder dataset.  Hint: Use `mode()` or `class()` to get the class of the data in each column. Remember that `names()` or `colnames()` returns the name of the columns in a dataset.
 
@@ -136,7 +136,7 @@ vector_info(le, include_median = F)
 vector_info(le, include_median = T)
 ```
 
-## Analyzing the relationship 
+## Analyzing the relationship between GDP per capita and life expectancy
 
 Use what you've learned so far to answer the following questions using the `gapminder` dataset. Be sure to include some visualizations!
 

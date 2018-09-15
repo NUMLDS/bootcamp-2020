@@ -314,16 +314,16 @@ $(document).ready(function () {
 </div>
 
 
-<div id="load-the-data" class="section level1">
-<h1>Load the data</h1>
+<div id="load-the-data" class="section level2">
+<h2>Load the data</h2>
 <p>Load the <code>gapminder</code> dataset.</p>
 <div id="answer" class="section level3">
 <h3>Answer</h3>
 <pre class="r"><code>gapminder &lt;- read.csv(here::here(&quot;data/gapminder5.csv&quot;), stringsAsFactors=FALSE)</code></pre>
 </div>
 </div>
-<div id="if-statement" class="section level1">
-<h1>If Statement</h1>
+<div id="if-statement" class="section level2">
+<h2>If Statement</h2>
 <p>Use an if() statement to print a suitable message reporting whether there are any records from 2002 in the gapminder dataset. Now do the same for 2012.</p>
 <p>Hint: use the <code>any</code> function.</p>
 <div id="answer-1" class="section level3">
@@ -337,8 +337,8 @@ if(any(gapminder$year == year)){
 <pre><code>## [1] &quot;Record(s) for the year 2002 found.&quot;</code></pre>
 </div>
 </div>
-<div id="loop-and-if-statements" class="section level1">
-<h1>Loop and If Statements</h1>
+<div id="loop-and-if-statements" class="section level2">
+<h2>Loop and If Statements</h2>
 <p>Write a script that finds the mean life expectancy by country for countries whose population is below the mean for the dataset</p>
 <p>Write a script that loops through the <code>gapminder</code> data by continent and prints out whether the mean life expectancy is smaller than 50, between 50 and 70, or greater than 70.</p>
 <div id="answer-2" class="section level3">
@@ -492,8 +492,8 @@ for (i in unique(gapminder$continent)){
 ## [1] &quot;Average Life Expectancy in Oceania is greater than 70&quot;</code></pre>
 </div>
 </div>
-<div id="exercise-write-functions" class="section level1">
-<h1>Exercise: Write Functions</h1>
+<div id="writing-functions" class="section level2">
+<h2>Writing Functions</h2>
 <p>Create a function that given a data frame will print the name of each column and the class of data it contains. Use the gapminder dataset. Hint: Use <code>mode()</code> or <code>class()</code> to get the class of the data in each column. Remember that <code>names()</code> or <code>colnames()</code> returns the name of the columns in a dataset.</p>
 <div id="answer-3" class="section level3">
 <h3>Answer</h3>
@@ -532,6 +532,14 @@ vector_info(le, include_median = F)</code></pre>
 ## [1] &quot;Standard Deviation: 12.9171074152412&quot;
 ## [1] &quot;Median: 60.7125&quot;</code></pre>
 </div>
+</div>
+<div id="analyzing-the-relationship-between-gdp-per-capita-and-life-expectancy" class="section level2">
+<h2>Analyzing the relationship between GDP per capita and life expectancy</h2>
+<p>Use what you’ve learned so far to answer the following questions using the <code>gapminder</code> dataset. Be sure to include some visualizations!</p>
+<ol style="list-style-type: decimal">
+<li><p>What is the relationship between GDP per capita and life expectancy? Does this relationship change over time? (Hint: Use the natural log of both variables.)</p></li>
+<li><p>Does the relationship between GDP per capita and life expectacy vary by continent? Make sure you divide the Americas into North and South America.</p></li>
+</ol>
 </div>
 
 
