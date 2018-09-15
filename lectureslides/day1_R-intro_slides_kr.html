@@ -694,6 +694,18 @@ If you leave the row number blank in the index, R will return the entire column.
 <li class="fragment">Select the 4th row</li>
 <li class="fragment">Square the value of the <code>cyl</code> variable and store this as a new variable <code>cylsq</code></li>
 </ul>
+</section><section id="data-frames-2" class="slide level2">
+<h2>Data frames</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(mtcars) <span class="co"># str(mtcars) also okay here</span></code></pre></div>
+<pre><code>## [1] 32 11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(mtcars)</code></pre></div>
+<pre><code>##  [1] &quot;mpg&quot;  &quot;cyl&quot;  &quot;disp&quot; &quot;hp&quot;   &quot;drat&quot; &quot;wt&quot;   &quot;qsec&quot; &quot;vs&quot;   &quot;am&quot;   &quot;gear&quot;
+## [11] &quot;carb&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>mpg</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars[<span class="dv">4</span>,]</code></pre></div>
+<pre><code>##                 mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Hornet 4 Drive 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>cylsq &lt;-<span class="st"> </span>(mtcars<span class="op">$</span>cyl)<span class="op">^</span><span class="dv">2</span></code></pre></div>
 </section></section>
 <section><section id="break" class="titleslide slide level1"><h1>Break!</h1></section></section>
 <section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">

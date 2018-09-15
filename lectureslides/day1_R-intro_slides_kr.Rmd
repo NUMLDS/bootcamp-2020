@@ -234,6 +234,26 @@ There is an example matrix for you to practice with in the exercises file, but w
 - Select the 4th row
 - Square the value of the `cyl` variable and store this as a new variable `cylsq`
 
+## Data frames
+
+```{r data frames setup, include = F}
+data(mtcars)
+```
+
+```{r data frames 1}
+dim(mtcars) # str(mtcars) also okay here
+names(mtcars)
+```
+
+```{r data frames 2, eval=F}
+mtcars$mpg
+```
+
+```{r data frames 3}
+mtcars[4,]
+mtcars$cylsq <- (mtcars$cyl)^2
+```
+
 # Break!
 
 Let's take a break and return to learn two new skills: **reading files** and basic **data manipulation**.
