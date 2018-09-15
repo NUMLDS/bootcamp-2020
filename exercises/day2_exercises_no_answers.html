@@ -314,224 +314,32 @@ $(document).ready(function () {
 </div>
 
 
-<div id="load-the-data" class="section level1">
-<h1>Load the data</h1>
+<div id="load-the-data" class="section level2">
+<h2>Load the data</h2>
 <p>Load the <code>gapminder</code> dataset.</p>
-<div id="answer" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>gapminder &lt;- read.csv(here::here(&quot;data/gapminder5.csv&quot;), stringsAsFactors=FALSE)</code></pre>
 </div>
-</div>
-<div id="if-statement" class="section level1">
-<h1>If Statement</h1>
+<div id="if-statement" class="section level2">
+<h2>If Statement</h2>
 <p>Use an if() statement to print a suitable message reporting whether there are any records from 2002 in the gapminder dataset. Now do the same for 2012.</p>
 <p>Hint: use the <code>any</code> function.</p>
-<div id="answer-1" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>year&lt;-2002
-if(any(gapminder$year == year)){
-   print(paste(&quot;Record(s) for the year&quot;,year,&quot;found.&quot;))
-} else {
-  print(paste(&quot;No records for year&quot;,year))
-}</code></pre>
-<pre><code>## [1] &quot;Record(s) for the year 2002 found.&quot;</code></pre>
 </div>
-</div>
-<div id="loop-and-if-statements" class="section level1">
-<h1>Loop and If Statements</h1>
+<div id="loop-and-if-statements" class="section level2">
+<h2>Loop and If Statements</h2>
 <p>Write a script that finds the mean life expectancy by country for countries whose population is below the mean for the dataset</p>
 <p>Write a script that loops through the <code>gapminder</code> data by continent and prints out whether the mean life expectancy is smaller than 50, between 50 and 70, or greater than 70.</p>
-<div id="answer-2" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>overall_mean &lt;- mean(gapminder$pop)
-
-for (i in unique(gapminder$country)) {
-   country_mean &lt;- mean(gapminder$pop[gapminder$country==i])
-   
-   if (country_mean &lt; overall_mean) {
-     mean_le &lt;- mean(gapminder$lifeExp[gapminder$country==i])
-     print(paste(&quot;Mean Life Expectancy in&quot;, i, &quot;is&quot;, mean_le))
-   } 
-} # end for loop</code></pre>
-<pre><code>## [1] &quot;Mean Life Expectancy in Afghanistan is 37.4788333333333&quot;
-## [1] &quot;Mean Life Expectancy in Albania is 68.4329166666667&quot;
-## [1] &quot;Mean Life Expectancy in Algeria is 59.0301666666667&quot;
-## [1] &quot;Mean Life Expectancy in Angola is 37.8835&quot;
-## [1] &quot;Mean Life Expectancy in Argentina is 69.0604166666667&quot;
-## [1] &quot;Mean Life Expectancy in Australia is 74.6629166666667&quot;
-## [1] &quot;Mean Life Expectancy in Austria is 73.10325&quot;
-## [1] &quot;Mean Life Expectancy in Bahrain is 65.6056666666667&quot;
-## [1] &quot;Mean Life Expectancy in Belgium is 73.64175&quot;
-## [1] &quot;Mean Life Expectancy in Benin is 48.7799166666667&quot;
-## [1] &quot;Mean Life Expectancy in Bolivia is 52.5045833333333&quot;
-## [1] &quot;Mean Life Expectancy in Bosnia and Herzegovina is 67.7078333333333&quot;
-## [1] &quot;Mean Life Expectancy in Botswana is 54.5975&quot;
-## [1] &quot;Mean Life Expectancy in Bulgaria is 69.74375&quot;
-## [1] &quot;Mean Life Expectancy in Burkina Faso is 44.694&quot;
-## [1] &quot;Mean Life Expectancy in Burundi is 44.8173333333333&quot;
-## [1] &quot;Mean Life Expectancy in Cambodia is 47.90275&quot;
-## [1] &quot;Mean Life Expectancy in Cameroon is 48.1285&quot;
-## [1] &quot;Mean Life Expectancy in Canada is 74.90275&quot;
-## [1] &quot;Mean Life Expectancy in Central African Republic is 43.8669166666667&quot;
-## [1] &quot;Mean Life Expectancy in Chad is 46.7735833333333&quot;
-## [1] &quot;Mean Life Expectancy in Chile is 67.4309166666667&quot;
-## [1] &quot;Mean Life Expectancy in Colombia is 63.89775&quot;
-## [1] &quot;Mean Life Expectancy in Comoros is 52.38175&quot;
-## [1] &quot;Mean Life Expectancy in Congo Rep. is 52.5019166666667&quot;
-## [1] &quot;Mean Life Expectancy in Costa Rica is 70.1814166666667&quot;
-## [1] &quot;Mean Life Expectancy in Cote d'Ivoire is 48.4361666666667&quot;
-## [1] &quot;Mean Life Expectancy in Croatia is 70.0559166666667&quot;
-## [1] &quot;Mean Life Expectancy in Cuba is 71.0450833333333&quot;
-## [1] &quot;Mean Life Expectancy in Czech Republic is 71.5105&quot;
-## [1] &quot;Mean Life Expectancy in Denmark is 74.3701666666667&quot;
-## [1] &quot;Mean Life Expectancy in Djibouti is 46.38075&quot;
-## [1] &quot;Mean Life Expectancy in Dominican Republic is 61.5545&quot;
-## [1] &quot;Mean Life Expectancy in Ecuador is 62.8168333333333&quot;
-## [1] &quot;Mean Life Expectancy in El Salvador is 59.6333333333333&quot;
-## [1] &quot;Mean Life Expectancy in Equatorial Guinea is 42.96&quot;
-## [1] &quot;Mean Life Expectancy in Eritrea is 45.99925&quot;
-## [1] &quot;Mean Life Expectancy in Finland is 72.9919166666667&quot;
-## [1] &quot;Mean Life Expectancy in Gabon is 51.2205&quot;
-## [1] &quot;Mean Life Expectancy in Gambia is 44.4005833333333&quot;
-## [1] &quot;Mean Life Expectancy in Ghana is 52.3406666666667&quot;
-## [1] &quot;Mean Life Expectancy in Greece is 73.7331666666667&quot;
-## [1] &quot;Mean Life Expectancy in Guatemala is 56.7294166666667&quot;
-## [1] &quot;Mean Life Expectancy in Guinea is 43.2398333333333&quot;
-## [1] &quot;Mean Life Expectancy in Guinea-Bissau is 39.21025&quot;
-## [1] &quot;Mean Life Expectancy in Haiti is 50.16525&quot;
-## [1] &quot;Mean Life Expectancy in Honduras is 57.9208333333333&quot;
-## [1] &quot;Mean Life Expectancy in Hong Kong China is 73.4928333333333&quot;
-## [1] &quot;Mean Life Expectancy in Hungary is 69.3931666666667&quot;
-## [1] &quot;Mean Life Expectancy in Iceland is 76.5114166666667&quot;
-## [1] &quot;Mean Life Expectancy in Iraq is 56.58175&quot;
-## [1] &quot;Mean Life Expectancy in Ireland is 73.01725&quot;
-## [1] &quot;Mean Life Expectancy in Israel is 73.6458333333333&quot;
-## [1] &quot;Mean Life Expectancy in Jamaica is 68.7493333333333&quot;
-## [1] &quot;Mean Life Expectancy in Jordan is 59.7864166666667&quot;
-## [1] &quot;Mean Life Expectancy in Kenya is 52.681&quot;
-## [1] &quot;Mean Life Expectancy in Korea Dem. Rep. is 63.6073333333333&quot;
-## [1] &quot;Mean Life Expectancy in Kuwait is 68.9223333333333&quot;
-## [1] &quot;Mean Life Expectancy in Lebanon is 65.8656666666667&quot;
-## [1] &quot;Mean Life Expectancy in Lesotho is 50.0070833333333&quot;
-## [1] &quot;Mean Life Expectancy in Liberia is 42.47625&quot;
-## [1] &quot;Mean Life Expectancy in Libya is 59.3041666666667&quot;
-## [1] &quot;Mean Life Expectancy in Madagascar is 47.7705833333333&quot;
-## [1] &quot;Mean Life Expectancy in Malawi is 43.3515833333333&quot;
-## [1] &quot;Mean Life Expectancy in Malaysia is 64.2795833333333&quot;
-## [1] &quot;Mean Life Expectancy in Mali is 43.4135&quot;
-## [1] &quot;Mean Life Expectancy in Mauritania is 52.3020833333333&quot;
-## [1] &quot;Mean Life Expectancy in Mauritius is 64.95325&quot;
-## [1] &quot;Mean Life Expectancy in Mongolia is 55.8903333333333&quot;
-## [1] &quot;Mean Life Expectancy in Montenegro is 70.2991666666667&quot;
-## [1] &quot;Mean Life Expectancy in Morocco is 57.6088333333333&quot;
-## [1] &quot;Mean Life Expectancy in Mozambique is 40.3795&quot;
-## [1] &quot;Mean Life Expectancy in Namibia is 53.4913333333333&quot;
-## [1] &quot;Mean Life Expectancy in Nepal is 48.9863333333333&quot;
-## [1] &quot;Mean Life Expectancy in Netherlands is 75.6485&quot;
-## [1] &quot;Mean Life Expectancy in New Zealand is 73.9895&quot;
-## [1] &quot;Mean Life Expectancy in Nicaragua is 58.3494166666667&quot;
-## [1] &quot;Mean Life Expectancy in Niger is 44.5586666666667&quot;
-## [1] &quot;Mean Life Expectancy in Norway is 75.843&quot;
-## [1] &quot;Mean Life Expectancy in Oman is 58.4426666666667&quot;
-## [1] &quot;Mean Life Expectancy in Panama is 67.80175&quot;
-## [1] &quot;Mean Life Expectancy in Paraguay is 66.8090833333333&quot;
-## [1] &quot;Mean Life Expectancy in Peru is 58.8593333333333&quot;
-## [1] &quot;Mean Life Expectancy in Portugal is 70.4198333333333&quot;
-## [1] &quot;Mean Life Expectancy in Puerto Rico is 72.7393333333333&quot;
-## [1] &quot;Mean Life Expectancy in Reunion is 66.64425&quot;
-## [1] &quot;Mean Life Expectancy in Romania is 68.2906666666667&quot;
-## [1] &quot;Mean Life Expectancy in Rwanda is 41.4815833333333&quot;
-## [1] &quot;Mean Life Expectancy in Sao Tome and Principe is 57.8963333333333&quot;
-## [1] &quot;Mean Life Expectancy in Saudi Arabia is 58.67875&quot;
-## [1] &quot;Mean Life Expectancy in Senegal is 50.6259166666667&quot;
-## [1] &quot;Mean Life Expectancy in Serbia is 68.551&quot;
-## [1] &quot;Mean Life Expectancy in Sierra Leone is 36.7691666666667&quot;
-## [1] &quot;Mean Life Expectancy in Singapore is 71.22025&quot;
-## [1] &quot;Mean Life Expectancy in Slovak Republic is 70.6960833333333&quot;
-## [1] &quot;Mean Life Expectancy in Slovenia is 71.60075&quot;
-## [1] &quot;Mean Life Expectancy in Somalia is 40.9886666666667&quot;
-## [1] &quot;Mean Life Expectancy in Sri Lanka is 66.5260833333333&quot;
-## [1] &quot;Mean Life Expectancy in Sudan is 48.4005&quot;
-## [1] &quot;Mean Life Expectancy in Swaziland is 49.0024166666667&quot;
-## [1] &quot;Mean Life Expectancy in Sweden is 76.177&quot;
-## [1] &quot;Mean Life Expectancy in Switzerland is 75.5650833333333&quot;
-## [1] &quot;Mean Life Expectancy in Syria is 61.3461666666667&quot;
-## [1] &quot;Mean Life Expectancy in Taiwan is 70.3366666666667&quot;
-## [1] &quot;Mean Life Expectancy in Tanzania is 47.9123333333333&quot;
-## [1] &quot;Mean Life Expectancy in Togo is 51.49875&quot;
-## [1] &quot;Mean Life Expectancy in Trinidad and Tobago is 66.828&quot;
-## [1] &quot;Mean Life Expectancy in Tunisia is 60.721&quot;
-## [1] &quot;Mean Life Expectancy in Uganda is 47.6188333333333&quot;
-## [1] &quot;Mean Life Expectancy in Uruguay is 70.7815833333333&quot;
-## [1] &quot;Mean Life Expectancy in Venezuela is 66.5806666666667&quot;
-## [1] &quot;Mean Life Expectancy in West Bank and Gaza is 60.3286666666667&quot;
-## [1] &quot;Mean Life Expectancy in Yemen Rep. is 46.7804166666667&quot;
-## [1] &quot;Mean Life Expectancy in Zambia is 45.9963333333333&quot;
-## [1] &quot;Mean Life Expectancy in Zimbabwe is 52.6631666666667&quot;</code></pre>
-<pre class="r"><code>lower_threshold &lt;- 50
-upper_threshold &lt;- 70
- 
-for (i in unique(gapminder$continent)){
-    tmp &lt;- mean(gapminder$lifeExp[gapminder$continent==i])
-    
-    if (tmp &lt; lower_threshold){
-        print(paste(&quot;Average Life Expectancy in&quot;, i, &quot;is less than&quot;, lower_threshold))
-    }
-    else if (tmp &gt; lower_threshold &amp; tmp &lt; upper_threshold){
-        print(paste(&quot;Average Life Expectancy in&quot;, i, &quot;is between&quot;, lower_threshold, &quot;and&quot;, upper_threshold))
-    }
-    else {
-        print(paste(&quot;Average Life Expectancy in&quot;, i, &quot;is greater than&quot;, upper_threshold))
-    }
-   
-}</code></pre>
-<pre><code>## [1] &quot;Average Life Expectancy in Asia is between 50 and 70&quot;
-## [1] &quot;Average Life Expectancy in Europe is greater than 70&quot;
-## [1] &quot;Average Life Expectancy in Africa is less than 50&quot;
-## [1] &quot;Average Life Expectancy in Americas is between 50 and 70&quot;
-## [1] &quot;Average Life Expectancy in Oceania is greater than 70&quot;</code></pre>
 </div>
-</div>
-<div id="exercise-write-functions" class="section level1">
-<h1>Exercise: Write Functions</h1>
+<div id="exercise-write-functions" class="section level2">
+<h2>Exercise: Write Functions</h2>
 <p>Create a function that given a data frame will print the name of each column and the class of data it contains. Use the gapminder dataset. Hint: Use <code>mode()</code> or <code>class()</code> to get the class of the data in each column. Remember that <code>names()</code> or <code>colnames()</code> returns the name of the columns in a dataset.</p>
-<div id="answer-3" class="section level3">
-<h3>Answer</h3>
-<p>Note: Some of these were taken or modified from <a href="https://www.r-bloggers.com/functions-exercises/" class="uri">https://www.r-bloggers.com/functions-exercises/</a></p>
-<pre class="r"><code>data_frame_info &lt;- function(df) {
-  cols &lt;- names(df)
-  for (i in cols) {
-    print(paste0(i, &quot;: &quot;, mode(df[, i])))
-  }
-}
-data_frame_info(gapminder)</code></pre>
-<pre><code>## [1] &quot;country: character&quot;
-## [1] &quot;year: numeric&quot;
-## [1] &quot;pop: numeric&quot;
-## [1] &quot;continent: character&quot;
-## [1] &quot;lifeExp: numeric&quot;
-## [1] &quot;gdpPercap: numeric&quot;</code></pre>
 <p>Create a function that given a vector will print the mean and the standard deviation of a <strong>vector</strong>, it will optionally also print the median. Hint: include an argument that takes a boolean (<code>TRUE</code>/<code>FALSE</code>) operator and then include an <code>if</code> statement.</p>
 </div>
-<div id="answer-4" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>vector_info &lt;- function(x, include_median=FALSE) {
-  print(paste(&quot;Mean:&quot;, mean(x)))
-  print(paste(&quot;Standard Deviation:&quot;, sd(x)))
-  if (include_median) {
-    print(paste(&quot;Median:&quot;, median(x)))
-  }
-}
-
-le &lt;- gapminder$lifeExp
-vector_info(le, include_median = F)</code></pre>
-<pre><code>## [1] &quot;Mean: 59.4744393661972&quot;
-## [1] &quot;Standard Deviation: 12.9171074152412&quot;</code></pre>
-<pre class="r"><code>vector_info(le, include_median = T)</code></pre>
-<pre><code>## [1] &quot;Mean: 59.4744393661972&quot;
-## [1] &quot;Standard Deviation: 12.9171074152412&quot;
-## [1] &quot;Median: 60.7125&quot;</code></pre>
-</div>
+<div id="analyzing-the-relationship" class="section level2">
+<h2>Analyzing the relationship</h2>
+<p>Use what you’ve learned so far to answer the following questions using the <code>gapminder</code> dataset. Be sure to include some visualizations!</p>
+<ol style="list-style-type: decimal">
+<li><p>What is the relationship between GDP per capita and life expectancy? Does this relationship change over time? (Hint: Use the natural log of both variables.)</p></li>
+<li><p>Does the relationship between GDP per capita and life expectacy vary by continent? Make sure you divide the Americas into North and South America.</p></li>
+</ol>
 </div>
 
 

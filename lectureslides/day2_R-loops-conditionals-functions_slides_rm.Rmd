@@ -536,5 +536,7 @@ for (i in years) {
 
 ## Day 2 Exercise
 
-1) Save your Rmarkdown file: "lastname_firstname_r_bootcamp_day2"
+1) Open the `rmd_exercise_template.Rmd`
+2) Save as: `Day2RExercise_LastnameFirstname.Rmd`.
 2) Read in the gapminder data set
+3) As you answer questions, be sure to annotate your work with as much detail as possible!
