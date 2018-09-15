@@ -116,7 +116,7 @@ gapminder5 %>%
        x = "GDP per capita", y = "Life expectancy")
 ```
 
-For another example of preparing data for plotting, let's turn to the California energy data, which we will use for the rest of the ggplot session. Recall that in the first session of Day 3, you created a long-format data frame containing data on all energy generated during September 3-9, called `long_gen`. Say we wanted to visualize the total energy generated in the state over time. By using `group_by()` and `summarize()`, we can sum the output for each date-time value (i.e. each hour) and feed this directly into `ggplot()`. Note that this kind of graphing task is one of the uses of having a long-format version of your data.
+For another example of preparing data for plotting, let's turn to the California energy data, which we will use for the rest of the ggplot session. Recall that in the advanced manipulation session this morning, you used dplyr to create long-format data frames `long_gen` (all generation data) and `long_merged_gen` (all generation + imports data). Say we wanted to visualize the total energy generated in the state over time. Starting with `long_gen`, and using `group_by()` and `summarize()`, we can sum the output for each date-time value (i.e. each hour) and feed this directly into `ggplot()`. Note that this kind of graphing task is one of the uses of having a long-format version of your data.
 
 ```{r data prep 2}
 long_gen %>% 
@@ -310,19 +310,23 @@ There are several `stat` functions in ggplot that enable you to conduct statisti
 
 Since these are relatively rare and more advanced use cases of ggplot, we will not explore them in detail here. If you are interested, see [Chapter 3.7 of the R for data science online textbook](http://r4ds.had.co.nz/data-visualisation.html#statistical-transformations).
 
-# Visualizing grouped data [INCOMPLETE] {#groupeddata}
+# Visualizing grouped data {#groupeddata}
 
-Throughout these examples, you will see one of the uses of converting data to long-format. Doing so allows us to plot multiple variables in one graphic using a single `geom` function, providing the key column as the grouping variable.
+Throughout these examples, you will see one of the uses of converting data to long-format. Doing so allows us to plot multiple variables in one graphic using a single `geom` function, providing the key column as the grouping variable. Generally, we indicate the grouping variable using the `group = ` function in the `aes()` function.
 
 ## Colors and fill
 
 Although ggplot will generally interpret a `col = ` argument as providing a grouping variable, it is good practice to specify `group = ` anyway. 
 
-```{r aes colors}
-
+```{r aes colors 1}
+long_merged_energy %>%
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source)) + 
+  labs(title="Output by energy source over time", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
-Let's take a look at a more complex plot that uses grouping to generate multiple lines. This plot shows the average output of each energy source by hour. Instead of describing the process in detail here, comments are included throughout the code itself. Note how the code for this plot combines several of the topics we have discussed so far (data manipulation before plotting, scales, themes, and labels).
+Let's take a look at a more complex plot that uses grouping to generate multiple lines. For example, we might look at the above plot and think that the repeated patterns over multiple days is too noisy. Perhaps we are interested in the average trend over the course of a single day. To visualize this, we can plot the average output of each energy source per hour over the 7 days in the data. Comments are included in the code below describing what each step does. Note how the code for this plot combines several of the topics we have discussed so far (data manipulation before plotting, scales, themes, and labels).
 
 ```{r aes colors 2}
 long_merged_energy %>% 
@@ -349,60 +353,146 @@ Remember from earlier that we may need to use either `col = ` or `fill = ` depen
 
 ## Position adjustment
 
-```{r pos dodge}
+In the above example, all groups are plotted overlaying each other. One way to visualize data more clearly, especially when we are dealing with bars or area plots rather than lines, is to use position adjustment.
 
+For example, let's plot a column chart with the total energy output per day. Note that we use the `fill = ` argument here to demarcate each group in a different color. By default, ggplot stacks all the groups on top of each other.
+
+```{r col stack}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source)) + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
 ```
 
-```{r pos stack 1}
+Instead of stacking the groups on top of each other, we can also use the `position = "dodge"` argument to create a column per group and arrange them next to each other horizontally.
 
+```{r col dodge}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="dodge") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
 ```
 
-```{r pos stack 2}
+A third alternative is to use `position = "fill"`, which normalizes the height of each bar and as such shows the proportion of the data in each bin that consists of each group.
 
+```{r col fill}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="fill") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+```
+
+Let's see another example of how position adjustment works with an area plot, of energy output over time by source. `geom_area()` defaults to `position="stack"` when using groups, but I have explicitly defined it here for illustration.
+
+```{r area stack 1}
+long_merged_energy %>% 
+  ggplot() + 
+  geom_area(aes(x=datetime, y=output, group=source, fill=source), position="stack") + 
+  labs(title="Energy use over time", subtitle="Data collected during September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
+```
+
+We might look at this plot and think it's not particularly helpful. To simplify the above plot, we can do two things: (1) use the categories contained in the `regroup` data frame to reduce the number of categories; and (2) switch to `position="fill"` instead of `position="stack"`.
+
+```{r area stack 2}
+# Make sure regroup data has been imported
+regroup <- read_csv("data/regroup.csv")
+# Prepare data frame
+long_merged_energy %>% 
+  rename(type = source) %>% 
+  merge(regroup, by = "type") %>% 
+  group_by(datetime, group) %>%
+  summarise(output=sum(output)) %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  geom_area(aes(x=datetime, y=output, group=group, fill=group), position="fill") + 
+  labs(title="Energy use over time", subtitle="Data collected during September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Shapes and linetypes
 
-```{r aes shapes}
+For certain `geom` functions, such as `geom_point()`, we can demarcate groups by shape. This is especially helpful in conjuction with line plots. For example, let's plot total output by day, grouped using the grouping variable from `regroup`. First, we will plot lines and use colors to demarcate groups. Then, we will plot points and use shapes to demarcate groups.
 
+```{r aes shapes}
+# Prepare data
+long_merged_energy %>%
+  rename(type = source) %>% 
+  merge(regroup, by = "type") %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, group) %>%
+  summarise(output=sum(output)) %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  geom_line(aes(x=date, y=output, group=group, col=group), size=0.8) +
+  geom_point(aes(x=date, y=output, group=group, shape=group)) + 
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018",
+       x="Date", y="Output (MW)")
 ```
+
+The `shape = ` approach works well for points, but when working with line plots, we can demarcate groups by `linetype = ` instead. For example, say we want to compare the energy output over time of hydroelectric sources and nuclear sources.
 
 ```{r aes linetypes}
-
+long_merged_energy %>% 
+  filter(source %in% c("large_hydro","small_hydro","nuclear")) %>% 
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, linetype=source)) + 
+  labs(title="Energy output over time from hydroelectric and nuclear sources", 
+       subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
 ```
+
+## Sizes and alpha (transparency)
+
+Especially useful for continuous variables, you can map the size and alpha (transparency) of geometric objects to data values. No examples are shown here, since our grouping variables are categorial rather than continuous, but you can try to set `size = ` and `alpha = ` arguments within `aes()` in `geom_point()` or other `geom`s using the same principles shown above. For example, you could create a scatterplot of the relationship between life expectancy and GDP using the gapminder data, and map the values of population to the size or alpha of the data points.
 
 ## Facets
 
-Let's say we are interested in examining hour-by-hour generation data by source. Using the position adjustment skills we learned in the previous subsection, we can generate a line plot as follows.
+While color, fill, shapes, and linetypes are useful ways to plot grouped data, we sometimes want to separate the visualization for each group even more clearly. To do so, we can use faceting, i.e. plot each group on a separate coordinate system. The simplest way to create facets using a grouping variable is `facet_wrap()`, but you can also control the arrangement of facets or use two grouping variables with `facet_grid()`.
+
+Let's say we are interested in examining trends in energy generation by source. Using the skills we've learned so far, we could generate a line plot as follows.
 
 ```{r why facet}
-long_merged_energy %>% 
-  filter(source!="imports") %>%
+long_gen %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=output, group=source, col=source, position="dodge"), size=1) + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output")
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
+
+But this feels too noisy, especially if our primary goal is to visualize the trend for each source. An alternative strategy is to *facet* by source rather than using a color aesthetic to separate each source.
 
 ```{r facet 1}
 long_gen %>% 
   ggplot() + 
   geom_line(aes(x = datetime, y = output)) + 
-  facet_wrap(~source)
+  facet_wrap(~source) + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
+
+This is a little better! But note that the scales for each coordinate system are fixed, i.e. the scale limits are the same for each plot. If our main goal is to examine the patterns over time for each source, rather than comparing the sources to each other, we can specify `scales="free"` in `facet_wrap()`.
 
 ```{r facet 2}
 long_gen %>% 
   ggplot() + 
   geom_line(aes(x = datetime, y = output)) + 
   facet_wrap(~source, scales="free") + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output")
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
-Using facets also means we can incorporate multiple groupings. 
+That's much better! Note that we can combine faceting with the previous skills we've learned to incorporate multiple groupings. For example, we can use map the source groups in `regroup` to the color aesthetic in `geom_line` as follows. Since this is a fairly complicated mix of data manipulation and visualization, comments are included describing each step.
 
 ```{r facet 3}
-# Import the regroup data
-regroup <- readr::read_csv("data/regroup.csv")
 # Begin data preparation
 long_gen %>% 
   # Rename "source" variable to "type", to prepare for merging
@@ -411,17 +501,18 @@ long_gen %>%
   merge(regroup, by = "type") %>% 
   # Pipe data into dplyr
   ggplot() + 
-  # Generate lines indicating output ~ time, colored based on "group" variable
-  geom_line(aes(x = datetime, y = output, col = group), size=1) + 
+  # Generate lines of output ~ datetime, color based on "group" variable, and increase size
+  geom_line(aes(x=datetime, y=output, group=group, col=group), size=1) + 
   # Adjust color palette for "group" colors and give legend a better name
-  scale_color_brewer(palette="Dark2", name="Type of energy source") + 
+  scale_color_brewer(palette="Set1", name="Type of energy source") +
   # Create facets by source, with free scales
   facet_wrap(~type, scales="free") + 
   # Add labels
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output") + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)") + 
   # Use the minmal theme
   theme_bw() + 
-  # Move the legend to the bottom
+  # Customize theme to move the legend to the bottom
   theme(legend.position = "bottom")
 ```
 
@@ -429,7 +520,7 @@ long_gen %>%
 
 ## Comment your code
 
-In some of the examples above, you have seen that we can write comments within a flow of `%>%` or `+` operators. It is highly recommended that you use such comments when doing complex data manipulation or data visualization tasks, or indeed when doing both together. This enables not only others to read your code, but also your own understanding of the code when returning to it at a later time.
+In some of the examples above, you have seen that we can write comments within a flow of `%>%` or `+` operators. It is highly recommended that you use such comments when doing complex data manipulation or data visualization tasks, or indeed when doing both together. This enables not only others to read your code, but also aids your own understanding of the code when returning to it at a later time.
 
 ## Saving images
 
