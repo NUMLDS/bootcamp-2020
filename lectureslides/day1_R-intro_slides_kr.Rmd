@@ -368,7 +368,7 @@ The most obvious use case of subsetting is to create and store smaller data fram
 gapminder07 <- subset(gapminder5, subset = year==2007)
 sort(table(gapminder07$continent))
 gapminder07$pop[gapminder07$country=="Mexico"]
-head(gapminder07[order(gapminder07$pop),])
+head(gapminder07[order(gapminder07$pop, decreasing=TRUE),])
 ```
 
 <aside class="notes">
@@ -490,7 +490,7 @@ summary(reg1)
 > - Earlier, we created a new data frame, `gapminder07`, and added several new variables to it.
 > - When we do more intensive data cleaning and wrangling tasks in R, we will often want to save the resulting data frame as a data file.
 > - You can use `write.csv()` from base R and `write_csv()` from `readr` to write data files.
-> - **Try it!** Save the data frame `gapminder07` to your working directory using the `write.csv` function. Set the argument `row.names = FALSE`.
+> - **Try it!** Save the data frame `gapminder07` to the "data" subfolder in your working directory using the `write.csv` function. Set the argument `row.names = FALSE`.
 
 ## Writing a data file
 
@@ -538,6 +538,19 @@ hist(gapminder07$lifeExp, main="Distribution of life expectancy across countries
 - Create a scatterplot with `lifeExp` on the y-axis and `gdpPercap` on the x-axis.
 - Add a title and axis labels.
 - Bonus: Add a horizontal line indicating the mean of `lifeExp` onto the plot using `abline()`.
+
+## Scatterplots
+
+```{r scatterplot}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap)
+```
+
+## Scatterplots
+
+```{r scatterplot}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
+     main="Relationship between life expectancy and GDP per capita in 2007", ylab="Life expectancy", xlab="GDP per capita")
+```
 
 ## Scatterplots
 
