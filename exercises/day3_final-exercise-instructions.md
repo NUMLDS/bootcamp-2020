@@ -48,7 +48,7 @@ Given the short time period, any answer will of course prove incomplete. The goa
 
 ## Github submission
 
-When you have completed the exercise, commit your RMarkdown file to our shared Github repo [NEED TO ADD DETAILS]. Make sure your file has the following filename structure: `FinalRExercise_LastnameFirstname.Rmd`.
+When you have completed the exercise, fork this repo and save your Markdown file in the submissions folder with the following filename structure: `FinalRExercise_LastnameFirstname.Rmd`. Then, submit a pull request to the origin repo.
 
 ## Reminders
 
