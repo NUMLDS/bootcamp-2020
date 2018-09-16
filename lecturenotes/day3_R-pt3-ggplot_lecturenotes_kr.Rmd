@@ -25,7 +25,7 @@ notes<-params$notes
 
 ## What is ggplot?
 
-The `ggplot2` package is part of `tidyverse`, a suite of packages maintained by the RStudio company. In ggplot, graphics are built by supplying *data* and *mapping* of data values to aesthetics, and then adding *layers* that build geometries, scales, coordinate systems, and more.
+The `ggplot2` package is part of `tidyverse`, a suite of packages maintained by the RStudio company. In ggplot, graphics are built by supplying *data* and *mapping* of data values to aesthetics, and then adding *layers* that build geometric objects, scales, labels, and more.
 
 Before using ggplot, make sure to load the package. You can either load `tidyverse` or `ggplot2` directly.
 
@@ -43,7 +43,7 @@ library(tidyverse)
 ## Some useful resources
 
 - The [ggplot cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf) maintained by RStudio is an invaluable resource. I always have it open when using `ggplot2`.
-- The [ggplot reference sheet](https://ggplot2.tidyverse.org/reference/index.html) maintained by RStudio. In your early days using `ggplot2`, this will be more useful in conjunction with the cheatsheet since it contains more detail on syntax and links to full help files. 
+- The [ggplot reference guide](https://ggplot2.tidyverse.org/reference/index.html) maintained by RStudio. In your early days using `ggplot2`, this will be more useful in conjunction with the cheatsheet since it contains more detail on syntax and links to full help files. 
 - The [Data Visualization chapter](http://r4ds.had.co.nz/data-visualisation.html) in the R for Data Science book by Garrett Grolemund and Hadley Wickham. The rest of the book explores other parts of the `tidyverse`.
 - [ggedit](https://github.com/metrumresearchgroup/ggedit) is an extension package for `ggplot2` that enables users to launch an graphical user interface (GUI) with which to build ggplot graphics layer-by-layer. When completed, the user can copy the code required to generate the plot and return to their script file. 
     - There is [some controversy](https://www.youtube.com/watch?v=cpbtcsGE0OA) over whether GUIs diminish creativity and flexibility in data science, but nevertheless, this tool may help early learners get used to the grammar of ggplot.
