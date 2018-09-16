@@ -541,20 +541,20 @@ hist(gapminder07$lifeExp, main="Distribution of life expectancy across countries
 
 ## Scatterplots
 
-```{r scatterplot}
+```{r scatterplot 1}
 plot(gapminder07$lifeExp ~ gapminder07$gdpPercap)
 ```
 
 ## Scatterplots
 
-```{r scatterplot}
+```{r scatterplot 2}
 plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
      main="Relationship between life expectancy and GDP per capita in 2007", ylab="Life expectancy", xlab="GDP per capita")
 ```
 
 ## Scatterplots
 
-```{r scatterplot}
+```{r scatterplot 3}
 plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
      main="Relationship between life expectancy and GDP per capita in 2007", ylab="Life expectancy", xlab="GDP per capita")
 abline(h = mean(gapminder07$lifeExp))

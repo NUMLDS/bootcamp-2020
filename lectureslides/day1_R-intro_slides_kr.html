@@ -845,16 +845,16 @@ The most obvious use case of subsetting is to create and store smaller data fram
 ##        2       25       30       33       52</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07<span class="op">$</span>pop[gapminder07<span class="op">$</span>country<span class="op">==</span><span class="st">&quot;Mexico&quot;</span>]</code></pre></div>
 <pre><code>## [1] 108700891</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop),])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),])</code></pre></div>
 <pre><code>## # A tibble: 6 x 6
-##   country                year    pop continent lifeExp gdpPercap
-##   &lt;chr&gt;                 &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Sao Tome and Principe  2007 199579 Africa       65.5     1598.
-## 2 Iceland                2007 301931 Europe       81.8    36181.
-## 3 Djibouti               2007 496374 Africa       54.8     2082.
-## 4 Equatorial Guinea      2007 551201 Africa       51.6    12154.
-## 5 Montenegro             2007 684736 Europe       74.5     9254.
-## 6 Bahrain                2007 708573 Asia         75.6    29796.</code></pre>
+##   country        year        pop continent lifeExp gdpPercap
+##   &lt;chr&gt;         &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+## 1 China          2007 1318683096 Asia         73.0     4959.
+## 2 India          2007 1110396331 Asia         64.7     2452.
+## 3 United States  2007  301139947 Americas     78.2    42952.
+## 4 Indonesia      2007  223547000 Asia         70.6     3541.
+## 5 Brazil         2007  190010647 Americas     72.4     9066.
+## 6 Pakistan       2007  169270617 Asia         65.5     2606.</code></pre>
 <aside class="notes">
 Don’t worry too much about the bonus question if you find it confusing. The package <code>dplyr</code>, which we will cover on Thursday, will offer other ways to do this kind of task which some of you may find more intuitive.
 </aside>
@@ -1012,7 +1012,7 @@ reg1</code></pre></div>
 <li class="fragment">Earlier, we created a new data frame, <code>gapminder07</code>, and added several new variables to it.</li>
 <li class="fragment">When we do more intensive data cleaning and wrangling tasks in R, we will often want to save the resulting data frame as a data file.</li>
 <li class="fragment">You can use <code>write.csv()</code> from base R and <code>write_csv()</code> from <code>readr</code> to write data files.</li>
-<li class="fragment"><strong>Try it!</strong> Save the data frame <code>gapminder07</code> to your working directory using the <code>write.csv</code> function. Set the argument <code>row.names = FALSE</code>.</li>
+<li class="fragment"><strong>Try it!</strong> Save the data frame <code>gapminder07</code> to the “data” subfolder in your working directory using the <code>write.csv</code> function. Set the argument <code>row.names = FALSE</code>.</li>
 </ul>
 </section><section id="writing-a-data-file-1" class="slide level2">
 <h2>Writing a data file</h2>
@@ -1066,10 +1066,19 @@ reg1</code></pre></div>
 </ul>
 </section><section id="scatterplots-2" class="slide level2">
 <h2>Scatterplots</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap)</code></pre></div>
+<p><img src="day1_R-intro_slides_kr_files/figure-revealjs/scatterplot%201-1.png" width="768" /></p>
+</section><section id="scatterplots-3" class="slide level2">
+<h2>Scatterplots</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,
+     <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)</code></pre></div>
+<p><img src="day1_R-intro_slides_kr_files/figure-revealjs/scatterplot%202-1.png" width="768" /></p>
+</section><section id="scatterplots-4" class="slide level2">
+<h2>Scatterplots</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,
      <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">mean</span>(gapminder07<span class="op">$</span>lifeExp))</code></pre></div>
-<p><img src="day1_R-intro_slides_kr_files/figure-revealjs/scatterplot-1.png" width="768" /></p>
+<p><img src="day1_R-intro_slides_kr_files/figure-revealjs/scatterplot%203-1.png" width="768" /></p>
 </section></section>
 <section><section id="the-end" class="titleslide slide level1"><h1>The End!</h1></section></section>
     </div>
