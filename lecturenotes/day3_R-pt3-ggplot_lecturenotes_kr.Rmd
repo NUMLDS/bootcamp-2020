@@ -25,7 +25,7 @@ notes<-params$notes
 
 ## What is ggplot?
 
-The `ggplot2` package is part of `tidyverse`, a suite of packages maintained by the RStudio company. In ggplot, graphics are built in ggplot by supplying *data* and *aesthetic mapping*, and then adding *layers* that build geometries, scales, coordinate systems, and more using the provided data and mapping.
+The `ggplot2` package is part of `tidyverse`, a suite of packages maintained by the RStudio company. In ggplot, graphics are built by supplying *data* and *mapping* of data values to aesthetics, and then adding *layers* that build geometries, scales, coordinate systems, and more.
 
 Before using ggplot, make sure to load the package. You can either load `tidyverse` or `ggplot2` directly.
 
@@ -36,8 +36,8 @@ library(tidyverse)
 ## Why ggplot?
 
 - It is highly customizable and extensible.
-- It is designed to work well in conjunction with `dplyr` and other `tidyverse` packages.
-- It has been in usage for over 10 years, meaning that help is widely available.
+- It is designed to work well with `dplyr` and other `tidyverse` packages.
+- It has been in use for over 10 years, meaning that help is widely available.
 - Its wide usage has also given rise to a wide variety of avilable [extensions](http://www.ggplot2-exts.org/gallery/), including those that handle create interactive graphics (`ggigraph`), animated graphics (`gganimate`), alluvial diagrams (`ggalluvial`), maps (`ggmap`), and more.
 
 ## Some useful resources
