@@ -53,8 +53,8 @@
 
 # Run this code to generate variables x1 and x2
 set.seed(1234)
-x1 <# rnorm(5)
-x2 <# rnorm(20, mean=0.5)
+x1 <- rnorm(5)
+x2 <- rnorm(20, mean=0.5)
 
 # Select the 3rd element in x1
 
@@ -74,7 +74,7 @@ x2 <# rnorm(20, mean=0.5)
 #### Missing values ####
 
 # Generate a vector
-vec <# c(1, 8, NA, 7, 3)
+vec <- c(1, 8, NA, 7, 3)
 
 # Calculate the mean of vec, excluding the NA value
 
@@ -92,7 +92,7 @@ vec <# c(1, 8, NA, 7, 3)
 #### Matricies ####
 
 # Generate a matrix
-mat <# matrix(c(1:51, rep(NA,4)), ncol=5)
+mat <- matrix(c(1:51, rep(NA,4)), ncol=5)
 
 # Select row 4, column 5
 
@@ -214,6 +214,7 @@ table(gapminder07$lifeExp_over70)
 # Use a t-test to evaluate the difference between 'gdpPercap' in "high" and "low" life expectancy countries. Store the results as t1, and then print out t1.
 
 
+
 #### Statistics, part 2 ####
 
 # Conduct a linear regression predicting 'lifeExp' as a function of 'gdpPercap' and 'pop', and store the results as reg1.
@@ -229,7 +230,8 @@ table(gapminder07$lifeExp_over70)
 
 #### Writing a data file ####
 
-# Save the gapminder07 data frame as a CSV file using write.csv()
+# Save the gapminder07 data frame as a CSV file using write.csv() in the "data" subfolder within the working directory
+# Set the argument `row.names = FALSE`.
 
 
 #### Save R objects ####
@@ -259,4 +261,5 @@ table(gapminder07$lifeExp_over70)
 
 
 # Bonus: Add a horizontal line indicating the mean of `lifeExp` onto the plot using `abline()`.
+
 
