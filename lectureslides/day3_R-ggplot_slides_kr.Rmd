@@ -1,0 +1,145 @@
+---
+title: 'Intro to R: Day 3 - Data viz with ggplot'
+author: "Kumar Ramanathan"
+date: "`r Sys.Date()`"
+output: 
+  revealjs::revealjs_presentation:
+    self_contained: false
+    reveal_plugins: ["notes"]
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# Introduction to ggplot
+
+Part of the `tidyverse`, `ggplot2` is an R package that implements the "grammar of graphics" in R.
+
+In ggplot, graphics are built by supplying *data* and *mapping* of data values to aesthetics, and then adding *layers* that build geometric objects, scales, labels, and more.
+
+## Why ggplot?
+
+> - Highly customizable and extensible.
+> - Designed to work with `dplyr` and other `tidyverse` packages.
+> - In use for over 10 years, meaning that help is widely available.
+> - Wide variety of avilable [extensions](http://www.ggplot2-exts.org/gallery/)
+
+## Useful resources
+
+- The [ggplot cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+- The [ggplot reference guide](https://ggplot2.tidyverse.org/reference/index.html)
+- The [Data Visualization chapter](http://r4ds.had.co.nz/data-visualisation.html) in the "R for Data Science" book
+- And, of course, the help files that come with the package itself.
+
+# Basics: grammar of graphics
+
+## Components of a basic plot
+
+> - **data**: a data frame, provided to the `ggplot()` function
+> - **geometric objects**: the objects/shapes that you want to plot, indicated through one of the many available `geom` functions, such as `geom_point()` or `geom_hist()`
+> - **aesthetic mapping**: the mapping from the data to the geometric objects, provided in an `aes()` function nested within the chosen `geom` function
+> - connected with the `+` operator
+
+```{r ggplot structure, eval=F}
+ggplot(data = <DATA FRAME>) + 
+  <GEOM_FUNCTION>(mapping = aes(<VARIABLES>))
+```
+
+<aside class="notes">
+Write this on the board, without data= and mapping= specified.
+</aside>
+
+## Example: Scatterplot from Day 1
+
+Task: Create scatterplot of `lifeExp` against `gdpPercap` from `gapminder07` data.
+
+Steps:
+
+1. Supply `gapminder07` data frame as input to `ggplot()` function
+2. Choose a `geom`; in this case we choose `geom_point()` to generate points
+3. Supply aesthetic mapping, i.e. specify `x` and `y` values, 
+
+## Example: Scatterplot from Day 1
+
+```{r scatterplot 1}
+ggplot(data = gapminder07) + 
+  geom_point(mapping = aes(x = gdpPercap, y = lifeExp))
+```
+
+## Example: Scatterplot from Day 1
+
+```{r scatterplot 1}
+ggplot(gapminder07) + 
+  geom_point(aes(x = gdpPercap, y = lifeExp)) + 
+  labs(title = "Relationship between life expectancy and GDP per capita in 2007", 
+       x = "GDP per capita", y = "Life expectancy")
+```
+
+## Exercise: Scatterplot
+
+Using the `gapminder07` data, create a scatterplot of `gdpPercap` as a function of `pop`. Give it a title and axis labels.
+
+Remember, you will need three functions: `ggplot()`, `geom_point()`, and `labs()`. 
+
+<aside class="notes">
+You can create a new script file for your exercises in this session, or you can continue to use script files from earlier in the day. In either case, make sure to give the file a sensible filename and to demarcate sections with meaningful comments.
+</aside>
+
+## Exercise: Scatterplot
+
+```{r scatterplot exercise}
+ggplot(gapminder07) + 
+  geom_point(aes(x = pop, y = gdpPercap)) + 
+  labs(title = "Relationship between GDP per capita and population in 2007", x = "GDP per capita", y = "Life expectancy")
+```
+
+# Preparing your data
+
+# Geometric objects
+
+# Additional layers
+
+## Labels
+
+## Scales
+
+## Themes
+
+## Coordinate system adjustment
+
+## Stats
+
+# Visualizing grouped data
+
+## Colors and fill
+
+## Position adjustment
+
+## Shapes and linetypes
+
+## Sizes and alpha
+
+## Facets
+
+# Final notes
+
+## Comment your code
+
+## Saving images
+
+# Break!
+
+This is the end of the ggplot session, and the end of the R lecture sessions.
+
+After a short break, we will return for a cumulative exercise that combines the skills you have learned since Monday. 
+
+
+
