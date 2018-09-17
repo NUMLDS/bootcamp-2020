@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 
 ```{r, include=FALSE}
 notes<-params$notes
-source(here::here("data/recreate_objects_for_day3ggplot.R"))
+source(here::here("data/day3_objects.R"))
 ```
 
 # Introduction to ggplot
@@ -195,7 +195,7 @@ long_gen %>%
 The above examples show cases where one geometric object is plotted per graphic. `ggplot` allows you to add multiple geometric objects as layers. Below is a plot of large hydro power generation over time, first shown using a line with `geom_line()`. On top of that line plot, we can also add a smoothed line with `geom_smooth()`, which plots smoothed conditional means (estimated using a loess regression) in order to aid observation of trends in cases of overplotting.
 
 ```{r multiple geoms}
-merged_energy %>% 
+generation %>% 
   ggplot() + 
   geom_line(aes(x=datetime, y=large_hydro), col="turquoise3") + 
   geom_smooth(aes(x=datetime, y=large_hydro)) + 
@@ -271,13 +271,13 @@ There are also many ggplot extension packages that provide additional themes.
 
 ### Manually modify theme components
 
-Instead of using a pre-set theme, you can modulate many components of the default theme using the `theme()` function. In this manually controlled theme layer, you can modify many things, including:
+Instead of using a pre-set theme, you can modulate many components of the default theme using the `theme()` function. In this manually controlled theme layer, some of the things you can modify:
 
-- Angle, position, and other characteristics of axis labels (e.g. using `axis.labels.x = element_text()` in the `theme()` function).
+- Angle, position, and other characteristics of axis labels (e.g. using `axis.labels.x = element_text()` argument in the `theme()` function).
 - Angle, position, and other characteristics of legends (this is useful when plotting grouped data).
 - Characteristics of the background of the plot (e.g. using the `plot.background = ` argument).
 
-For a full list of the components that can be manipulated in the theme layer, see the help file for `ggplot2::theme()`.
+For a full list of the components that can be modified in the theme layer, see the help file for `ggplot2::theme()`.
 
 ## Coordinate system adjustment
 
