@@ -112,11 +112,10 @@ for (i in obs) { # the function to repeat is enclosed in braces {}
 head(gapminder)
 ```
 
-## Another word of caution -- used vectorized functions when possible
+## Avoid loops when possible
 
-- Everything in R is a vector!
-- It is quicker and easier to use vectorized functions when possible
-  - The function is applied to each item in the vector
+- Loops are useful, but slow
+- Avoid when possible, especially when there is a vectorized function you can use
 
 ```{r vectorized}
 gapminder$vec_log_gdpPercap <- log(gapminder$gdpPercap)

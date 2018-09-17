@@ -1612,14 +1612,11 @@ for (i in obs) { # the function to repeat is enclosed in braces {}
 ## 5      6.606625 16.38655
 ## 6      6.667101 16.51555</code></pre>
 </div>
-<div id="another-word-of-caution-used-vectorized-functions-when-possible" class="section level2">
-<h2>Another word of caution – used vectorized functions when possible</h2>
+<div id="avoid-loops-when-possible" class="section level2">
+<h2>Avoid loops when possible</h2>
 <ul>
-<li>Everything in R is a vector!</li>
-<li>It is quicker and easier to use vectorized functions when possible
-<ul>
-<li>The function is applied to each item in the vector</li>
-</ul></li>
+<li>Loops are useful, but slow</li>
+<li>Avoid when possible, especially when there is a vectorized function you can use</li>
 </ul>
 <pre class="r"><code>gapminder$vec_log_gdpPercap &lt;- log(gapminder$gdpPercap)
 all(gapminder$vec_log_gdpPercap == gapminder$log_gdpPercap)</code></pre>
@@ -2050,7 +2047,6 @@ while (i &lt;= 2002) {
 if (random_year &gt; 1977) {
   print(random_year)
 }</code></pre>
-<pre><code>## [1] 1992</code></pre>
 </div>
 <div id="if-statements" class="section level2">
 <h2><code>if</code> statements</h2>
