@@ -228,10 +228,10 @@ Task:<br>Plot a *line* of large hydro generation over time, and a *smoothed line
 
 Steps: 
 
-> 1. Supply the `generation` data to ggplot.
+> 1. Supply the `generation` data to `ggplot()`.
 > 2. Create a line with `geom_line()` with appropriate `x` and `y` aesthetics. Make it turquoise for fun.
 > 3. Create a smoothed line with `geom_smooth()` with the same `x` and `y` aesthetics.
->    - `geom_smooth()` plots smoothed conditional means (estimated using a loess regression)
+>     1. `geom_smooth()` plots smoothed conditional means (estimated using a loess regression)
 
 ## Multiple geoms in one plot
 
@@ -269,9 +269,9 @@ No exercise this time, but we will practice this later.
 > - Scales allow you to manipulate the relationship between data values and aesthetics beyond aesthetic mapping.
 > - AKA: scales "control the details of how data values are translated to visual properties" (quote from [reference guide](https://ggplot2.tidyverse.org/reference/index.html#section-aesthetics)).
 > - For example:
->    - `scale_alpha`: control transparency settings
->    - `scale_color` and `scale_fill`: control color palettes and other aspects of data mapped to colors
->    - `scale_x` and `scale_y`: control the position of axis markers
+>     - `scale_alpha`: control transparency settings
+>     - `scale_color` and `scale_fill`: control color palettes and other aspects of data mapped to colors
+>     - `scale_x` and `scale_y`: control the position of axis markers
 > - The cheatsheet is your friend!
 
 ## Scales
@@ -358,8 +358,8 @@ long_gen %>%
 
 > - We often want to visualize multiple variables, or a variable that can be divided into groups, in one graphic.
 > - There are two broad principles for visualizing grouped variables in R:
->    - Identify a grouping variable in a `geom()` using the `group = ` argument, and demarcate the distinct objects created per group in some way.
->    - Use facets to generate geometric objects in separate coordinate systems for each group.
+>     - Identify a grouping variable in a `geom()` using the `group = ` argument, and demarcate the distinct objects created per group in some way.
+>     - Use facets to generate geometric objects in separate coordinate systems for each group.
 
 ## Colors and fill
 
@@ -385,7 +385,7 @@ long_merged_energy %>%
 
 Task:<br>Create a line plot that compares generation of wind, solar, and geothermal energy over time.
 
-<small>Bonus: Set the size of the line objects to 1.5.</small>
+<small>Bonus: Set the line size to 1.5.</small>
 
 ## Exercise: Colors and fill
 
@@ -416,27 +416,215 @@ long_merged_energy %>% filter(source=="wind"|source=="solar"|source=="geothermal
 
 ## Position adjustment
 
-## Example: Columns, position stack
+> - Once we introduce a grouping variable to a `geom` function, we generate multiple geometric objects on the same plot.
+> - Colors and fill help us distinguish each object from other objects.
+> - Another way to distinguish objects, often used together with color/fill, is *position adjustment*.
 
-## Example: Columns, position dodge
+## Example: Energy use by day
+
+Task:<br>Create a column chart of energy use by day, grouped by source.
+
+Steps:
+
+> 1. Modify `long_merged_energy` to summarize output by date and source.
+>     1. Use `mutate()` to create a `date` variable from `datetime`.
+>     2. Use `group_by()` and `summarize()` to calculate total output per date per source.
+> 2. Supply modified data frame to `ggplot()`
+> 3. Add a `geom_col()` layer, supply `x` and `y` aesthetics.
+> 4. Specify `group=source` and `fill=source`.
+> 5. Add a `labs()` layer.
+
+## Example: Energy use by day
+
+```{r col stack}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source)) + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+```
+
+## Example: Energy use by day
+
+> - This column chart is useful if our main goal is to examine total output over time across sources.
+> - But what if our main goal is to compare trends across sources?
+>     - We can use `position="dodge"` in `geom_col()` 'unstack' the columns for each source.
+> - What if our goal is to compare what portion of output per day each source comprises?
+>     - We can use `position="fill"` to normalize height of stacked columns.
+
+## Example: Energy use by day
+
+```{r col dodge}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="dodge") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+```
+
+## Example: Energy use by day
+
+```{r col fill}
+long_merged_energy %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, source) %>% 
+  summarize(output=sum(output)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="fill") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+```
 
 ## Shapes and linetypes
 
-## Example: Shapes
+> - Colors/fill and position adjustment are the most common and intuitive way to distinguish geometric objects from each other.
+> - Shapes and linetypes are two other ways.
+> - The idea here is to modify what the object actually looks like.
 
-## Example: Linetypes
+## Example: Energy source group by day
+
+Task:<br>
+
+Steps:
+
+> 1. Prepare data frame that summarizes output by date and "group" from `regroup`.
+> 2. Supply modified data frame to `ggplot()`.
+> 3. Two choices!
+>     1. Add `geom_line()` and `geom_point()` with `shape=group`.
+>     2. Add `geom_line()` with `linetype=group`.
+
+## Example: Energy source group by day
+
+```{r prep shapes}
+long_merged_energy_regroup <- long_merged_energy %>%
+  rename(type = source) %>% 
+  merge(regroup, by = "type") %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, group) %>%
+  summarise(output=sum(output))
+
+head(long_merged_energy_regroup)
+```
+
+## Example: Energy source group by day
+
+```{r aes shapes}
+long_merged_energy_regroup %>% 
+  ggplot() + 
+  geom_line(aes(x=date, y=output, group=group, col=group), size=0.8) +
+  geom_point(aes(x=date, y=output, group=group, shape=group)) + 
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
+```
+
+## Example: Energy source group by day
+
+```{r aes linetypes}
+long_merged_energy_regroup %>% 
+  ggplot() + 
+  geom_line(aes(x=date, y=output, group=group, linetype=group), size=1) +
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
+```
 
 ## Sizes and alpha
 
+> - `size=` and `alpha=` inside `aes()` modulate the size and transparency of geom objects based on some data value.
+> - They are particularly useful when you want to distinguish objects based on some *continuous* variable.
+
+## Example: Size
+
+```{r aes size}
+gapminder07 %>% 
+  ggplot() + 
+  geom_point(aes(x=gdpPercap, y=lifeExp, size=pop, col=continent)) + 
+  scale_size_continuous(name="Population") + scale_color_discrete(name="Continent") +
+  labs(title="Life expectancy as a function of GDP per capita in 2007", x="GDP per capita", y="Life expectancy")
+```
+
 ## Facets
 
-## Example: Facets
+> - So far we have been visualizing grouped data by changing the appearance or position of the objects.
+> - A different approach is to use facets, which creates separate coordinate systems for each geometric object.
 
-## Example: Facets
+## Example: Comparing generation patterns
+
+Task:<br>Compare energy generation over time, across sources.
+
+How do we do this? Using what we've learned so far:
+
+> 1. Supply `long_gen` to `ggplot()`.
+> 2. Add a `geom_line()` layer, setting `x=datetime` and `y=output` in `aes()`.
+> 3. Let's set `group=source` and `col=source` in `aes()`.
+
+## Example: Comparing generation patterns
+
+```{r why facet}
+long_gen %>%
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1) + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
+
+## Example: Comparing generation patterns
+
+Is this a helpful plot?
+
+> - Not if our goal is to compare the patterns of each source.
+> - It's too noisy!
+> - Instead of setting `col=` in `aes()`, let's add a `facet_wrap()` layer.
+> - Specifically, `facet_wrap(~source)`, i.e. tell ggplot to "facet by source".
+
+## Example: Comparing generation patterns
+
+```{r facet 1}
+long_gen %>% 
+  ggplot() + 
+  geom_line(aes(x = datetime, y = output)) + 
+  facet_wrap(~source) + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
+
+## Example: Comparing generation patterns
+
+```{r facet 2}
+long_gen %>% 
+  ggplot() + 
+  geom_line(aes(x = datetime, y = output)) + 
+  facet_wrap(~source, scales="free") + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
 
 ## Exercise: Facets
 
+Task:<br>Compare generation patterns for each source in facets. Color the lines using the "group" variable in `regroup`.
+
+Remember:
+
+- You will need to prepare your data. Think about the variables that you need: source/type, output, and group.
+- When you pipe modified data into ggplot, remember that you are grouping in two ways: source/type through facets, and group through color.
+
 ## Exercise: Facets
+
+```{r data prep for facets ex}
+long_gen_regroup <- long_gen %>%
+  rename(type = source) %>% 
+  merge(regroup, by="type")
+
+head(long_gen_regroup)
+```
+
+## Exercise: Facets
+
+```{r facets ex}
+long_gen_regroup %>% ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=group, col=group), size=1) + 
+  scale_color_brewer(palette="Set1", name="Type of energy source") +
+  facet_wrap(~type, scales="free") + 
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)") + 
+  theme(legend.position = "bottom")
+```
 
 # Final notes
 
