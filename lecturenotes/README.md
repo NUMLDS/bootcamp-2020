@@ -9,7 +9,7 @@ For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio
     - Reading and writing files
     - Data manipulation in base R
     - Data visualization in base R
-2. Day 2: 
+2. Day 2, covering:
     - RMarkdown
     - Loops, conditionals, and functions
     - R and Github
