@@ -127,7 +127,7 @@ mtcars$cylsq <- (mtcars$cyl)^2
 
 # Set your working directory
 # Choose the folder where you have copied the "data" and "exercises" subfolders
-setwd("~/team/bootcamp/2018/R session materials") # This will vary for each user
+setwd("~/team/bootcamp/2018/R") # This will vary for each user
 
 # Check your working directory
 getwd()

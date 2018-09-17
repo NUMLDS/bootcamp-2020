@@ -535,7 +535,7 @@ Today, we will briefly review the above topics, and then turn to new material on
 </section><section id="copy-relevant-folders" class="slide level2">
 <h2>Copy relevant folders</h2>
 <p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.</p>
-<p>The R session materials are stored in the following read-only directory: “~/team/bootcamp/2018/R session materials”. Copy the “data” and “exercises” subfolders (and others if you want) to a directory in your home folder.</p>
+<p>The R session materials are stored in the following read-only directory: “~/team/bootcamp/2018/R”. Copy the “data” and “exercises” subfolders (and others if you want) to a directory in your home folder.</p>
 <p><small>You can do this either using Bash or the GUI in the “Files” tab in the bottom-right pane or RStudio.</small></p>
 </section></section>
 <section><section id="review-basics-and-data-types" class="titleslide slide level1"><h1>Review: Basics and data types</h1></section><section id="arithmetic" class="slide level2">
@@ -718,7 +718,7 @@ There is an example matrix for you to practice with in the exercises file, but w
 <h2>Working directories</h2>
 <p>The working directory is the folder where R scripts and projects look for files by default. It is a good idea to create a folder for any project and store all your R and data files in that directory.</p>
 <p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then under the More menu, there is an option to set the current directory as the working directory. Or you can use the <code>setwd</code> command as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018/R session materials&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018/R&quot;</span>)</code></pre></div>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
