@@ -600,7 +600,7 @@ setwd("C:\Users\username\Documents\workshop") # windows, absolute path example
 In our case, we are working out of the directory team/bootcamp/2018 in the base directory. So we can set our working directory as follows:
 
 ```{r, eval=FALSE}
-setwd("~/team/bootcamp/2018")
+setwd("~/team/bootcamp/2018/R session materials")
 ```
 
 To check where your working directory is, use `getwd()`:
