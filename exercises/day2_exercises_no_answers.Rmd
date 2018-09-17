@@ -1,5 +1,5 @@
 ---
-title: "Exercises Part 6"
+title: "Exercises Day 2"
 author: "Richard Paquin Morel, adapted from exercises by Christina Maimone"
 date: "`r Sys.Date()`"
 output: html_document
