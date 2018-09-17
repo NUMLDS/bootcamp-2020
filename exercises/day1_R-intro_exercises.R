@@ -126,7 +126,8 @@ data(mtcars)
 #### READING FILES ####
 
 # Set your working directory
-setwd("~/team/bootcamp/2018")
+# Choose the folder where you have copied the "data" and "exercises" subfolders
+setwd()
 
 # Check your working directory
 

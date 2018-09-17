@@ -65,6 +65,14 @@ To refresh, you covered the following material in your course:
 Today, we will briefly review the above topics, and then turn to new material on reading and writing files, data manipulation, and data visualization.
 </aside>
 
+## Copy relevant folders
+
+We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.
+
+The R session materials are stored in the following read-only directory: "~/team/bootcamp/2018/R session materials". Copy the "data" and "exercises" subfolders (and others if you want) to a directory in your home folder.
+
+<small>You can do this either using Bash or the GUI in the "Files" tab in the bottom-right pane or RStudio.</small>
+
 # Review: Basics and data types 
 
 ## Arithmetic
@@ -262,7 +270,7 @@ The working directory is the folder where R scripts and projects look for files 
 You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then under the More menu, there is an option to set the current directory as the working directory. Or you can use the `setwd` command as follows:
 
 ```{r, eval=FALSE}
-setwd("~/team/bootcamp/2018")
+setwd("~/team/bootcamp/2018/R session materials")
 ```
 
 ## Reading files: read.csv()
@@ -283,7 +291,7 @@ The above code is what you will usually see and use. The below code breaks down 
 
 ## Reading files: read_csv()
 
-- Set your working directory using the code provided, and then check it.
+- Set your working directory: this should be the folder in which your copies of the "data" and "exercises" folders are stored.
 - Run the `read.csv()` code provided and see what happens in the Environment tab.
 - Load the `readr` package. <br><small>(It as has already been installed on the system-level as part of `tidyverse`)</small>
 - Use `read_csv()` to load the gapminder data. Read the message generated in the console.
