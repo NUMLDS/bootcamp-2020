@@ -133,36 +133,36 @@ setwd("~/team/bootcamp/2018/R session materials") # This will vary for each user
 getwd()
 
 # Read gapminder data with read.csv()
-gapminder5 <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
+gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
 
 # Load the readr package
 library(readr)
 
 # Read gapminder data with read_csv()
-gapminder5 <- read_csv("data/gapminder5.csv")
+gapminder <- read_csv("data/gapminder5.csv")
 
 #### DATA MANIPULATION ####
 
 #### Exploring data frames ####
 
 # Run summary() on the gapminder data
-summary(gapminder5)
+summary(gapminder)
 
 # Find the mean of the variable pop
-mean(gapminder5$pop)
+mean(gapminder$pop)
 
 # Create a frequency table of the variable 'year'
 # Hint: use table()
-table(gapminder5$year)
+table(gapminder$year)
 
 # Create a proportion table of the variable 'continent'
 # Hint: use prop.table()
-prop.table(table(gapminder5$continent))
+prop.table(table(gapminder$continent))
 
 #### Subsetting and Sorting ####
 
 # Create a new data frame called gapminder07 contaning only those rows in the gapminder data where year is 2007
-gapminder07 <- subset(gapminder5, year==2007)
+gapminder07 <- subset(gapminder, year==2007)
 
 # Created a sorted frequency table of the variable continent in gapminder07
 sort(table(gapminder07$continent))

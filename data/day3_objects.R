@@ -6,10 +6,10 @@ library(here)
 library(reshape2)
 
 # Prep gapminder5
-gapminder5 <- read_csv(here("data/gapminder5.csv"))
+gapminder <- read_csv(here("data/gapminder5.csv"))
 
 # Prep gapminder07
-gapminder07 <- subset(gapminder5, subset = year==2007)
+gapminder07 <- subset(gapminder, subset = year==2007)
 gapminder07$lifeExp_round <- round(gapminder07$lifeExp)
 gapminder07$lifeExp_over70 <- case_when(gapminder07$lifeExp > 70 ~ "Yes", 
                                         gapminder07$lifeExp < 70 ~ "No")

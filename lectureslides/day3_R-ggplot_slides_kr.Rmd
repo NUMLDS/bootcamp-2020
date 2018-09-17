@@ -43,7 +43,7 @@ In ggplot, graphics are built by supplying *data* and *mapping* of data values t
 
 ## Let's make sure we have the necessary data frames for our examples
 
-1. If you still have `imports`, `generation`, `merged_energy`, `long_gen` and `long_merged_energy` in your Enrivorment, run the code from your Day 1 exercises file to get `gapminder5` and `gapminder07`.
+1. If you still have `imports`, `generation`, `merged_energy`, `long_gen` and `long_merged_energy` in your Enrivorment, run the code from your Day 1 exercises file to get `gapminder` and `gapminder07`.
 2. If you are missing any of those objects from your workspace, run the following line of code:
 
 ```{r, warning=FALSE, message=FALSE}

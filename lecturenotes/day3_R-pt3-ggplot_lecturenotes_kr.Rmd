@@ -106,10 +106,10 @@ As you can see, the grammar of graphics used in ggplot2 breaks down the informat
 
 Recall the role of pipes (`%>%`) in `dplyr` this morning. Since `dplyr` and `ggplot2` are both part of tidyverse, they are designed to work well together. You can use a series of pipes to prepare your data to be in the appropriate format, subset, etc before plotting.
 
-For example, consider the above plot. Instead of specifying the data in the `ggplot()` function, we can supply the data through a pipe. Instead of using the subsetted `gapminder07` data, we can use the original `gapminder5` and use a `filter()` function to select the 2007 observations only.
+For example, consider the above plot. Instead of specifying the data in the `ggplot()` function, we can supply the data through a pipe. Instead of using the subsetted `gapminder07` data, we can use the original `gapminder` and use a `filter()` function to select the 2007 observations only.
 
 ```{r data prep 1}
-gapminder5 %>% 
+gapminder %>% 
   filter(year == 2007) %>% 
   ggplot() + 
   geom_point(aes(x = gdpPercap, y = lifeExp)) + 

@@ -618,14 +618,14 @@ Read in a csv file and save it as a data frame with a name. Below are two exampl
 schooldata <- read.csv("https://goo.gl/f4UhMX")
 
 # Using a local file
-gapminder5 <- read.csv("data/gapminder5.csv")
+gapminder <- read.csv("data/gapminder5.csv")
 ```
 
 You can view the data frames in RStudio using the `View()` function.
 
 ```{r, eval=FALSE}
 View(schooldata)
-View(gapminder5)
+View(gapminder)
 ```
 
 You could also use the Import Dataset option in the Environment tab in the top right window in RStudio.
@@ -640,7 +640,7 @@ Looking at the help for `read.csv`, there are a number of different options and 
 Let's redo the above with a better set of options:
 
 ```{r}
-gapminder5 <- read.csv("data/gapminder5.csv", 
+gapminder <- read.csv("data/gapminder5.csv", 
                       stringsAsFactors=FALSE, 
                       strip.white=TRUE, 
                       na.strings=c("NA", ""))
@@ -658,7 +658,7 @@ To read in the same data with the same settings as above, using `readr` (note si
 
 ```{r, message=TRUE}
 library(readr)
-gapminder5 <- read_csv("data/gapminder5.csv")
+gapminder <- read_csv("data/gapminder5.csv")
 ```
 
 Options used above are defaults in `readr`. You get a long message about the column types.
@@ -681,16 +681,16 @@ There are also multiple packages that make collecting data from APIs (either in 
 
 ## Exploring a data frame
 
-In the previous section, we imported two datasets. For the rest of today, we will focus on the Gapminder data, which is stored in our environment as `gapminder5`. To refresh yourself, you can view the data frame in R using the `View()` function.
+In the previous section, we imported two datasets. For the rest of today, we will focus on the Gapminder data, which is stored in our environment as `gapminder`. To refresh yourself, you can view the data frame in R using the `View()` function.
 
 ```{r, eval=F}
-View(gapminder5)
+View(gapminder)
 ```
 
 You can also see a list of variables using `names()`.
 
 ```{r}
-names(gapminder5)
+names(gapminder)
 ```
 
 Other useful functions are `dim()` which shows the dimensions of the data frame, `str()` which shows the dimensions of the data frame along with the names of variables and the first few values in each variable, `nrow()` and `ncol()` which show the number of rows and colums, and `head()` which shows the first few rows of the data frame (5 rows by default).
@@ -698,31 +698,31 @@ Other useful functions are `dim()` which shows the dimensions of the data frame,
 When applied to a data frame, the `summary()` function provides useful summary statistics for each variable (i.e. column) in the data frame. Let's try it with the Gapminder data:
 
 ```{r}
-summary(gapminder5)
+summary(gapminder)
 ```
 
 We can also use functions like `mean()`, `median()`, `var()`, `sd()`, and `quantile()` to calculate other summary statistics for individual variables. For example, let's calculate the mean of life expectancy. Recall that we can use the `$` operator to call up a variable within a data frame using its name.
 
 ```{r}
-mean(gapminder5$lifeExp)
+mean(gapminder$lifeExp)
 ```
 
 A useful way to examine a discrete or categorical variable is to use a frequency table. These are easy to make in R, using the `table()` function:
 
 ```{r}
-table(gapminder5$continent)
+table(gapminder$continent)
 ```
 
 `prop.table()` is a useful wrapper around `table()`, showing the proportion of rows in each category:
 
 ```{r}
-prop.table(table(gapminder5$continent))
+prop.table(table(gapminder$continent))
 ```
 
 You can generate a frequency table with more than one variable as well:
 
 ```{r}
-table(gapminder5$continent, gapminder5$year)
+table(gapminder$continent, gapminder$year)
 ```
 
 ## Subsetting
@@ -740,7 +740,7 @@ subset(data.frame,
 For eaxmple, let's create a new data frame containing only 2007 data by subsetting the original data frame.
 
 ```{r}
-gapminder07 <- subset(gapminder5, subset = year==2007)
+gapminder07 <- subset(gapminder, subset = year==2007)
 ```
 
 Look at the number of rows in the new data frame: it is only 142, whereas the original data frame has 1704 rows.
@@ -789,26 +789,26 @@ newvar <- sample(1:5000, 1704, replace = FALSE)
 You can add a variable/column by using the `cbind()` function:
 
 ```{r}
-gapminder5 <- cbind(gapminder5, newvar)
+gapminder <- cbind(gapminder, newvar)
 ```
 
 You can add a variable/column by assigning it to data frame directly:
 
 ```{r}
-gapminder5$newvar <- newvar
+gapminder$newvar <- newvar
 ```
 
 To remove a variable/column from a data frame, you can assign a `NULL` value to the variable:
 
 ```{r}
-gapminder5$newvar <- NULL
+gapminder$newvar <- NULL
 ```
 
 You can also remove a variable/column by negatively indexing the data frame:
 
 ```{r, eval = F}
-gapminder5 <- gapminder5[-"newvar"]
-gapminder5 <- gapminder5[,-c("newvar")] 
+gapminder <- gapminder[-"newvar"]
+gapminder <- gapminder[,-c("newvar")] 
 # The second method is equivalent to the first, but can be used to remove multiple columns at the same time.
 ```
 
@@ -861,7 +861,7 @@ The `~` operator can be read as "by" or "as a function of", and is used in many 
 We can also aggregate by two variables. For example, let's use the original Gapminder data (not just the 2007 data) and aggregate by continent *and* year.
 
 ```{r}
-aggregate(gapminder5$lifeExp ~ gapminder5$year + gapminder5$continent, FUN=mean)
+aggregate(gapminder$lifeExp ~ gapminder$year + gapminder$continent, FUN=mean)
 ```
 
 ## Statistics
@@ -947,21 +947,21 @@ You will often want to save your work in R as well. There are a few different wa
 
 ## Writing a data file
 
-We imported the `gapminder5` data earlier in CSV format, and manipulated it in several ways: we subsetted the 2007 data and added the variables `lifeExp_rounded`, `lifeExp_highlow`. and `continent_abrv`. 
+We imported the `gapminder` data earlier in CSV format, and manipulated it in several ways: we subsetted the 2007 data and added the variables `lifeExp_rounded`, `lifeExp_highlow`. and `continent_abrv`. 
 
 The best method for making your workflow and analysis reproducible is to write any data sets you create to plain text files.
 
 Let's try to save our subsetted and manipulated `gapminder07` data frame as a CSV. To write a CSV, there are `write.csv` and `write.table` functions, similar to their `read` counterparts. The one trick is that you usually want to NOT write row.names.
 
 ```{r, eval=FALSE}
-write.csv(gapminder07, file="data/gapminder5_2007_edited.csv", 
+write.csv(gapminder07, file="data/gapminder_2007_edited.csv", 
           row.names=FALSE)
 ```
 
 Or using `readr` package's equivalent:
 
 ```{r, eval=FALSE}
-write_csv(schooldata, "data/gapminder5_2007_edited.csv")
+write_csv(schooldata, "data/gapminder_2007_edited.csv")
 ```
 
 ## Saving R objects
@@ -969,7 +969,7 @@ write_csv(schooldata, "data/gapminder5_2007_edited.csv")
 You can use the `save` function to save multiple objects together in a file.  The standard file extension to use is `.RData`. Example:
 
 ```{r, eval=FALSE}
-save(schooldata, gapminder5, 
+save(schooldata, gapminder, 
      file = "workshopobjects.RData")
 ```
 

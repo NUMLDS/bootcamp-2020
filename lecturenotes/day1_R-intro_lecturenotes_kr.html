@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kumar Ramanathan (based on materials by Christina Maimone)" />
 
-<meta name="date" content="2018-09-15" />
+<meta name="date" content="2018-09-16" />
 
 <title>Intro to R: Day 1</title>
 
@@ -222,7 +222,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Intro to R: Day 1</h1>
 <h4 class="author"><em>Kumar Ramanathan (based on materials by Christina Maimone)</em></h4>
-<h4 class="date"><em>2018-09-15</em></h4>
+<h4 class="date"><em>2018-09-16</em></h4>
 
 </div>
 
@@ -688,33 +688,33 @@ color</code></pre>
 ## [17] &quot;blue&quot;  &quot;blue&quot;  &quot;blue&quot;  &quot;blue&quot;</code></pre>
 <pre class="r"><code>score&lt;-runif(20)
 score</code></pre>
-<pre><code>##  [1] 0.051868462 0.183124996 0.116484354 0.617721432 0.792829066
-##  [6] 0.903761253 0.593895615 0.692560803 0.939859794 0.542713236
-## [11] 0.518077082 0.121824918 0.992496506 0.002114496 0.616868847
-## [16] 0.515133746 0.143941831 0.316884091 0.324264554 0.420500944</code></pre>
+<pre><code>##  [1] 0.35448943 0.62951740 0.36925879 0.15391786 0.49879479 0.02624805
+##  [7] 0.55731052 0.38109965 0.43620806 0.21493019 0.32607681 0.16305469
+## [13] 0.35438788 0.98624642 0.92546906 0.83197664 0.78335862 0.93000622
+## [19] 0.68616774 0.20210345</code></pre>
 <pre class="r"><code>df&lt;-data.frame(id, color, score)
 df</code></pre>
-<pre><code>##    id color       score
-## 1   1   red 0.051868462
-## 2   2   red 0.183124996
-## 3   3   red 0.116484354
-## 4   4 green 0.617721432
-## 5   5 green 0.792829066
-## 6   6 green 0.903761253
-## 7   7 green 0.593895615
-## 8   8 green 0.692560803
-## 9   9 green 0.939859794
-## 10 10 green 0.542713236
-## 11 11 green 0.518077082
-## 12 12 green 0.121824918
-## 13 13 green 0.992496506
-## 14 14  blue 0.002114496
-## 15 15  blue 0.616868847
-## 16 16  blue 0.515133746
-## 17 17  blue 0.143941831
-## 18 18  blue 0.316884091
-## 19 19  blue 0.324264554
-## 20 20  blue 0.420500944</code></pre>
+<pre><code>##    id color      score
+## 1   1   red 0.35448943
+## 2   2   red 0.62951740
+## 3   3   red 0.36925879
+## 4   4 green 0.15391786
+## 5   5 green 0.49879479
+## 6   6 green 0.02624805
+## 7   7 green 0.55731052
+## 8   8 green 0.38109965
+## 9   9 green 0.43620806
+## 10 10 green 0.21493019
+## 11 11 green 0.32607681
+## 12 12 green 0.16305469
+## 13 13 green 0.35438788
+## 14 14  blue 0.98624642
+## 15 15  blue 0.92546906
+## 16 16  blue 0.83197664
+## 17 17  blue 0.78335862
+## 18 18  blue 0.93000622
+## 19 19  blue 0.68616774
+## 20 20  blue 0.20210345</code></pre>
 <p>Instead of making individual objects first, we could do it all together:</p>
 <pre class="r"><code>df&lt;-data.frame(id=1:20, 
                color=c(rep(&quot;red&quot;, 3), rep(&quot;green&quot;,10), rep(&quot;blue&quot;, 7)),
@@ -725,47 +725,47 @@ df</code></pre>
 ## Levels: blue green red</code></pre>
 <pre class="r"><code>df[1,]</code></pre>
 <pre><code>##   id color     score
-## 1  1   red 0.6469298</code></pre>
+## 1  1   red 0.3007911</code></pre>
 <pre class="r"><code>df[,3]</code></pre>
-<pre><code>##  [1] 0.646929838 0.989704874 0.239116613 0.335956801 0.178810963
-##  [6] 0.811950797 0.228598241 0.729084415 0.147403570 0.882378077
-## [11] 0.382674366 0.965407989 0.280425037 0.438426912 0.004782254
-## [16] 0.030421801 0.867079394 0.905151529 0.961718363 0.389178454</code></pre>
+<pre><code>##  [1] 0.300791116 0.901201044 0.629483142 0.957251180 0.495166630
+##  [6] 0.847443188 0.437754877 0.872048439 0.782935861 0.390369120
+## [11] 0.688745148 0.474597213 0.075085383 0.829901089 0.722287315
+## [16] 0.607302098 0.029408450 0.006842539 0.140815072 0.200647831</code></pre>
 <p>You can use negative values when indexing to exclude values:</p>
 <pre class="r"><code>df[,-2]</code></pre>
 <pre><code>##    id       score
-## 1   1 0.646929838
-## 2   2 0.989704874
-## 3   3 0.239116613
-## 4   4 0.335956801
-## 5   5 0.178810963
-## 6   6 0.811950797
-## 7   7 0.228598241
-## 8   8 0.729084415
-## 9   9 0.147403570
-## 10 10 0.882378077
-## 11 11 0.382674366
-## 12 12 0.965407989
-## 13 13 0.280425037
-## 14 14 0.438426912
-## 15 15 0.004782254
-## 16 16 0.030421801
-## 17 17 0.867079394
-## 18 18 0.905151529
-## 19 19 0.961718363
-## 20 20 0.389178454</code></pre>
+## 1   1 0.300791116
+## 2   2 0.901201044
+## 3   3 0.629483142
+## 4   4 0.957251180
+## 5   5 0.495166630
+## 6   6 0.847443188
+## 7   7 0.437754877
+## 8   8 0.872048439
+## 9   9 0.782935861
+## 10 10 0.390369120
+## 11 11 0.688745148
+## 12 12 0.474597213
+## 13 13 0.075085383
+## 14 14 0.829901089
+## 15 15 0.722287315
+## 16 16 0.607302098
+## 17 17 0.029408450
+## 18 18 0.006842539
+## 19 19 0.140815072
+## 20 20 0.200647831</code></pre>
 <pre class="r"><code>df[-1:-10,]</code></pre>
 <pre><code>##    id color       score
-## 11 11 green 0.382674366
-## 12 12 green 0.965407989
-## 13 13 green 0.280425037
-## 14 14  blue 0.438426912
-## 15 15  blue 0.004782254
-## 16 16  blue 0.030421801
-## 17 17  blue 0.867079394
-## 18 18  blue 0.905151529
-## 19 19  blue 0.961718363
-## 20 20  blue 0.389178454</code></pre>
+## 11 11 green 0.688745148
+## 12 12 green 0.474597213
+## 13 13 green 0.075085383
+## 14 14  blue 0.829901089
+## 15 15  blue 0.722287315
+## 16 16  blue 0.607302098
+## 17 17  blue 0.029408450
+## 18 18  blue 0.006842539
+## 19 19  blue 0.140815072
+## 20 20  blue 0.200647831</code></pre>
 <p>You can also use the names of the columns after a <code>$</code> or in the indexing:</p>
 <pre class="r"><code>df$color</code></pre>
 <pre><code>##  [1] red   red   red   green green green green green green green green
@@ -796,55 +796,56 @@ df</code></pre>
 ## 20  blue</code></pre>
 <pre class="r"><code>df[2:3]</code></pre>
 <pre><code>##    color       score
-## 1    red 0.646929838
-## 2    red 0.989704874
-## 3    red 0.239116613
-## 4  green 0.335956801
-## 5  green 0.178810963
-## 6  green 0.811950797
-## 7  green 0.228598241
-## 8  green 0.729084415
-## 9  green 0.147403570
-## 10 green 0.882378077
-## 11 green 0.382674366
-## 12 green 0.965407989
-## 13 green 0.280425037
-## 14  blue 0.438426912
-## 15  blue 0.004782254
-## 16  blue 0.030421801
-## 17  blue 0.867079394
-## 18  blue 0.905151529
-## 19  blue 0.961718363
-## 20  blue 0.389178454</code></pre>
+## 1    red 0.300791116
+## 2    red 0.901201044
+## 3    red 0.629483142
+## 4  green 0.957251180
+## 5  green 0.495166630
+## 6  green 0.847443188
+## 7  green 0.437754877
+## 8  green 0.872048439
+## 9  green 0.782935861
+## 10 green 0.390369120
+## 11 green 0.688745148
+## 12 green 0.474597213
+## 13 green 0.075085383
+## 14  blue 0.829901089
+## 15  blue 0.722287315
+## 16  blue 0.607302098
+## 17  blue 0.029408450
+## 18  blue 0.006842539
+## 19  blue 0.140815072
+## 20  blue 0.200647831</code></pre>
 <p>Instead of index numbers or names, you can also select values by using logical statements. This is usually done with selecting rows.</p>
 <pre class="r"><code>df[df$color == &quot;green&quot;,]</code></pre>
-<pre><code>##    id color     score
-## 4   4 green 0.3359568
-## 5   5 green 0.1788110
-## 6   6 green 0.8119508
-## 7   7 green 0.2285982
-## 8   8 green 0.7290844
-## 9   9 green 0.1474036
-## 10 10 green 0.8823781
-## 11 11 green 0.3826744
-## 12 12 green 0.9654080
-## 13 13 green 0.2804250</code></pre>
+<pre><code>##    id color      score
+## 4   4 green 0.95725118
+## 5   5 green 0.49516663
+## 6   6 green 0.84744319
+## 7   7 green 0.43775488
+## 8   8 green 0.87204844
+## 9   9 green 0.78293586
+## 10 10 green 0.39036912
+## 11 11 green 0.68874515
+## 12 12 green 0.47459721
+## 13 13 green 0.07508538</code></pre>
 <pre class="r"><code>df[df$score &gt; .5,]</code></pre>
 <pre><code>##    id color     score
-## 1   1   red 0.6469298
-## 2   2   red 0.9897049
-## 6   6 green 0.8119508
-## 8   8 green 0.7290844
-## 10 10 green 0.8823781
-## 12 12 green 0.9654080
-## 17 17  blue 0.8670794
-## 18 18  blue 0.9051515
-## 19 19  blue 0.9617184</code></pre>
+## 2   2   red 0.9012010
+## 3   3   red 0.6294831
+## 4   4 green 0.9572512
+## 6   6 green 0.8474432
+## 8   8 green 0.8720484
+## 9   9 green 0.7829359
+## 11 11 green 0.6887451
+## 14 14  blue 0.8299011
+## 15 15  blue 0.7222873
+## 16 16  blue 0.6073021</code></pre>
 <pre class="r"><code>df[df$score &gt; .5 &amp; df$color == &quot;blue&quot;,]</code></pre>
 <pre><code>##    id color     score
-## 17 17  blue 0.8670794
-## 18 18  blue 0.9051515
-## 19 19  blue 0.9617184</code></pre>
+## 14 14  blue 0.8299011
+## 15 15  blue 0.7222873
+## 16 16  blue 0.6073021</code></pre>
 <p>You can assign names to the rows of a data frame as well as to the columns, and then use those names for indexing and selecting data.</p>
 <pre class="r"><code>rownames(df)</code></pre>
 <pre><code>##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot;
@@ -853,26 +854,26 @@ df</code></pre>
 <pre class="r"><code>df$year&lt;-1901:1920
 df</code></pre>
 <pre><code>##    id color       score year
-## 1   1   red 0.646929838 1901
-## 2   2   red 0.989704874 1902
-## 3   3   red 0.239116613 1903
-## 4   4 green 0.335956801 1904
-## 5   5 green 0.178810963 1905
-## 6   6 green 0.811950797 1906
-## 7   7 green 0.228598241 1907
-## 8   8 green 0.729084415 1908
-## 9   9 green 0.147403570 1909
-## 10 10 green 0.882378077 1910
-## 11 11 green 0.382674366 1911
-## 12 12 green 0.965407989 1912
-## 13 13 green 0.280425037 1913
-## 14 14  blue 0.438426912 1914
-## 15 15  blue 0.004782254 1915
-## 16 16  blue 0.030421801 1916
-## 17 17  blue 0.867079394 1917
-## 18 18  blue 0.905151529 1918
-## 19 19  blue 0.961718363 1919
-## 20 20  blue 0.389178454 1920</code></pre>
+## 1   1   red 0.300791116 1901
+## 2   2   red 0.901201044 1902
+## 3   3   red 0.629483142 1903
+## 4   4 green 0.957251180 1904
+## 5   5 green 0.495166630 1905
+## 6   6 green 0.847443188 1906
+## 7   7 green 0.437754877 1907
+## 8   8 green 0.872048439 1908
+## 9   9 green 0.782935861 1909
+## 10 10 green 0.390369120 1910
+## 11 11 green 0.688745148 1911
+## 12 12 green 0.474597213 1912
+## 13 13 green 0.075085383 1913
+## 14 14  blue 0.829901089 1914
+## 15 15  blue 0.722287315 1915
+## 16 16  blue 0.607302098 1916
+## 17 17  blue 0.029408450 1917
+## 18 18  blue 0.006842539 1918
+## 19 19  blue 0.140815072 1919
+## 20 20  blue 0.200647831 1920</code></pre>
 <pre class="r"><code>df[22,]&lt;-list(21, &quot;green&quot;, 0.4, 1921)</code></pre>
 <p>Note that we had to use a list for adding a row because there are different data types.</p>
 </div>
@@ -887,7 +888,7 @@ df</code></pre>
 setwd(&quot;/Users/username/Documents/workshop&quot;) # mac, absolute path example
 setwd(&quot;C:\Users\username\Documents\workshop&quot;) # windows, absolute path example</code></pre>
 <p>In our case, we are working out of the directory team/bootcamp/2018 in the base directory. So we can set our working directory as follows:</p>
-<pre class="r"><code>setwd(&quot;~/team/bootcamp/2018&quot;)</code></pre>
+<pre class="r"><code>setwd(&quot;~/team/bootcamp/2018/R session materials&quot;)</code></pre>
 <p>To check where your working directory is, use <code>getwd()</code>:</p>
 <pre class="r"><code>getwd()</code></pre>
 <pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2018&quot;</code></pre>
@@ -899,10 +900,10 @@ setwd(&quot;C:\Users\username\Documents\workshop&quot;) # windows, absolute path
 schooldata &lt;- read.csv(&quot;https://goo.gl/f4UhMX&quot;)
 
 # Using a local file
-gapminder5 &lt;- read.csv(&quot;data/gapminder5.csv&quot;)</code></pre>
+gapminder &lt;- read.csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <p>You can view the data frames in RStudio using the <code>View()</code> function.</p>
 <pre class="r"><code>View(schooldata)
-View(gapminder5)</code></pre>
+View(gapminder)</code></pre>
 <p>You could also use the Import Dataset option in the Environment tab in the top right window in RStudio.</p>
 <p>Looking at the help for <code>read.csv</code>, there are a number of different options and different function calls. <code>read.table</code>, <code>read.csv</code>, and <code>read.delim</code> all work in the same basic way and take the same set of arguments, but they have different defaults. Key options to pay attention to include:</p>
 <ul>
@@ -912,7 +913,7 @@ View(gapminder5)</code></pre>
 <li><code>stringsAsFactors</code>: should strings (text data) be converted to factors or kept as is? Example of this below.</li>
 </ul>
 <p>Let’s redo the above with a better set of options:</p>
-<pre class="r"><code>gapminder5 &lt;- read.csv(&quot;data/gapminder5.csv&quot;, 
+<pre class="r"><code>gapminder &lt;- read.csv(&quot;data/gapminder5.csv&quot;, 
                       stringsAsFactors=FALSE, 
                       strip.white=TRUE, 
                       na.strings=c(&quot;NA&quot;, &quot;&quot;))</code></pre>
@@ -924,7 +925,7 @@ View(gapminder5)</code></pre>
 <p>Look at the <code>readr</code> package (part of the tidyverse), which attempts to smooth over some of the annoyances of reading in file in R. The main source of potential problems when using <code>readr</code> functions is that it guesses variable types from a subset of the observations, so if you have a strange value further down in your dataset, you might get an error or an unexpected value conversion.</p>
 <p>To read in the same data with the same settings as above, using <code>readr</code> (note similar function name, with <code>_</code> instead of <code>.</code>):</p>
 <pre class="r"><code>library(readr)
-gapminder5 &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
+gapminder &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   country = col_character(),
@@ -952,14 +953,14 @@ gapminder5 &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <h1>Data manipulation in base R</h1>
 <div id="exploring-a-data-frame" class="section level2">
 <h2>Exploring a data frame</h2>
-<p>In the previous section, we imported two datasets. For the rest of today, we will focus on the Gapminder data, which is stored in our environment as <code>gapminder5</code>. To refresh yourself, you can view the data frame in R using the <code>View()</code> function.</p>
-<pre class="r"><code>View(gapminder5)</code></pre>
+<p>In the previous section, we imported two datasets. For the rest of today, we will focus on the Gapminder data, which is stored in our environment as <code>gapminder</code>. To refresh yourself, you can view the data frame in R using the <code>View()</code> function.</p>
+<pre class="r"><code>View(gapminder)</code></pre>
 <p>You can also see a list of variables using <code>names()</code>.</p>
-<pre class="r"><code>names(gapminder5)</code></pre>
+<pre class="r"><code>names(gapminder)</code></pre>
 <pre><code>## [1] &quot;country&quot;   &quot;year&quot;      &quot;pop&quot;       &quot;continent&quot; &quot;lifeExp&quot;   &quot;gdpPercap&quot;</code></pre>
 <p>Other useful functions are <code>dim()</code> which shows the dimensions of the data frame, <code>str()</code> which shows the dimensions of the data frame along with the names of variables and the first few values in each variable, <code>nrow()</code> and <code>ncol()</code> which show the number of rows and colums, and <code>head()</code> which shows the first few rows of the data frame (5 rows by default).</p>
 <p>When applied to a data frame, the <code>summary()</code> function provides useful summary statistics for each variable (i.e. column) in the data frame. Let’s try it with the Gapminder data:</p>
-<pre class="r"><code>summary(gapminder5)</code></pre>
+<pre class="r"><code>summary(gapminder)</code></pre>
 <pre><code>##    country               year           pop             continent        
 ##  Length:1704        Min.   :1952   Min.   :6.001e+04   Length:1704       
 ##  Class :character   1st Qu.:1966   1st Qu.:2.794e+06   Class :character  
@@ -975,20 +976,20 @@ gapminder5 &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 ##  3rd Qu.:70.85   3rd Qu.:  9325.5  
 ##  Max.   :82.60   Max.   :113523.1</code></pre>
 <p>We can also use functions like <code>mean()</code>, <code>median()</code>, <code>var()</code>, <code>sd()</code>, and <code>quantile()</code> to calculate other summary statistics for individual variables. For example, let’s calculate the mean of life expectancy. Recall that we can use the <code>$</code> operator to call up a variable within a data frame using its name.</p>
-<pre class="r"><code>mean(gapminder5$lifeExp)</code></pre>
+<pre class="r"><code>mean(gapminder$lifeExp)</code></pre>
 <pre><code>## [1] 59.47444</code></pre>
 <p>A useful way to examine a discrete or categorical variable is to use a frequency table. These are easy to make in R, using the <code>table()</code> function:</p>
-<pre class="r"><code>table(gapminder5$continent)</code></pre>
+<pre class="r"><code>table(gapminder$continent)</code></pre>
 <pre><code>## 
 ##   Africa Americas     Asia   Europe  Oceania 
 ##      624      300      396      360       24</code></pre>
 <p><code>prop.table()</code> is a useful wrapper around <code>table()</code>, showing the proportion of rows in each category:</p>
-<pre class="r"><code>prop.table(table(gapminder5$continent))</code></pre>
+<pre class="r"><code>prop.table(table(gapminder$continent))</code></pre>
 <pre><code>## 
 ##     Africa   Americas       Asia     Europe    Oceania 
 ## 0.36619718 0.17605634 0.23239437 0.21126761 0.01408451</code></pre>
 <p>You can generate a frequency table with more than one variable as well:</p>
-<pre class="r"><code>table(gapminder5$continent, gapminder5$year)</code></pre>
+<pre class="r"><code>table(gapminder$continent, gapminder$year)</code></pre>
 <pre><code>##           
 ##            1952 1957 1962 1967 1972 1977 1982 1987 1992 1997 2002 2007
 ##   Africa     52   52   52   52   52   52   52   52   52   52   52   52
@@ -1005,7 +1006,7 @@ gapminder5 &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
        subset=condition indicating rows to keep,
        select=condition indicating columns to keep)</code></pre>
 <p>For eaxmple, let’s create a new data frame containing only 2007 data by subsetting the original data frame.</p>
-<pre class="r"><code>gapminder07 &lt;- subset(gapminder5, subset = year==2007)</code></pre>
+<pre class="r"><code>gapminder07 &lt;- subset(gapminder, subset = year==2007)</code></pre>
 <p>Look at the number of rows in the new data frame: it is only 142, whereas the original data frame has 1704 rows.</p>
 <pre class="r"><code>nrow(gapminder07)</code></pre>
 <pre><code>## [1] 142</code></pre>
@@ -1079,14 +1080,14 @@ gapminder5 &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <p>To demonstrate, let’s first create a vector with the same number of values as the number of rows in the data frame. If you want to learn what is going on in this code, look at the help file for the function <code>sample()</code>.</p>
 <pre class="r"><code>newvar &lt;- sample(1:5000, 1704, replace = FALSE)</code></pre>
 <p>You can add a variable/column by using the <code>cbind()</code> function:</p>
-<pre class="r"><code>gapminder5 &lt;- cbind(gapminder5, newvar)</code></pre>
+<pre class="r"><code>gapminder &lt;- cbind(gapminder, newvar)</code></pre>
 <p>You can add a variable/column by assigning it to data frame directly:</p>
-<pre class="r"><code>gapminder5$newvar &lt;- newvar</code></pre>
+<pre class="r"><code>gapminder$newvar &lt;- newvar</code></pre>
 <p>To remove a variable/column from a data frame, you can assign a <code>NULL</code> value to the variable:</p>
-<pre class="r"><code>gapminder5$newvar &lt;- NULL</code></pre>
+<pre class="r"><code>gapminder$newvar &lt;- NULL</code></pre>
 <p>You can also remove a variable/column by negatively indexing the data frame:</p>
-<pre class="r"><code>gapminder5 &lt;- gapminder5[-&quot;newvar&quot;]
-gapminder5 &lt;- gapminder5[,-c(&quot;newvar&quot;)] 
+<pre class="r"><code>gapminder &lt;- gapminder[-&quot;newvar&quot;]
+gapminder &lt;- gapminder[,-c(&quot;newvar&quot;)] 
 # The second method is equivalent to the first, but can be used to remove multiple columns at the same time.</code></pre>
 <p>To add rows, you can use the function <code>rbind()</code>. Remember that rows may include different data types, in which case you would need to use the function <code>list()</code>.</p>
 </div>
@@ -1127,68 +1128,68 @@ table(gapminder07$continent_abrv)</code></pre>
 ## 5               Oceania            80.71950</code></pre>
 <p>The <code>~</code> operator can be read as “by” or “as a function of”, and is used in many contexts. A construction such as <code>y ~ x1 + x2</code> is referred to as a <em>formula</em>.</p>
 <p>We can also aggregate by two variables. For example, let’s use the original Gapminder data (not just the 2007 data) and aggregate by continent <em>and</em> year.</p>
-<pre class="r"><code>aggregate(gapminder5$lifeExp ~ gapminder5$year + gapminder5$continent, FUN=mean)</code></pre>
-<pre><code>##    gapminder5$year gapminder5$continent gapminder5$lifeExp
-## 1             1952               Africa           39.13550
-## 2             1957               Africa           41.26635
-## 3             1962               Africa           43.31944
-## 4             1967               Africa           45.33454
-## 5             1972               Africa           47.45094
-## 6             1977               Africa           49.58042
-## 7             1982               Africa           51.59287
-## 8             1987               Africa           53.34479
-## 9             1992               Africa           53.62958
-## 10            1997               Africa           53.59827
-## 11            2002               Africa           53.32523
-## 12            2007               Africa           54.80604
-## 13            1952             Americas           53.27984
-## 14            1957             Americas           55.96028
-## 15            1962             Americas           58.39876
-## 16            1967             Americas           60.41092
-## 17            1972             Americas           62.39492
-## 18            1977             Americas           64.39156
-## 19            1982             Americas           66.22884
-## 20            1987             Americas           68.09072
-## 21            1992             Americas           69.56836
-## 22            1997             Americas           71.15048
-## 23            2002             Americas           72.42204
-## 24            2007             Americas           73.60812
-## 25            1952                 Asia           46.31439
-## 26            1957                 Asia           49.31854
-## 27            1962                 Asia           51.56322
-## 28            1967                 Asia           54.66364
-## 29            1972                 Asia           57.31927
-## 30            1977                 Asia           59.61056
-## 31            1982                 Asia           62.61794
-## 32            1987                 Asia           64.85118
-## 33            1992                 Asia           66.53721
-## 34            1997                 Asia           68.02052
-## 35            2002                 Asia           69.23388
-## 36            2007                 Asia           70.72848
-## 37            1952               Europe           64.40850
-## 38            1957               Europe           66.70307
-## 39            1962               Europe           68.53923
-## 40            1967               Europe           69.73760
-## 41            1972               Europe           70.77503
-## 42            1977               Europe           71.93777
-## 43            1982               Europe           72.80640
-## 44            1987               Europe           73.64217
-## 45            1992               Europe           74.44010
-## 46            1997               Europe           75.50517
-## 47            2002               Europe           76.70060
-## 48            2007               Europe           77.64860
-## 49            1952              Oceania           69.25500
-## 50            1957              Oceania           70.29500
-## 51            1962              Oceania           71.08500
-## 52            1967              Oceania           71.31000
-## 53            1972              Oceania           71.91000
-## 54            1977              Oceania           72.85500
-## 55            1982              Oceania           74.29000
-## 56            1987              Oceania           75.32000
-## 57            1992              Oceania           76.94500
-## 58            1997              Oceania           78.19000
-## 59            2002              Oceania           79.74000
-## 60            2007              Oceania           80.71950</code></pre>
+<pre class="r"><code>aggregate(gapminder$lifeExp ~ gapminder$year + gapminder$continent, FUN=mean)</code></pre>
+<pre><code>##    gapminder$year gapminder$continent gapminder$lifeExp
+## 1            1952              Africa          39.13550
+## 2            1957              Africa          41.26635
+## 3            1962              Africa          43.31944
+## 4            1967              Africa          45.33454
+## 5            1972              Africa          47.45094
+## 6            1977              Africa          49.58042
+## 7            1982              Africa          51.59287
+## 8            1987              Africa          53.34479
+## 9            1992              Africa          53.62958
+## 10           1997              Africa          53.59827
+## 11           2002              Africa          53.32523
+## 12           2007              Africa          54.80604
+## 13           1952            Americas          53.27984
+## 14           1957            Americas          55.96028
+## 15           1962            Americas          58.39876
+## 16           1967            Americas          60.41092
+## 17           1972            Americas          62.39492
+## 18           1977            Americas          64.39156
+## 19           1982            Americas          66.22884
+## 20           1987            Americas          68.09072
+## 21           1992            Americas          69.56836
+## 22           1997            Americas          71.15048
+## 23           2002            Americas          72.42204
+## 24           2007            Americas          73.60812
+## 25           1952                Asia          46.31439
+## 26           1957                Asia          49.31854
+## 27           1962                Asia          51.56322
+## 28           1967                Asia          54.66364
+## 29           1972                Asia          57.31927
+## 30           1977                Asia          59.61056
+## 31           1982                Asia          62.61794
+## 32           1987                Asia          64.85118
+## 33           1992                Asia          66.53721
+## 34           1997                Asia          68.02052
+## 35           2002                Asia          69.23388
+## 36           2007                Asia          70.72848
+## 37           1952              Europe          64.40850
+## 38           1957              Europe          66.70307
+## 39           1962              Europe          68.53923
+## 40           1967              Europe          69.73760
+## 41           1972              Europe          70.77503
+## 42           1977              Europe          71.93777
+## 43           1982              Europe          72.80640
+## 44           1987              Europe          73.64217
+## 45           1992              Europe          74.44010
+## 46           1997              Europe          75.50517
+## 47           2002              Europe          76.70060
+## 48           2007              Europe          77.64860
+## 49           1952             Oceania          69.25500
+## 50           1957             Oceania          70.29500
+## 51           1962             Oceania          71.08500
+## 52           1967             Oceania          71.31000
+## 53           1972             Oceania          71.91000
+## 54           1977             Oceania          72.85500
+## 55           1982             Oceania          74.29000
+## 56           1987             Oceania          75.32000
+## 57           1992             Oceania          76.94500
+## 58           1997             Oceania          78.19000
+## 59           2002             Oceania          79.74000
+## 60           2007             Oceania          80.71950</code></pre>
 </div>
 <div id="statistics" class="section level2">
 <h2>Statistics</h2>
@@ -1305,18 +1306,18 @@ summary(r2)</code></pre>
 <p>You will often want to save your work in R as well. There are a few different ways to save:</p>
 <div id="writing-a-data-file" class="section level2">
 <h2>Writing a data file</h2>
-<p>We imported the <code>gapminder5</code> data earlier in CSV format, and manipulated it in several ways: we subsetted the 2007 data and added the variables <code>lifeExp_rounded</code>, <code>lifeExp_highlow</code>. and <code>continent_abrv</code>.</p>
+<p>We imported the <code>gapminder</code> data earlier in CSV format, and manipulated it in several ways: we subsetted the 2007 data and added the variables <code>lifeExp_rounded</code>, <code>lifeExp_highlow</code>. and <code>continent_abrv</code>.</p>
 <p>The best method for making your workflow and analysis reproducible is to write any data sets you create to plain text files.</p>
 <p>Let’s try to save our subsetted and manipulated <code>gapminder07</code> data frame as a CSV. To write a CSV, there are <code>write.csv</code> and <code>write.table</code> functions, similar to their <code>read</code> counterparts. The one trick is that you usually want to NOT write row.names.</p>
-<pre class="r"><code>write.csv(gapminder07, file=&quot;data/gapminder5_2007_edited.csv&quot;, 
+<pre class="r"><code>write.csv(gapminder07, file=&quot;data/gapminder_2007_edited.csv&quot;, 
           row.names=FALSE)</code></pre>
 <p>Or using <code>readr</code> package’s equivalent:</p>
-<pre class="r"><code>write_csv(schooldata, &quot;data/gapminder5_2007_edited.csv&quot;)</code></pre>
+<pre class="r"><code>write_csv(schooldata, &quot;data/gapminder_2007_edited.csv&quot;)</code></pre>
 </div>
 <div id="saving-r-objects" class="section level2">
 <h2>Saving R objects</h2>
 <p>You can use the <code>save</code> function to save multiple objects together in a file. The standard file extension to use is <code>.RData</code>. Example:</p>
-<pre class="r"><code>save(schooldata, gapminder5, 
+<pre class="r"><code>save(schooldata, gapminder, 
      file = &quot;workshopobjects.RData&quot;)</code></pre>
 <p>To later load in saved data, use the <code>load</code> function:</p>
 <pre class="r"><code>load(&quot;workshopobjects.RData&quot;)</code></pre>

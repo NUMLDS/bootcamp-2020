@@ -133,7 +133,7 @@ setwd()
 
 
 # Read gapminder data with read.csv()
-gapminder5 <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
+gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
 
 # Load the readr package
 

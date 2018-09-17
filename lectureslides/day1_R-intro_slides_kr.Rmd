@@ -276,11 +276,11 @@ setwd("~/team/bootcamp/2018/R session materials")
 ## Reading files: read.csv()
 
 ```{r read.csv intro, eval=F}
-gapminder5 <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
+gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
 ```
 
 ```{r read.csv breakdown, eval=F}
-gapminder5 <- read.csv(file = "data/gapminder5.csv",
+gapminder <- read.csv(file = "data/gapminder5.csv",
                        sep = ",",
                        stringsAsFactors = FALSE)
 ```
@@ -301,7 +301,7 @@ The above code is what you will usually see and use. The below code breaks down 
 ```{r read_csv, message=TRUE}
 getwd()
 library(readr)
-gapminder5 <- read_csv("data/gapminder5.csv")
+gapminder <- read_csv("data/gapminder5.csv")
 ```
 
 ## Reading files
@@ -335,13 +335,13 @@ Notice that any data frames which have been read in or created, like all other o
 ## Exploring data frames
 
 ```{r exploring data frames pt1}
-summary(gapminder5)
+summary(gapminder)
 ```
 
 ```{r exploring data frames pt2}
-mean(gapminder5$pop)
-table(gapminder5$continent)
-prop.table(table(gapminder5$continent))
+mean(gapminder$pop)
+table(gapminder$continent)
+prop.table(table(gapminder$continent))
 ```
 
 ## Subsetting
@@ -349,8 +349,8 @@ prop.table(table(gapminder5$continent))
 > - One of the benefits of R is that we can work with multiple data frames at the same time
 > - We will often want to *subset* a data frame, i.e. work with a portion of the data frame
 > - There are two common ways to subset a data frame in base R
->     - Index the data frame: `gapminder5[gapminder5$continent=="Asia",]`
->     - Use the `subset()` function: `subset(gapminder5, subset=continent=="Asia")`
+>     - Index the data frame: `gapminder[gapminder$continent=="Asia",]`
+>     - Use the `subset()` function: `subset(gapminder, subset=continent=="Asia")`
 
 <aside class="notes">
 The most obvious use case of subsetting is to create and store smaller data frame, which we will do shortly. But think also about how useful it is to quickly subset a data frame: we can use subsets as inputs for statistical models, for example.
@@ -373,7 +373,7 @@ The most obvious use case of subsetting is to create and store smaller data fram
 ## Subsetting and Sorting
 
 ```{r subsetting and sorting}
-gapminder07 <- subset(gapminder5, subset = year==2007)
+gapminder07 <- subset(gapminder, subset = year==2007)
 sort(table(gapminder07$continent))
 gapminder07$pop[gapminder07$country=="Mexico"]
 head(gapminder07[order(gapminder07$pop, decreasing=TRUE),])
@@ -388,9 +388,9 @@ Don't worry too much about the bonus question if you find it confusing. The pack
 When cleaning or wrangling datasets in RStudio, we will often want to create new variables. There are several ways to add a vector as a new variable in R:
 
 ```{r adding columns, eval=F}
-gapminder5 <- cbind(gapminder5, newvar)
+gapminder <- cbind(gapminder, newvar)
 
-gapminder5$newvar <- newvar
+gapminder$newvar <- newvar
 ```
 
 Removing columns is easy too:

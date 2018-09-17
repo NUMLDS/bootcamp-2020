@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Kumar Ramanathan" />
-  <meta name="dcterms.date" content="2018-09-15" />
+  <meta name="dcterms.date" content="2018-09-16" />
   <title>Intro to R: Day 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,7 +489,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Intro to R: Day 1</h1>
     <h2 class="author">Kumar Ramanathan</h2>
-    <h3 class="date">2018-09-15</h3>
+    <h3 class="date">2018-09-16</h3>
 </section>
 
 <section><section id="introduction" class="titleslide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
@@ -532,6 +532,11 @@ RStudio helps you organize your workflow and keep track of your work. The top-le
 <aside class="notes">
 Today, we will briefly review the above topics, and then turn to new material on reading and writing files, data manipulation, and data visualization.
 </aside>
+</section><section id="copy-relevant-folders" class="slide level2">
+<h2>Copy relevant folders</h2>
+<p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.</p>
+<p>The R session materials are stored in the following read-only directory: “~/team/bootcamp/2018/R session materials”. Copy the “data” and “exercises” subfolders (and others if you want) to a directory in your home folder.</p>
+<p><small>You can do this either using Bash or the GUI in the “Files” tab in the bottom-right pane or RStudio.</small></p>
 </section></section>
 <section><section id="review-basics-and-data-types" class="titleslide slide level1"><h1>Review: Basics and data types</h1></section><section id="arithmetic" class="slide level2">
 <h2>Arithmetic</h2>
@@ -713,11 +718,11 @@ There is an example matrix for you to practice with in the exercises file, but w
 <h2>Working directories</h2>
 <p>The working directory is the folder where R scripts and projects look for files by default. It is a good idea to create a folder for any project and store all your R and data files in that directory.</p>
 <p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then under the More menu, there is an option to set the current directory as the working directory. Or you can use the <code>setwd</code> command as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018/R session materials&quot;</span>)</code></pre></div>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder5 &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder5 &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
                        <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
                        <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <aside class="notes">
@@ -726,7 +731,7 @@ The above code is what you will usually see and use. The below code breaks down 
 </section><section id="reading-files-read_csv" class="slide level2">
 <h2>Reading files: read_csv()</h2>
 <ul>
-<li>Set your working directory using the code provided, and then check it.</li>
+<li>Set your working directory: this should be the folder in which your copies of the “data” and “exercises” folders are stored.</li>
 <li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
 <li>Load the <code>readr</code> package. <br><small>(It as has already been installed on the system-level as part of <code>tidyverse</code>)</small></li>
 <li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
@@ -736,7 +741,7 @@ The above code is what you will usually see and use. The below code breaks down 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
 <pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2018&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
-gapminder5 &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
+gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   country = col_character(),
@@ -779,7 +784,7 @@ Notice that any data frames which have been read in or created, like all other o
 </ul>
 </section><section id="exploring-data-frames-2" class="slide level2">
 <h2>Exploring data frames</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(gapminder5)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(gapminder)</code></pre></div>
 <pre><code>##    country               year           pop             continent        
 ##  Length:1704        Min.   :1952   Min.   :6.001e+04   Length:1704       
 ##  Class :character   1st Qu.:1966   1st Qu.:2.794e+06   Class :character  
@@ -794,13 +799,13 @@ Notice that any data frames which have been read in or created, like all other o
 ##  Mean   :59.47   Mean   :  7215.3  
 ##  3rd Qu.:70.85   3rd Qu.:  9325.5  
 ##  Max.   :82.60   Max.   :113523.1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(gapminder5<span class="op">$</span>pop)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(gapminder<span class="op">$</span>pop)</code></pre></div>
 <pre><code>## [1] 29601212</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(gapminder5<span class="op">$</span>continent)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(gapminder<span class="op">$</span>continent)</code></pre></div>
 <pre><code>## 
 ##   Africa Americas     Asia   Europe  Oceania 
 ##      624      300      396      360       24</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(<span class="kw">table</span>(gapminder5<span class="op">$</span>continent))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(<span class="kw">table</span>(gapminder<span class="op">$</span>continent))</code></pre></div>
 <pre><code>## 
 ##     Africa   Americas       Asia     Europe    Oceania 
 ## 0.36619718 0.17605634 0.23239437 0.21126761 0.01408451</code></pre>
@@ -811,8 +816,8 @@ Notice that any data frames which have been read in or created, like all other o
 <li class="fragment">We will often want to <em>subset</em> a data frame, i.e. work with a portion of the data frame</li>
 <li class="fragment">There are two common ways to subset a data frame in base R
 <ul>
-<li class="fragment">Index the data frame: <code>gapminder5[gapminder5$continent==&quot;Asia&quot;,]</code></li>
-<li class="fragment">Use the <code>subset()</code> function: <code>subset(gapminder5, subset=continent==&quot;Asia&quot;)</code></li>
+<li class="fragment">Index the data frame: <code>gapminder[gapminder$continent==&quot;Asia&quot;,]</code></li>
+<li class="fragment">Use the <code>subset()</code> function: <code>subset(gapminder, subset=continent==&quot;Asia&quot;)</code></li>
 </ul></li>
 </ul>
 <aside class="notes">
@@ -838,7 +843,7 @@ The most obvious use case of subsetting is to create and store smaller data fram
 </ul>
 </section><section id="subsetting-and-sorting-1" class="slide level2">
 <h2>Subsetting and Sorting</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07 &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder5, <span class="dt">subset =</span> year<span class="op">==</span><span class="dv">2007</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07 &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, <span class="dt">subset =</span> year<span class="op">==</span><span class="dv">2007</span>)
 <span class="kw">sort</span>(<span class="kw">table</span>(gapminder07<span class="op">$</span>continent))</code></pre></div>
 <pre><code>## 
 ##  Oceania Americas   Europe     Asia   Africa 
@@ -861,9 +866,9 @@ Don’t worry too much about the bonus question if you find it confusing. The pa
 </section><section id="adding-and-removing-columns" class="slide level2">
 <h2>Adding and removing columns</h2>
 <p>When cleaning or wrangling datasets in RStudio, we will often want to create new variables. There are several ways to add a vector as a new variable in R:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder5 &lt;-<span class="st"> </span><span class="kw">cbind</span>(gapminder5, newvar)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">cbind</span>(gapminder, newvar)
 
-gapminder5<span class="op">$</span>newvar &lt;-<span class="st"> </span>newvar</code></pre></div>
+gapminder<span class="op">$</span>newvar &lt;-<span class="st"> </span>newvar</code></pre></div>
 <p>Removing columns is easy too:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder<span class="op">$</span>newvar &lt;-<span class="st"> </span><span class="ot">NULL</span>
 
