@@ -1,5 +1,5 @@
 ---
-title: "Intro to R: Day 3, part 3"
+title: "Advanced R: Day 3, part 3"
 subtitle: "Data visualization with ggplot"
 author: "Kumar Ramanathan"
 date: "`r Sys.Date()`"
