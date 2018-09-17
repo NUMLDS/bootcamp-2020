@@ -313,11 +313,15 @@ Since these are relatively rare and more advanced use cases of ggplot, we will n
 
 # Visualizing grouped data {#groupeddata}
 
-Throughout these examples, you will see one of the uses of converting data to long-format. Doing so allows us to plot multiple variables in one graphic using a single `geom` function, providing the key column as the grouping variable. Generally, we indicate the grouping variable using the `group = ` function in the `aes()` function.
+A common task in data visualization is plotting variables that are grouped, in order to make comparisons across groups or to show how a particular trend breaks down on a group level. For example, instead of visualizing energy generation as a whole, we may want to visualize generation from each source relative to ther sources. 
+
+There are two broad ways to visualize grouped data. One is to generate multiple geometric objects of the same type for each group by indicating the grouping variable using the `group = ` function in the `aes()` function. Another is to use facets. We will examine both below. Throughout these examples, you will see one of the uses of converting data to long-format.
 
 ## Colors and fill
 
-Although ggplot will generally interpret a `col = ` argument as providing a grouping variable, it is good practice to specify `group = ` anyway. 
+Note that the `col = ` argument is specified within `aes()` here, as our goal is to map data values to the color aesthetics. When supplied outside the `aes()` function, the role of `col=` is to modify the color of the geometric object unrelated to any data values.
+
+Although ggplot will generally interpret a `col = ` argument inside `aes()` as providing a grouping variable, it is good practice to specify `group = ` anyway. 
 
 ```{r aes colors 1}
 long_merged_energy %>%
@@ -464,7 +468,7 @@ Let's say we are interested in examining trends in energy generation by source. 
 ```{r why facet}
 long_gen %>%
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, col=source, position="dodge"), size=1) + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1) + 
   labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
        x="Hour", y="Output (MW)")
 ```
@@ -533,7 +537,7 @@ Graphics generated using `ggplot2` can be saved as images in three ways:
 
 Let's see an example where we combine methods 1 and 3. First, we will save a graphic as an object, and then call the object and add a `ggsave()` layer to create a `.png` file in our directory.
 
-```{r saving images}
+```{r saving images, eval=F}
 # Save a column chart of imports over time
 plot_importsovertime <- ggplot(imports) + 
   geom_line(aes(x=datetime, y=imports), col="red") + 
