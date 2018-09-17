@@ -9,9 +9,10 @@ For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio
     - Reading and writing files
     - Data manipulation in base R
     - Data visualization in base R
-2. [Day 2](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/)
+2. [Day 2](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/), covering:
     - RMarkdown
     - Loops, conditionals, and functions
+    - R and Github
 3. Day 3
     1. Part 1: Advanced manipulation: reshaping, merging, and dplyr
     2. [Part 2](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_dplyr_slides_rm#/): Advanced manipulation: data.table
