@@ -7,7 +7,7 @@ This Github repository contains materials for the 2018 Masters of Science in Ana
 |Session|Content|Lecture notes|Slides|Exercises|
 |-------|-------|-------------|------|---------|
 |Day 1|Review; Reading and writing files; Data manipulation in base R; Data visualization in base R|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day1_R-intro_lecturenotes_kr.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day1_R-intro_slides_kr.html#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day1_R-intro_exercises.R)|
-|Day 2|Loops, conditionals, and functions; RMarkdown; R and Github||[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/)||
+|Day 2|Loops, conditionals, and functions; RMarkdown; R and Github||[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day2_exercises_no_answers.Rmd)|
 |Day 3, part 1|Advanced manipulation: reshaping, manipulation, and dplyr||[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_dplyr_slides_rm#/)||
 |Day 3, part 2|Advanced manipulation and data.table||||
 |Day 3, part 3|Data visualization with ggplot||||
