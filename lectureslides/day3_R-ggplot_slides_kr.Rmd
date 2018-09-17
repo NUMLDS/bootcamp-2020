@@ -356,21 +356,103 @@ long_gen %>%
 
 # Visualizing grouped data
 
+> - We often want to visualize multiple variables, or a variable that can be divided into groups, in one graphic.
+> - There are two broad principles for visualizing grouped variables in R:
+>    - Identify a grouping variable in a `geom()` using the `group = ` argument, and demarcate the distinct objects created per group in some way.
+>    - Use facets to generate geometric objects in separate coordinate systems for each group.
+
 ## Colors and fill
+
+Task:<br>Create a line plot of energy output over time, with separate lines for each source.
+
+Steps:
+
+> 1. Supply the data frame `long_merged_energy` to `ggplot()`.
+> 2. Add a `geom_line()` layer and specify `x=datetime` and `y=output`.
+> 3. Also specify that `group=source` and `col=source`.
+> 4. Add a `labs()` layer.
+
+## Colors and fill
+
+```{r aes colors 1}
+long_merged_energy %>%
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source)) + 
+  labs(title="Output by energy source over time", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
+
+## Exercise: Colors and fill
+
+Task:<br>Create a line plot that compares generation of wind, solar, and geothermal energy over time.
+
+<small>Bonus: Set the size of the line objects to 1.5.</small>
+
+## Exercise: Colors and fill
+
+```{r aes colors ex}
+long_merged_energy %>%
+  filter(source=="wind"|source=="solar"|source=="geothermal") %>% 
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
+  labs(title="Wind vs. Solar vs. Geothermal generation", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
+
+## Customizing with scale_color layers
+
+```{r aes colors 2}
+long_merged_energy %>% filter(source=="wind"|source=="solar"|source=="geothermal") %>% 
+  ggplot() + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
+  scale_color_brewer(palette="Accent", name="Energy source") + 
+  labs(title="Wind vs. Solar vs. Geothermal generation", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+```
+
+## Colors and fill
+
+- `col=` is used to color objects like lines and points
+- `fill=` is used to color objects like columns and histograms
+    - `col=` will create colored outlines for such objects
+- After some trial and error, this will become intuitive
 
 ## Position adjustment
 
+## Example: Columns, position stack
+
+## Example: Columns, position dodge
+
 ## Shapes and linetypes
+
+## Example: Shapes
+
+## Example: Linetypes
 
 ## Sizes and alpha
 
 ## Facets
 
+## Example: Facets
+
+## Example: Facets
+
+## Exercise: Facets
+
+## Exercise: Facets
+
 # Final notes
 
 ## Comment your code
 
+Always remember to comment your code!
+
+When writing particularly complex code in `dplyr` or `ggplot2`, this includes commenting *within* a flow of `%>%` or `+` operators. See the lecture notes for some examples of this.
+
 ## Saving images
+
+Three ways to save images created by ggplot:
+
+- Assign the result of your ggplot code to a named object, which can be saved like other objects in your R workspace
+- Use the "save" icon in the Plots tab of RStudio
+- Add the function `ggsave()` as a layer to your plotting code
 
 # Break!
 
