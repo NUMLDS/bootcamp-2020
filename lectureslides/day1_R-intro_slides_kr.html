@@ -536,7 +536,7 @@ Today, we will briefly review the above topics, and then turn to new material on
 <h2>Copy relevant folders</h2>
 <p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.</p>
 <ul>
-<li>The R session materials are stored in the following read-only directory: <code>/team/bootcamp/2018/R</code></li>
+<li>The R session materials are stored in the following read-only directory: <code>/team/bootcamp/2018/R_sessions</code></li>
 <li>Copy the “data” and “exercises” subfolders (and others if you want) to a directory in your home folder.</li>
 <li>Ways to do this:
 <ul>
@@ -731,7 +731,8 @@ There is an example matrix for you to practice with in the exercises file, but w
 <h2>Working directories</h2>
 <p>The working directory is the folder where R scripts and projects look for files by default.</p>
 <p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/team/bootcamp/2018/R&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;/nfs/home/krn5889/R sessions&quot;</span>)</code></pre></div>
+<p>In the exercises script file, set your working directory now.</p>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
@@ -744,7 +745,7 @@ The above code is what you will usually see and use. The below code breaks down 
 </section><section id="reading-files-exercise" class="slide level2">
 <h2>Reading files: exercise</h2>
 <ul>
-<li>Set your working directory: this should be the folder in which your copies of the “data” and “exercises” folders are stored.</li>
+<li>Check your working directory with <code>getwd()</code>.</li>
 <li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
 <li>Load the <code>readr</code> package. <br><small>(It as has already been installed on the system-level as part of <code>tidyverse</code>)</small></li>
 <li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
