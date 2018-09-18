@@ -74,7 +74,7 @@ We will be working on some exercises and using data files in the next few hours.
 - Copy the "data" and "exercises" subfolders (and others if you want) to a directory in your home folder.
 - Ways to do this:
     - Bash in the Terminal
-        - Remember to use `cd -R`
+        - Remember to use `cp -R`
     - File explorer in your remote desktop
     - "Files" tab in the bottom-right pane or RStudio
 
