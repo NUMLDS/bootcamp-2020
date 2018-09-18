@@ -20,6 +20,6 @@ The R materials used in Days 1 and 2 are based on the [Intro to R workshop](http
 
 ## Contact information
 
-- Kumar Ramanathan: [Email](mailto:kumar.ramanathan@u.northwestern.edu) | [Website](www.kumarramanathan.com)
+- Kumar Ramanathan: [Email](mailto:kumar.ramanathan@u.northwestern.edu) | [Website](http://www.kumar.fyi)
 - Richard Morel: [Email](mailto:richard.morel@u.northwestern.edu) | [Website](https://sites.northwestern.edu/paquinmorel/)
 - Ali Ehlen: [Email](mailto:AnnalieseEhlen2020@u.northwestern.edu)
