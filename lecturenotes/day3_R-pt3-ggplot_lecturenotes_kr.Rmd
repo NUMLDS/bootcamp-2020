@@ -1,6 +1,5 @@
 ---
-title: "Intro to R: Day 3, part 3"
-subtitle: "Data visualization with ggplot"
+title: "Advanced R: Day 3, part 3: Data visualization with ggplot"
 author: "Kumar Ramanathan"
 date: "`r Sys.Date()`"
 output: 
@@ -445,20 +444,35 @@ long_merged_energy %>%
        x="Date", y="Output (MW)")
 ```
 
-The `shape = ` approach works well for points, but when working with line plots, we can demarcate groups by `linetype = ` instead. For example, say we want to compare the energy output over time of hydroelectric sources and nuclear sources.
+The `shape = ` approach works well for points, but when working with line plots, we can demarcate groups by `linetype = ` instead. For example, instead of combining colored lines and shapes in the above plot, let's use linetypes to demarcate groups.
 
 ```{r aes linetypes}
-long_merged_energy %>% 
-  filter(source %in% c("large_hydro","small_hydro","nuclear")) %>% 
+# Prepare data
+long_merged_energy %>%
+  rename(type = source) %>% 
+  merge(regroup, by = "type") %>% 
+  mutate(date=lubridate::date(datetime)) %>% 
+  group_by(date, group) %>%
+  summarise(output=sum(output)) %>% 
+  # Pipe data into ggplot
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, linetype=source)) + 
-  labs(title="Energy output over time from hydroelectric and nuclear sources", 
-       subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  geom_line(aes(x=date, y=output, group=group, linetype=group), size=1) +
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018",
+       x="Date", y="Output (MW)")
 ```
 
-## Sizes and alpha (transparency)
+## Sizes and alpha
 
-Especially useful for continuous variables, you can map the size and alpha (transparency) of geometric objects to data values. No examples are shown here, since our grouping variables are categorial rather than continuous, but you can try to set `size = ` and `alpha = ` arguments within `aes()` in `geom_point()` or other `geom`s using the same principles shown above. For example, you could create a scatterplot of the relationship between life expectancy and GDP using the gapminder data, and map the values of population to the size or alpha of the data points.
+Especially useful for continuous variables, you can map the size and alpha (transparency) of geometric objects to data values. Since the grouping variables we have been working with in the California energy data are categorical, let us briefly return to the gapminder data to show an example. For example, you could create a scatterplot of the relationship between life expectancy and GDP using the gapminder data, and map the values of population to the size of that points by using `aes(size=pop)` in `geom_point()`. To show how you can incorporate multiple grouping variables, I have also added `aes(col=continent)`.
+
+```{r aes size}
+gapminder07 %>% 
+  ggplot() + 
+  geom_point(aes(x=gdpPercap, y=lifeExp, size=pop, col=continent)) + 
+  scale_size_continuous(name="Population") + 
+  scale_color_discrete(name="Continent") + 
+  labs(title="Life expectancy as a function of GDP per capita in 2007", x="GDP per capita", y="Life expectancy")
+```
 
 ## Facets
 

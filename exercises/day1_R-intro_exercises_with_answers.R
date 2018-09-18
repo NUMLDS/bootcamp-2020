@@ -125,9 +125,9 @@ mtcars$cylsq <- (mtcars$cyl)^2
 
 #### READING FILES ####
 
-# Set your working directory
+# Set your working directory with setwd()
 # Choose the folder where you have copied the "data" and "exercises" subfolders
-setwd("~/team/bootcamp/2018/R") # This will vary for each user
+setwd("/nfs/home/krn5589/R sessions") # This will vary for each user
 
 # Check your working directory
 getwd()
