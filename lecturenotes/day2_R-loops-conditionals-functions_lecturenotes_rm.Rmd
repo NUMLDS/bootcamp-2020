@@ -11,9 +11,8 @@ params:
   notes: no
 ---
 
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
 ```
 
 ```{r, include=FALSE}
@@ -23,8 +22,33 @@ notes<-params$notes
 ## Remember our data from yesterday...
 
 ```{r revisiting the data}
-data(gapminder, package = "gapminder")
+gapminder <- read.csv(here::here("data", "gapminder5.csv"))
 head(gapminder)
+```
+
+## Sidebar: the `here` package
+
+The `here()` function gets your current working directory and appends any strings enclosed in the function.
+
+```{r here}
+# install.packages("here")
+here::here()
+
+here::here("data", "gapminder.csv")
+```
+
+## Remember our data from yesterday...
+
+```{r revisiting the data 2}
+gapminder <- read.csv(here::here("data", "gapminder5.csv"))
+head(gapminder)
+```
+
+
+## `gapminder` dataset
+
+```{r str gapminder}
+str(gapminder)
 ```
 
 ## `gapminder` dataset
@@ -35,12 +59,6 @@ head(gapminder)
 
 ## `gapminder` dataset
 
-```{r str gapminder}
-str(gapminder)
-```
-
-## `gapminder` dataset
-
 ```{r recoding gapminder}
 gapminder$country <- as.character(gapminder$country)
 gapminder$continent <- as.character(gapminder$continent)
@@ -48,16 +66,21 @@ str(gapminder)
 ```
 
 ## `gapminder` dataset
-- What if we want to know the mean life expectancy by country? Or by year?
+- What if we want to know the mean life expectancy by country? 
+  -Or by year?
 - One approach:
-`mean(gapminder$lifeExp[gapminder$country == "Afganistan"])`
-`mean(gapminder$lifeExp[gapminder$country == "Albania"])`
-...
+```{r one approach}
+mean(gapminder$lifeExp[gapminder$country == "Afghanistan"])
+mean(gapminder$lifeExp[gapminder$country == "Albania"])
+#...
+```
+
+## `gapminder` dataset
 - Or we could do save ourselves a lot of typing and time
 
 - Loops!
 
-# Don't repeart yourself--loop it! 
+# Don't repeat yourself--loop it! 
 
 ## Loops in R -- `for`, `while`, and the `apply` family
 
@@ -170,13 +193,12 @@ for (i in conts) {
 for (i in conts) {
   print(paste0("Continent: ", i))
   for (j in years) {
-    print(paste0(j, ": ",
-                 mean(gapminder$lifeExp[gapminder$continent == i & 
-                                          gapminder$year == j], na.rm = T)
-                 )
-          )
+    mean_le <- mean(gapminder$lifeExp[gapminder$continent == i & 
+                                          gapminder$year == j], 
+                      na.rm = T)
+    print(paste0(j, ": ", mean_le))
   }
-}
+  }
 ```
 
 ## nested `for` loop exercise!
@@ -193,12 +215,10 @@ for (i in conts) {
 for (i in conts) {
   print(paste0("Continent: ", i))
   for (j in years) {
-    print(paste0(j, ": ",
-                 sd(gapminder$lifeExp[gapminder$continent == i & 
+    sd_le <- sd(gapminder$lifeExp[gapminder$continent == i & 
                                           gapminder$year == j], 
                     na.rm = T)
-                 )
-          )
+    print(paste0(j, ": ", sd_le))
   }
 }
 ```
@@ -279,9 +299,8 @@ sapply(years, function(x) mean(gapminder$lifeExp[gapminder$year == x]))
 i <-  1952 # define the interator
 
 while (i < 1987) {
-  print(paste0(i, ": ", 
-               sd(gapminder$lifeExp[gapminder$year == i])
-               )
+  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  print(paste0(i, ": ", sd_le)
         )
   i <- i + 5 # increase the iterator by the interval between years
 }
@@ -297,9 +316,8 @@ while (i < 1987) {
 i <-  1987 # define the interator
 
 while (i <= 2002) {
-  print(paste0(i, ": ", 
-               sd(gapminder$lifeExp[gapminder$year == i])
-               )
+  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  print(paste0(i, ": ", sd_le)
         )
   i <- i + 5 # increase the iterator by the interval between years
 }
@@ -314,11 +332,9 @@ while (i <= 2002) {
 i <-  1987 # define the interator
 
 while (i <= 2002) {
-  print(paste0(i, ": ", 
-               sd(gapminder$lifeExp[gapminder$year == i])
-               )
+  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  print(paste0(i, ": ", sd_le)
         )
-  
   # oops! forgot to increase i by 5! ESC! ESC! ESC!
 }
 ```
@@ -333,6 +349,8 @@ while (i <= 2002) {
 
 ```{r if statement}
 random_year <- sample(years, 1)
+
+random_year
 
 if (random_year > 1977) {
   print(random_year)
@@ -361,6 +379,7 @@ if (random_year > 1977) {
 ```{r adding the else statement}
 set.seed(1)
 random_year <- sample(years, 1)
+random_year
 
 if (random_year > 1977) {
   print(random_year)
@@ -383,10 +402,9 @@ if (random_year > 1977) {
     }
 ```
 
-## Putting it `for` and `if/else` together
+## Putting `for` and `if/else` together
 
 - We can add an `if`...`else` clause to a `for` loop
-
 
 ```{r, eval = F}
 # initialize the `for` loop
@@ -400,7 +418,7 @@ for () {
 ```
 
 
-## Putting it `for` and `if/else` together
+## Putting `for` and `if/else` together
 
 Which continents have a mean life expectancy greater than 70 years?
 
@@ -417,6 +435,24 @@ for (i in unique(gapminder$continent)) {
    }
 }
 ```
+
+## Putting `for` and `if/else` together
+
+Write a `for` loop that reports the mean population for years greater than or equal to 1987. Make sure the loop prints a message if the condition is not met!
+
+## Putting `for` and `if/else` together
+
+```{r for if else exercise}
+for (i in years) {
+  if (i >= 1987) {
+    mean_pop <- mean(gapminder$lifeExp[gapminder$year == i])
+    print(paste0(i, ": ", mean_pop))
+  } else {
+    print("Sorry, year is less than 1987")
+  }
+}
+```
+
 
 # Writing functions
 
