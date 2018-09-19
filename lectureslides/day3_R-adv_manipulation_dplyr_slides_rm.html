@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Richard Paquin Morel" />
-  <meta name="dcterms.date" content="2018-09-18" />
+  <meta name="dcterms.date" content="2018-09-19" />
   <title>Advanced R - Reshaping, merging, and dplyr</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1833,7 +1833,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Advanced R - Reshaping, merging, and dplyr</h1>
     <h2 class="author">Richard Paquin Morel</h2>
-    <h3 class="date">2018-09-18</h3>
+    <h3 class="date">2018-09-19</h3>
 </section>
 
 <section><section id="r-day-3---advanced-manipulation-and-dplyr" class="title-slide slide level1"><h1>R Day 3 - Advanced manipulation and dplyr</h1></section><section id="a-new-dataset" class="slide level2">
@@ -2322,14 +2322,14 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 10  1997    65.0  11.6
 ## 11  2002    65.7  12.3
 ## 12  2007    67.0  12.1</code></pre>
-</section><section id="find-the-mean-by-hour" class="slide level2">
-<h2>Find the mean by hour</h2>
+</section><section id="find-the-mean-by-source" class="slide level2">
+<h2>Find the mean by source</h2>
 <ul>
 <li>Use your knowledge of <code>dplyr</code> to find the mean usage for small hydro, large hydro, biogas, and biomass</li>
 <li>Start with either the wide or long merged dataset</li>
 </ul>
-</section><section id="find-the-mean-by-hour-1" class="slide level2">
-<h2>Find the mean by hour</h2>
+</section><section id="find-the-mean-by-source-1" class="slide level2">
+<h2>Find the mean by source</h2>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb63-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(datetime, <span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>), <span class="kw">contains</span>(<span class="st">&quot;bio&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb63-3" data-line-number="3"><span class="st">  </span><span class="kw">melt</span>(<span class="dt">id.vars =</span> <span class="st">&quot;datetime&quot;</span>,</a>

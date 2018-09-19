@@ -11,7 +11,7 @@
 
 <meta name="author" content="Richard Paquin Morel" />
 
-<meta name="date" content="2018-09-18" />
+<meta name="date" content="2018-09-19" />
 
 <title>Advanced R - Reshaping, merging, and dplyr</title>
 
@@ -1475,7 +1475,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Advanced R - Reshaping, merging, and dplyr</h1>
 <h4 class="author"><em>Richard Paquin Morel</em></h4>
-<h4 class="date"><em>2018-09-18</em></h4>
+<h4 class="date"><em>2018-09-19</em></h4>
 
 </div>
 
@@ -2010,15 +2010,15 @@ gapminder %&gt;%
 ## 11  2002    65.7  12.3
 ## 12  2007    67.0  12.1</code></pre>
 </div>
-<div id="find-the-mean-by-hour" class="section level2">
-<h2>Find the mean by hour</h2>
+<div id="find-the-mean-by-source" class="section level2">
+<h2>Find the mean by source</h2>
 <ul>
 <li>Use your knowledge of <code>dplyr</code> to find the mean usage for small hydro, large hydro, biogas, and biomass</li>
 <li>Start with either the wide or long merged dataset</li>
 </ul>
 </div>
-<div id="find-the-mean-by-hour-1" class="section level2">
-<h2>Find the mean by hour</h2>
+<div id="find-the-mean-by-source-1" class="section level2">
+<h2>Find the mean by source</h2>
 <pre class="r"><code>merged_energy %&gt;% 
   select(datetime, contains(&quot;hydro&quot;), contains(&quot;bio&quot;)) %&gt;% 
   melt(id.vars = &quot;datetime&quot;,

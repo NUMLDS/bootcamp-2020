@@ -359,12 +359,12 @@ gapminder %>%
             sd_lf = sd(lifeExp, na.rm = T))
 ```
 
-## Find the mean by hour
+## Find the mean by source
 
 - Use your knowledge of `dplyr` to find the mean usage for small hydro, large hydro, biogas, and biomass
 - Start with either the wide or long merged dataset
 
-## Find the mean by hour
+## Find the mean by source
 
 ```{r exercise grouping}
 merged_energy %>% 
