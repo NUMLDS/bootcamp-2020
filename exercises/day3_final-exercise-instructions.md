@@ -48,7 +48,9 @@ Given the short time period, any answer will of course prove incomplete. The goa
 
 ## Github submission
 
-When you have completed the exercise, fork this repo and save your Markdown file in the submissions folder with the following filename structure: `FinalRExercise_LastnameFirstname.Rmd`. Then, submit a pull request to the origin repo.
+When you have completed the exercise, save your Markdown file in the `submissions` folder of your forked repo using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`. Commit changes periodically, and push commits when you are done.
+
+You can optionally create a pull request to submit this file (and other exercise files from the bootcamp sessions) to the base repo that lives in the MSiA organization. If you would like to do this, make sure that all new files you have created are in the `submissions` folder, and then create a pull request that asks to merge changes from your forked repo to the base repo. 
 
 ## Reminders
 

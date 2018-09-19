@@ -722,3 +722,17 @@ Three ways to save images created by ggplot:
 This is the end of the R lecture sessions.
 
 After a short break, we will return for a cumulative exercise that combines the skills you have learned since Monday. 
+
+# Final Exercise
+
+The instructions are in a markdown file in the `exercises` folder. Create a new RMarkdown file (save it using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`), in which you will complete the exercise.
+
+You can work in small groups, but write up your code separately.
+
+Raise your hand if you need help!
+
+## Optional Submissions
+
+You've created several RMarkdown files over the past three days. Since you stored these in a forked repo, it is possible to create a pull request and 'submit' these changes to the base repo. This is *optional*, but gives you a chance to explore Github functionality and share your work with your classmates. 
+
+Before you submit your completed exercises, *move every new file in your repo to the* `submissions` *folder*. This ensures that we won't inadvertently make changes to the session materials. Then, create a new pull request, asking to merge changes from your fork to the base repository.
