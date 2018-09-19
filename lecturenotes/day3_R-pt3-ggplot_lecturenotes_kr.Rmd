@@ -463,15 +463,16 @@ long_merged_energy %>%
 
 ## Sizes and alpha
 
-Especially useful for continuous variables, you can map the size and alpha (transparency) of geometric objects to data values. Since the grouping variables we have been working with in the California energy data are categorical, let us briefly return to the gapminder data to show an example. For example, you could create a scatterplot of the relationship between life expectancy and GDP using the gapminder data, and map the values of population to the size of that points by using `aes(size=pop)` in `geom_point()`. To show how you can incorporate multiple grouping variables, I have also added `aes(col=continent)`.
+Especially useful for continuous variables, you can map the size and alpha (transparency) of geometric objects to data values. Since the grouping variables we have been working with in the California energy data are categorical, let us briefly return to the gapminder data to show an example. For example, you could create a scatterplot of the relationship between life expectancy and logged GDP per capita using the gapminder data, and map the values of population to the size of that points by using `aes(size=pop)` in `geom_point()`. To show how you can incorporate multiple grouping variables, I have also added `aes(col=continent)`.
 
 ```{r aes size}
 gapminder07 %>% 
   ggplot() + 
-  geom_point(aes(x=gdpPercap, y=lifeExp, size=pop, col=continent)) + 
+  geom_point(aes(x=log(gdpPercap), y=lifeExp, size=pop, col=continent)) + 
   scale_size_continuous(name="Population") + 
-  scale_color_discrete(name="Continent") + 
-  labs(title="Life expectancy as a function of GDP per capita in 2007", x="GDP per capita", y="Life expectancy")
+  scale_color_discrete(name="Continent") +
+  labs(title="Life expectancy as a function of GDP per capita in 2007", 
+       x="Logged GDP per capita", y="Life expectancy")
 ```
 
 ## Facets

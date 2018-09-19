@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Ali Ehlen" />
+  <meta name="dcterms.date" content="2018-09-19" />
+  <title>Advanced R - data.table</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="day3_R-adv_manipulation_datatable_slides_ae_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="day3_R-adv_manipulation_datatable_slides_ae_files/reveal.js-3.3.0.1/css/theme/simple.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Advanced R - data.table</h1>
+    <h2 class="author">Ali Ehlen</h2>
+    <h3 class="date">2018-09-19</h3>
+</section>
+
+<section><section id="introduction" class="titleslide slide level1"><h1>introduction</h1></section><section id="what-is-data.table" class="slide level2">
+<h2>what is <code>data.table</code>?</h2>
+<ul>
+<li class="fragment">“<code>data.table</code> is an R package that provides an enhanced version of data.frames”</li>
+<li class="fragment">“Briefly, if you are interested in reducing programming and compute time tremendously, then this package is for you.”</li>
+</ul>
+<ul>
+<li class="fragment">- <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">authors of <code>data.table</code></a></li>
+</ul>
+<ul>
+<li class="fragment"><code>data.tables</code> provide an alternate framework for tabular data analysis, similar to <code>dplyr</code></li>
+</ul>
+</section><section id="why-do-we-care" class="slide level2">
+<h2>why do we care?</h2>
+<ul>
+<li class="fragment"><code>data.table</code> is popular <img src="figures/cran_downloads.png" /></li>
+<li class="fragment"><code>data.table</code> performs better on large data sets</li>
+<li class="fragment">you might prefer the syntax and/or philosophy behind it</li>
+</ul>
+</section></section>
+<section><section id="data.table-basics" class="titleslide slide level1"><h1><code>data.table</code> basics</h1></section><section id="load-data" class="slide level2">
+<h2>load data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># import data.table library</span>
+<span class="kw">library</span>(data.table)
+<span class="kw">library</span>(lubridate)
+
+data_file &lt;-<span class="st"> </span>here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;generation.csv&quot;</span>)
+
+<span class="co"># read in two versions of data, one as a data.frame and one as a data.table</span>
+generation_df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(data_file, <span class="dt">stringsAsFactors =</span> F)
+
+generation_dt &lt;-<span class="st"> </span><span class="kw">fread</span>(data_file)</code></pre></div>
+<p><code>data.table</code> inherits from a <code>data.frame</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">View</span>(generation_df)
+<span class="kw">View</span>(generation_dt)
+
+generation_df
+generation_dt
+
+<span class="kw">class</span>(generation_df) <span class="co"># &quot;data.frame&quot;</span>
+<span class="kw">class</span>(generation_dt) <span class="co"># &quot;data.table&quot; &quot;data.frame&quot;</span>
+
+<span class="kw">str</span>(generation_df)
+<span class="kw">str</span>(generation_dt)</code></pre></div>
+</section><section id="data.frame-and-data.table-comparison" class="slide level2">
+<h2><code>data.frame</code> and <code>data.table</code> comparison</h2>
+<p>There are some major differences between the two:</p>
+<ul>
+<li class="fragment">different philosophy =&gt; different syntax</li>
+<li class="fragment">due to optimizations, <code>data.table</code> might perform better, particularly on large and complex data sets</li>
+<li class="fragment">fewer packages required</li>
+<li class="fragment">a <code>data.table</code> can be passed to functions expecting a <code>data.frame</code></li>
+<li class="fragment">we will only scratch the surface today. Links to more resources are at the end of the lecture notes</li>
+</ul>
+</section></section>
+<section><section id="slicing-column-operations-and-group-by" class="titleslide slide level1"><h1>slicing, column operations, and group by</h1></section><section id="syntax-column-selection-and-row-filtering" class="slide level2">
+<h2>syntax: column selection and row filtering</h2>
+<ul>
+<li class="fragment"><code>dplyr</code> syntax: depends on a small set of verbs</li>
+<li class="fragment"><del>verbs</del></li>
+<li class="fragment"><code>data.table</code> syntax: small set of consistent rules for interpreting input into <code>dt[]</code></li>
+<li class="fragment">This set of rules can be most easily summarized as: <code>dt[i, j, by]</code></li>
+</ul>
+<ul>
+<li class="fragment"><code>i</code> filters rows</li>
+<li class="fragment"><code>j</code> column operations</li>
+<li class="fragment"><code>by</code> is group by</li>
+</ul>
+</section><section id="exercise" class="slide level2">
+<h2>exercise</h2>
+<p>Using <code>data.table</code>’s special operator and what you learned about converting datetimes in the previous session, convert the <code>datetime</code> column to a POSIX object. Then, create a new <code>data.table</code> that contains the total renewable energy generation (solar + wind) by hour and day. You will probably need lubridate’s functions <code>day()</code> and <code>hour()</code></p>
+</section><section id="exercise---answer" class="slide level2">
+<h2>exercise - answer</h2>
+<p>Using <code>data.table</code>’s special operator and what you learned about converting datetimes in the previous session, convert the <code>datetime</code> column to a POSIX object. Then, create a new <code>data.table</code> that contains the total renewable energy generation (solar + wind) by hour and day. You will probably need lubridate’s functions <code>day()</code> and <code>hour()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">generation_dt[, datetime <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">as_datetime</span>(datetime)]
+
+generation_dt[,.(<span class="dt">solar_wind =</span> solar <span class="op">+</span><span class="st"> </span>wind), by =<span class="st"> </span>.(<span class="kw">day</span>(datetime), <span class="kw">hour</span>(datetime))]</code></pre></div>
+</section><section id="clean-up" class="slide level2">
+<h2>clean up</h2>
+<p>Columns can also be removed using <code>NULL</code>, similarly to base R:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">generation_dt[,solar_on <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="ot">NULL</span>]
+generation_dt[,all_hydro <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="ot">NULL</span>]</code></pre></div>
+<p>There are several other <code>data.table</code> features, but these rules for syntax cover lots of functionality</p>
+</section></section>
+<section><section id="data.table-upgrades-to-other-functions" class="titleslide slide level1"><h1><code>data.table</code> upgrades to other functions</h1></section><section id="data.table-upgrades-to-other-functions-1" class="slide level2">
+<h2><code>data.table</code> upgrades to other functions</h2>
+<p><code>data.table</code> co-opts some functions we’ve already talked about</p>
+<ul>
+<li class="fragment"><code>melt</code></li>
+<li class="fragment"><code>dcast</code></li>
+<li class="fragment"><code>merge</code></li>
+<li class="fragment"><code>order</code></li>
+<li class="fragment"><em>Note:</em> sometimes loading <code>reshape</code> or <code>dplyr</code> will disrupt this behavior and the original functions will be dispatched. To get around this, either call <code>merge.data.table</code> directly or don’t load those packages.</li>
+<li class="fragment">This means we can repeat what we did this morning almost exactly</li>
+</ul>
+</section><section id="exercise-1" class="slide level2">
+<h2>exercise</h2>
+<p>Convert this <code>dplyr</code> syntax into <code>data.table</code> syntax (remember that this created the columns <code>day</code>, <code>log_output</code>, and <code>per_output</code>)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">long_ca_energy &lt;-<span class="st"> </span>long_ca_energy <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">day =</span> <span class="kw">as_date</span>(datetime),
+         <span class="dt">log_output =</span> <span class="kw">log</span>(output)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(day) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_daily_output =</span> <span class="kw">sum</span>(output, <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">per_output =</span> output<span class="op">/</span>total_daily_output)</code></pre></div>
+</section><section id="exercise---answer-1" class="slide level2">
+<h2>exercise - answer</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">long_ca_energy &lt;-<span class="st"> </span>long_ca_energy <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">day =</span> <span class="kw">as_date</span>(datetime),
+         <span class="dt">log_output =</span> <span class="kw">log</span>(output)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(day) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_daily_output =</span> <span class="kw">sum</span>(output, <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">per_output =</span> output<span class="op">/</span>total_daily_output)
+
+<span class="co"># becomes</span>
+all_generation_long[,day <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">as_date</span>(datetime)]
+all_generation_long[,log_output <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">log</span>(value)]
+all_generation_long[,per_output <span class="op">:</span><span class="er">=</span><span class="st"> </span>value<span class="op">/</span><span class="kw">sum</span>(value), by =<span class="st"> </span>day]</code></pre></div>
+<p>Note that this is possible to do in one command:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">all_generation_long[,<span class="kw">c</span>(<span class="st">&quot;day2&quot;</span>, <span class="st">&quot;log_output2&quot;</span>, <span class="st">&quot;per_output2&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(<span class="kw">as_date</span>(datetime), <span class="kw">log</span>(value), value<span class="op">/</span><span class="kw">sum</span>(value)), by =<span class="st"> </span>day]
+<span class="co"># or</span>
+all_generation_long[,<span class="st">`</span><span class="dt">:=</span><span class="st">`</span>(<span class="dt">day2 =</span> <span class="kw">as_date</span>(datetime), 
+                          <span class="dt">log_output2 =</span> <span class="kw">log</span>(value), 
+                          <span class="dt">per_output2 =</span> value<span class="op">/</span><span class="kw">sum</span>(value)), 
+                    by =<span class="st"> </span>day]
+
+<span class="co"># can check this this resulted in correct values</span>
+all_generation_long[,<span class="kw">all</span>(day <span class="op">==</span><span class="st"> </span>day2)] <span class="co"># TRUE</span>
+all_generation_long[,<span class="kw">all</span>(per_output2 <span class="op">==</span><span class="st"> </span>per_output)] <span class="co"># TRUE</span></code></pre></div>
+<p>but how you prefer to write this depends on you.</p>
+</section></section>
+<section><section id="a-few-bonus-features" class="titleslide slide level1"><h1>a few bonus features</h1></section><section id="fread" class="slide level2">
+<h2>fread</h2>
+<ul>
+<li class="fragment">“Fast and friendly file finagler” - <em>help file</em></li>
+<li class="fragment">“Similar to read.table but faster and more convenient” - <em>help file</em></li>
+<li class="fragment">this is one of the most useful features of the <code>data.table</code> package, according to some</li>
+</ul>
+</section><section id="fread-benchmarks" class="slide level2">
+<h2>fread benchmarks</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># example, no need to run this</span>
+<span class="kw">library</span>(rbenchmark)
+
+<span class="co"># this will run each command 100 times and report the average time taken</span>
+
+<span class="co"># 168 lines</span>
+data_file &lt;-<span class="st"> </span>here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;generation.csv&quot;</span>)
+<span class="kw">benchmark</span>(<span class="kw">read.csv</span>(data_file, <span class="dt">stringsAsFactors =</span> F), 
+          <span class="kw">fread</span>(data_file), 
+          <span class="dt">replications =</span> <span class="dv">500</span>)
+
+<span class="co">#                                        test replications elapsed relative user.self sys.self user.child sys.child</span>
+<span class="co"># 2                          fread(data_file)          200    0.23    1.000      0.19     0.05         NA        NA</span>
+<span class="co"># 1 read.csv(data_file, stringsAsFactors = F)          200    0.35    1.522      0.34     0.00         NA        NA</span>
+
+<span class="co"># 12,600 lines</span>
+data_file_medium &lt;-<span class="st"> </span>here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;generation_medium.csv&quot;</span>)
+<span class="kw">benchmark</span>(<span class="kw">read.csv</span>(data_file_medium, <span class="dt">stringsAsFactors =</span> F), 
+          <span class="kw">fread</span>(data_file_medium))
+
+<span class="co">#                                               test replications elapsed relative user.self sys.self user.child sys.child</span>
+<span class="co"># 2                          fread(data_file_medium)          100    2.53     1.00      2.33     0.09         NA        NA</span>
+<span class="co"># 1 read.csv(data_file_medium, stringsAsFactors = F)          100    6.25     2.47      6.17     0.08         NA        NA</span>
+
+<span class="co"># 1,008,000 lines</span>
+data_file_large &lt;-<span class="st"> </span>here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;generation_large.csv&quot;</span>)
+<span class="kw">benchmark</span>(<span class="kw">read.csv</span>(data_file_large, <span class="dt">stringsAsFactors =</span> F), 
+          <span class="kw">fread</span>(data_file_large),
+          <span class="dt">replications =</span> <span class="dv">20</span>)
+
+<span class="co">#                                              test replications elapsed relative user.self sys.self user.child sys.child</span>
+<span class="co"># 2                          fread(data_file_large)           20   37.12    1.000     36.38     0.59         NA        NA</span>
+<span class="co"># 1 read.csv(data_file_large, stringsAsFactors = F)           20   98.41    2.651     96.27     1.82         NA        NA</span></code></pre></div>
+</section><section id="special-variables" class="slide level2">
+<h2>special variables</h2>
+<p><code>data.table</code>s also contain some special read-only symbols that are often useful:</p>
+<ul>
+<li><code>.N</code>: number of rows in the current group</li>
+<li><code>.I</code>: a vector, <code>1:nrow(dt)</code>, usually used for more advanced operations</li>
+</ul>
+<p>Here are some somewhat contrived examples of how to use them:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># for .N: convenient</span>
+all_generation_long[,.N] 
+all_generation_long[,.N, by =<span class="st"> </span>type]
+
+<span class="co"># for .I: more advanced syntax</span>
+all_generation_long[,.I]</code></pre></div>
+</section><section id="other-features-keys" class="slide level2">
+<h2>Other features: keys</h2>
+<ul>
+<li>keys: one or more columns, pre-sorted index of the table.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># check the current key</span>
+<span class="kw">key</span>(generation_dt)
+
+<span class="co"># set key</span>
+<span class="kw">setkey</span>(generation_dt, datetime)
+<span class="kw">key</span>(generation_dt)</code></pre></div>
+</section><section id="other-features-joins" class="slide level2">
+<h2>Other features: joins</h2>
+<ul>
+<li>joins: <code>data.table</code> has a special join syntax</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># this only works if at least one key is set</span>
+generation_dt[imports]
+
+<span class="co"># this can also be used to select rows</span>
+fewer_imports &lt;-<span class="st"> </span>imports[<span class="kw">day</span>(datetime) <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">|</span><span class="st"> </span><span class="kw">day</span>(datetime) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>]
+generation_dt[fewer_imports]
+
+<span class="co"># operations can be performed in the same step as the merge</span>
+generation_dt[fewer_imports, <span class="kw">sum</span>(small_hydro <span class="op">+</span><span class="st"> </span>large_hydro), by =<span class="st"> </span><span class="kw">day</span>(datetime)]</code></pre></div>
+</section><section id="other-features-.sd" class="slide level2">
+<h2>Other features: <code>.SD</code></h2>
+<ul>
+<li><code>.SD</code>: “subset of data”</li>
+<li>chunks off <code>data.table</code> by columns and groups.</li>
+</ul>
+</section></section>
+<section><section id="final-thoughts" class="titleslide slide level1"><h1>final thoughts</h1></section><section id="final-thoughts-1" class="slide level2">
+<h2>final thoughts</h2>
+<ul>
+<li>developers: Matt Dowle, Arun Srinivasan (look out for them on stack overflow)</li>
+<li>useful <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html">introduction</a> to <code>data.table</code></li>
+<li>also useful <code>data.table</code> <a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-faq.html">FAQ</a></li>
+<li><a href="https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reshape.html">Intro to advanced features</a> of <code>data.table</code> <code>melt</code> and <code>dcast</code> functions</li>
+<li>or any other vignette</li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+  <script src="day3_R-adv_manipulation_datatable_slides_ae_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="day3_R-adv_manipulation_datatable_slides_ae_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: false,
+        // Transition style
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'day3_R-adv_manipulation_datatable_slides_ae_files/reveal.js-3.3.0.1/plugin/notes/notes.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>
