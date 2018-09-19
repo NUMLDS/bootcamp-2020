@@ -728,7 +728,6 @@ No exercise this time, but we will practice this later.
 </ol>
 </section><section id="example-imports-over-time" class="slide level2">
 <h2>Example: Imports over time</h2>
-<p><small>(with scale changes)</small></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imports <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span>
@@ -747,11 +746,10 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li><code>theme_dark()</code> and <code>theme_light()</code>: change the background of the coordinate system</li>
 <li><code>theme_minimal()</code> and <code>theme_void()</code>: see reference guide for details</li>
 </ul>
-</section><section id="example-imports-over-time-with-present-theme" class="slide level2">
-<h2>Example: Imports over time (with present theme)</h2>
+</section><section id="example-imports-over-time-1" class="slide level2">
+<h2>Example: Imports over time</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imports <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">theme_minimal</span>()</code></pre></div>
@@ -765,11 +763,10 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li class="fragment">Characteristics of the background of the plot (e.g. <code>plot.background =</code>).</li>
 <li class="fragment">For a full list of the components that can be modified, see the help file for <code>ggplot2::theme()</code>.</li>
 </ul>
-</section><section id="example-imports-over-time-with-manual-theme-layer" class="slide level2">
-<h2>Example: Imports over time (with manual theme layer)</h2>
+</section><section id="example-imports-over-time-2" class="slide level2">
+<h2>Example: Imports over time</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imports <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_text</span>(<span class="dt">angle=</span><span class="dv">45</span>, <span class="dt">hjust=</span><span class="dv">1</span>, <span class="dt">size=</span><span class="dv">12</span>))</code></pre></div>
@@ -928,7 +925,7 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li class="fragment">The idea here is to modify what the object actually looks like.</li>
 </ul>
 </section><section id="example-energy-source-group-by-day" class="slide level2">
-<h2>Example: Energy source group by day</h2>
+<h2>Example: Energy source group, by day</h2>
 <p>Task:<br></p>
 <p>Steps:</p>
 <ol type="1">
@@ -962,16 +959,16 @@ long_merged_energy_regroup &lt;-<span class="st"> </span>long_merged_energy <spa
 ## 4 2018-09-03 nuclear      53856 
 ## 5 2018-09-03 renewable   166340 
 ## 6 2018-09-04 hydro       122112.</code></pre>
-</section><section id="example-energy-source-group-by-day-shapes" class="slide level2">
-<h2>Example: Energy source group by day (shapes)</h2>
+</section><section id="example-energy-source-group-by-day-2" class="slide level2">
+<h2>Example: Energy source group, by day</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">col=</span>group), <span class="dt">size=</span><span class="fl">0.8</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">shape=</span>group)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by source group over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Date&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20shapes-1.png" width="768" /></p>
-</section><section id="example-energy-source-group-by-day-linetypes" class="slide level2">
-<h2>Example: Energy source group by day (linetypes)</h2>
+</section><section id="example-energy-source-group-by-day-3" class="slide level2">
+<h2>Example: Energy source group, by day</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">linetype=</span>group), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span>
@@ -984,8 +981,8 @@ long_merged_energy_regroup &lt;-<span class="st"> </span>long_merged_energy <spa
 <li class="fragment">They are particularly useful when you want to distinguish objects based on some <em>continuous</em> variable.</li>
 <li class="fragment">Let’s return to the Gapminder data for an example.</li>
 </ul>
-</section><section id="example-life-expectancy-gdp-sizes" class="slide level2">
-<h2>Example: Life expectancy ~ GDP (sizes)</h2>
+</section><section id="example-life-expectancy-over-gdp" class="slide level2">
+<h2>Example: Life expectancy over GDP</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07 <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">log</span>(gdpPercap), <span class="dt">y=</span>lifeExp, <span class="dt">size=</span>pop, <span class="dt">col=</span>continent)) <span class="op">+</span><span class="st"> </span>

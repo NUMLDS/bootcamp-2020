@@ -333,8 +333,7 @@ ggplot comes with several preset themes that can be added as layers, including:
 
 ```{r theme preset}
 imports %>%
-  ggplot() + 
-  geom_line(aes(x=datetime, y=imports), col="red") + 
+  ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
   scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
   labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
   theme_minimal()
@@ -353,8 +352,7 @@ The `theme()` layer lets you modulate many components of the theme, including:
 
 ```{r theme manual}
 imports %>%
-  ggplot() + 
-  geom_line(aes(x=datetime, y=imports), col="red") + 
+  ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
   scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
   labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
   theme(axis.text.x=element_text(angle=45, hjust=1, size=12))
@@ -525,7 +523,7 @@ long_merged_energy %>%
 > - Shapes and linetypes are two other ways.
 > - The idea here is to modify what the object actually looks like.
 
-## Example: Energy source group by day
+## Example: Energy source group, by day
 
 Task:<br>
 
@@ -552,7 +550,7 @@ long_merged_energy_regroup <- long_merged_energy %>%
 head(long_merged_energy_regroup)
 ```
 
-## Example: Energy source group by day (shapes)
+## Example: Energy source group, by day
 
 ```{r aes shapes}
 long_merged_energy_regroup %>% 
@@ -562,7 +560,7 @@ long_merged_energy_regroup %>%
   labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
 ```
 
-## Example: Energy source group by day (linetypes)
+## Example: Energy source group, by day
 
 ```{r aes linetypes}
 long_merged_energy_regroup %>% 
@@ -577,7 +575,7 @@ long_merged_energy_regroup %>%
 > - They are particularly useful when you want to distinguish objects based on some *continuous* variable.
 > - Let's return to the Gapminder data for an example.
 
-## Example: Life expectancy ~ GDP (sizes)
+## Example: Life expectancy over GDP
 
 ```{r aes size}
 gapminder07 %>% 
