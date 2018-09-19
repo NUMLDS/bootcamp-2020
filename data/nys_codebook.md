@@ -21,4 +21,4 @@ This document serves as a codebook for the data files `nys_schools.csv` and `nys
 - year = year
 - county_per_poverty
 - median_household_income
-- county_per_bach = percent over 25 with bachelors
+- county_per_bach = percent over 25 with bachelors degree
