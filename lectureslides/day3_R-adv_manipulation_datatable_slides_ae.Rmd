@@ -1,0 +1,323 @@
+---
+title: "Advanced R - data.table"
+author: "Ali Ehlen"
+date: "`r Sys.Date()`"
+output: 
+  revealjs::revealjs_presentation:
+    fig_height: 4
+    self_contained: false
+    reveal_plugins: ["notes"]
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# introduction
+
+## what is `data.table`?
+
+> - "`data.table` is an R package that provides an enhanced version of data.frames" 
+> - "Briefly, if you are interested in reducing programming and compute time tremendously, then this package is for you." 
+
+  > - \- [authors of `data.table`](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
+
+> - `data.tables` provide an alternate framework for tabular data analysis, similar to `dplyr`
+
+## why do we care?
+
+> - `data.table` is popular
+![](figures/cran_downloads.png)
+> - `data.table` performs better on large data sets
+> - you might prefer the syntax and/or philosophy behind it
+
+# `data.table` basics
+
+## load data
+
+```{r, eval=FALSE, echo=TRUE}
+
+# import data.table library
+library(data.table)
+library(lubridate)
+
+data_file <- here::here("data", "generation.csv")
+
+# read in two versions of data, one as a data.frame and one as a data.table
+generation_df <- read.csv(data_file, stringsAsFactors = F)
+
+generation_dt <- fread(data_file)
+
+```
+
+`data.table` inherits from a `data.frame`.
+
+```{r, eval=FALSE, echo=TRUE}
+
+View(generation_df)
+View(generation_dt)
+
+generation_df
+generation_dt
+
+class(generation_df) # "data.frame"
+class(generation_dt) # "data.table" "data.frame"
+
+str(generation_df)
+str(generation_dt)
+
+```
+
+## `data.frame` and `data.table` comparison
+
+There are some major differences between the two:
+
+> - different philosophy => different syntax
+> - due to optimizations, `data.table` might perform better, particularly on large and complex data sets
+> - fewer packages required
+> - a `data.table` can be passed to functions expecting a `data.frame`
+> - we will only scratch the surface today. Links to more resources are 
+at the end of the lecture notes 
+
+# slicing, column operations, and group by
+
+## syntax: column selection and row filtering
+
+> - `dplyr` syntax: depends on a small set of verbs
+> - ~~verbs~~
+> - `data.table` syntax: small set of consistent rules for interpreting input into `dt[]`
+>- This set of rules can be most easily summarized as:
+> `dt[i, j, by]`
+
+  > - `i` filters rows
+  > - `j` column operations
+  > - `by` is group by
+  
+## exercise 
+
+Using `data.table`'s special operator and what you learned about converting
+datetimes in the previous session, convert the `datetime` column to a POSIX 
+object. Then, create a new `data.table` that contains the total renewable energy generation (solar + wind) by hour and day. 
+You will probably need lubridate's functions `day()` and `hour()`
+
+## exercise - answer
+
+Using `data.table`'s special operator and what you learned about converting
+datetimes in the previous session, convert the `datetime` column to a POSIX 
+object. Then, create a new `data.table` that contains the total renewable energy generation (solar + wind) by hour and day. 
+You will probably need lubridate's functions `day()` and `hour()`
+
+```{r, eval=FALSE, echo=TRUE}
+
+generation_dt[, datetime := as_datetime(datetime)]
+
+generation_dt[,.(solar_wind = solar + wind), by = .(day(datetime), hour(datetime))]
+
+```
+
+## clean up 
+
+Columns can also be removed using `NULL`, similarly to base R:
+
+```{r, eval=FALSE, echo=TRUE}
+
+generation_dt[,solar_on := NULL]
+generation_dt[,all_hydro := NULL]
+
+```
+
+There are several other `data.table` features, but these rules for syntax
+cover lots of functionality
+
+# `data.table` upgrades to other functions
+
+## `data.table` upgrades to other functions
+
+`data.table` co-opts some functions we've already talked about
+
+> - `melt`
+> - `dcast`
+> - `merge`
+> - `order`
+> - _Note:_ sometimes loading `reshape` or `dplyr` will disrupt this behavior
+and the original functions will be dispatched. To get around this, either 
+call `merge.data.table` directly or don't load those packages.
+> - This means we can repeat what we did this morning almost exactly
+
+## exercise
+
+Convert this `dplyr` syntax into `data.table` syntax (remember that this created
+the columns `day`, `log_output`, and `per_output`)
+
+```{r, eval=FALSE, echo=TRUE}
+
+long_ca_energy <- long_ca_energy %>%
+  mutate(day = as_date(datetime),
+         log_output = log(output)) %>%
+  group_by(day) %>%
+  mutate(total_daily_output = sum(output, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(per_output = output/total_daily_output)
+
+```
+
+## exercise - answer
+```{r, eval=FALSE, echo=TRUE}
+
+long_ca_energy <- long_ca_energy %>%
+  mutate(day = as_date(datetime),
+         log_output = log(output)) %>%
+  group_by(day) %>%
+  mutate(total_daily_output = sum(output, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(per_output = output/total_daily_output)
+
+# becomes
+all_generation_long[,day := as_date(datetime)]
+all_generation_long[,log_output := log(value)]
+all_generation_long[,per_output := value/sum(value), by = day]
+```
+Note that this is possible to do in one command:
+```{r, eval=FALSE, echo=TRUE}
+
+all_generation_long[,c("day2", "log_output2", "per_output2") := .(as_date(datetime), log(value), value/sum(value)), by = day]
+# or
+all_generation_long[,`:=`(day2 = as_date(datetime), 
+                          log_output2 = log(value), 
+                          per_output2 = value/sum(value)), 
+                    by = day]
+
+# can check this this resulted in correct values
+all_generation_long[,all(day == day2)] # TRUE
+all_generation_long[,all(per_output2 == per_output)] # TRUE
+
+```
+but how you prefer to write this depends on you. 
+
+# a few bonus features
+
+## fread
+
+> - "Fast and friendly file finagler" - _help file_
+> - "Similar to read.table but faster and more convenient" - _help file_
+> - this is one of the most useful features of the `data.table` package, 
+according to some
+
+## fread benchmarks
+
+```{r, eval=FALSE, echo=TRUE}
+
+# example, no need to run this
+library(rbenchmark)
+
+# this will run each command 100 times and report the average time taken
+
+# 168 lines
+data_file <- here::here("data", "generation.csv")
+benchmark(read.csv(data_file, stringsAsFactors = F), 
+          fread(data_file), 
+          replications = 500)
+
+#                                        test replications elapsed relative user.self sys.self user.child sys.child
+# 2                          fread(data_file)          200    0.23    1.000      0.19     0.05         NA        NA
+# 1 read.csv(data_file, stringsAsFactors = F)          200    0.35    1.522      0.34     0.00         NA        NA
+
+# 12,600 lines
+data_file_medium <- here::here("data", "generation_medium.csv")
+benchmark(read.csv(data_file_medium, stringsAsFactors = F), 
+          fread(data_file_medium))
+
+#                                               test replications elapsed relative user.self sys.self user.child sys.child
+# 2                          fread(data_file_medium)          100    2.53     1.00      2.33     0.09         NA        NA
+# 1 read.csv(data_file_medium, stringsAsFactors = F)          100    6.25     2.47      6.17     0.08         NA        NA
+
+# 1,008,000 lines
+data_file_large <- here::here("data", "generation_large.csv")
+benchmark(read.csv(data_file_large, stringsAsFactors = F), 
+          fread(data_file_large),
+          replications = 20)
+
+#                                              test replications elapsed relative user.self sys.self user.child sys.child
+# 2                          fread(data_file_large)           20   37.12    1.000     36.38     0.59         NA        NA
+# 1 read.csv(data_file_large, stringsAsFactors = F)           20   98.41    2.651     96.27     1.82         NA        NA
+
+```
+
+
+## special variables
+
+`data.table`s also contain some special read-only symbols that are often useful: 
+
+- `.N`: number of rows in the current group
+- `.I`: a vector, `1:nrow(dt)`, usually used for more advanced operations
+
+Here are some somewhat contrived examples of how to use them:
+
+```{r, eval=FALSE, echo=TRUE}
+
+# for .N: convenient
+all_generation_long[,.N] 
+all_generation_long[,.N, by = type]
+
+# for .I: more advanced syntax
+all_generation_long[,.I]
+
+```
+
+## Other features: keys
+
+- keys: one or more columns, pre-sorted index of the table.
+
+```{r, eval=FALSE, echo=TRUE}
+
+# check the current key
+key(generation_dt)
+
+# set key
+setkey(generation_dt, datetime)
+key(generation_dt)
+
+```
+
+## Other features: joins
+
+- joins: `data.table` has a special join syntax
+
+```{r, eval=FALSE, echo=TRUE}
+
+# this only works if at least one key is set
+generation_dt[imports]
+
+# this can also be used to select rows
+fewer_imports <- imports[day(datetime) == 3 | day(datetime) == 4]
+generation_dt[fewer_imports]
+
+# operations can be performed in the same step as the merge
+generation_dt[fewer_imports, sum(small_hydro + large_hydro), by = day(datetime)]
+
+```
+
+## Other features: `.SD`
+
+- `.SD`: "subset of data"
+- chunks off `data.table` by columns and groups. 
+
+# final thoughts
+
+## final thoughts
+
+- developers: Matt Dowle, Arun Srinivasan (look out for them on stack overflow)
+- useful [introduction](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) to `data.table`
+- also  useful `data.table` [FAQ](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-faq.html)
+- [Intro to advanced features](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-reshape.html) of `data.table` `melt` and `dcast` functions
+- or any other vignette
+
+
+
