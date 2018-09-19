@@ -43,12 +43,11 @@ In ggplot, graphics are built by supplying *data* and *mapping* of data values t
 
 ## Let's make sure we have the necessary data frames for our examples
 
-1. If you still have `imports`, `generation`, `merged_energy`, `long_gen` and `long_merged_energy` in your Enrivorment, run the code from your Day 1 exercises file to get `gapminder` and `gapminder07`.
-2. If you are missing any of those objects from your workspace, run the following line of code:
+1. If you still have `imports`, `generation`, `merged_energy`, `long_gen` and `long_merged_energy` in your Enrivorment, read in `gapminder` and recreate `gapminder07`.
+2. Alternatively, or if you are missing any of those objects from your workspace, run the following line of code:
 
 ```{r, warning=FALSE, message=FALSE}
-library(here)
-source(here("data/day3_objects.R"))
+source(here::here("data/day3_objects.R"))
 ```
 
 # Basics: grammar of graphics
@@ -95,9 +94,9 @@ ggplot(gapminder07) +
        x = "GDP per capita", y = "Life expectancy")
 ```
 
-## Exercise: Scatterplot
+## Exercise 1: Scatterplot
 
-Using the `gapminder07` data, create a scatterplot of `gdpPercap` as a function of `pop`. Give it a title and axis labels.
+Using the `gapminder07` data, create a scatterplot of the natural log of `gdpPercap` as a function of the natural log of `pop`. Give it a title and axis labels.
 
 Remember, you will need three functions: `ggplot()`, `geom_point()`, and `labs()`. 
 
@@ -105,12 +104,12 @@ Remember, you will need three functions: `ggplot()`, `geom_point()`, and `labs()
 You can create a new script file for your exercises in this session, or you can continue to use script files from earlier in the day. In either case, make sure to give the file a sensible filename and to demarcate sections with meaningful comments.
 </aside>
 
-## Exercise: Scatterplot
+## Exercise 1: Scatterplot
 
 ```{r scatterplot exercise}
 ggplot(gapminder07) + 
-  geom_point(aes(x = pop, y = gdpPercap)) + 
-  labs(title = "Relationship between GDP per capita and population in 2007", x = "GDP per capita", y = "Life expectancy")
+  geom_point(aes(x = log(pop), y = log(gdpPercap))) + 
+  labs(title = "Relationship between GDP per capita and population in 2007", x = "Logged GDP per capita", y = "Logged life expectancy")
 ```
 
 # Preparing your data
@@ -142,13 +141,13 @@ long_gen %>%
   labs(title="Total energy generated, by hour", x="Hour", y="Output (MW)")
 ```
 
-## Exercise: Hydro power generated over time
+## Exercise 2: Hydro power generated over time
 
 Task:<br>Plot a column chart *hydroelectric* power generated over time.
 
 <small>Hint: There are two types of hydroelectric sources in the data: `large_hydro` and `small_hydro`.</small>
 
-## Exercise: Hydro power generated over time
+## Exercise 2: Hydro power generated over time
 
 ```{r data prep ex1}
 long_gen %>% 
@@ -160,7 +159,7 @@ long_gen %>%
   labs(title="Total hydro power generated, by hour", x="Hour", y="Output (MW)")
 ```
 
-## Exercise: Hydro power generated over time
+## Exercise 2: Hydro power generated over time
 
 ```{r data prep ex2}
 generation %>% 
@@ -243,6 +242,26 @@ generation %>%
   labs(title="Hydroelectric (large) generation per hour, Sept 3-9", x="Hour", y="Output (MW)")
 ```
 
+## Exercise 3: Total output per source
+
+Task:<br>Create a column chart that shows the total output per source. 
+
+- Change the color of the columns to `"darkred"`. 
+- Add a horizontal line indicating the mean output across all sources. Use the cheatsheet to identify the `geom` function that you need.
+- Add a meaningful title and axis labels using `labs()`.
+
+## Exercise 3: Total output per source
+
+```{r exercise3}
+long_merged_energy %>%
+  group_by(source) %>% 
+  summarise(output=sum(output)) %>%
+  ggplot() + 
+  geom_col(aes(x=source, y=output), fill="darkred") + 
+  geom_hline(aes(yintercept=mean(output))) + 
+  labs(title="Total output per energy source over Sept 3-9", y="Output (MW)", x="Source")
+```
+
 # Additional layers
 
 ## Labels
@@ -267,7 +286,7 @@ No exercise this time, but we will practice this later.
 ## Scales
 
 > - Scales allow you to manipulate the relationship between data values and aesthetics beyond aesthetic mapping.
-> - AKA: scales "control the details of how data values are translated to visual properties" (quote from [reference guide](https://ggplot2.tidyverse.org/reference/index.html#section-aesthetics)).
+>     - AKA: scales "control the details of how data values are translated to visual properties" (quote from [reference guide](https://ggplot2.tidyverse.org/reference/index.html#section-aesthetics)).
 > - For example:
 >     - `scale_alpha`: control transparency settings
 >     - `scale_color` and `scale_fill`: control color palettes and other aspects of data mapped to colors
@@ -286,7 +305,7 @@ Steps:
 > 3. Add a `scale_x_datetime()` layer and use `date_labels=` and `date_breaks=` arguments to modify x-axis labels and breaks.
 > 4. Add a `labs()` layer.
 
-## Scales
+## Example: Imports over time
 
 ```{r scales dates}
 imports %>%
@@ -310,6 +329,16 @@ ggplot comes with several preset themes that can be added as layers, including:
 - `theme_dark()` and `theme_light()`: change the background of the coordinate system
 - `theme_minimal()` and `theme_void()`: see reference guide for details
 
+## Example: Imports over time
+
+```{r theme preset}
+imports %>%
+  ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
+  scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
+  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
+  theme_minimal()
+```
+
 ## Themes: manual
 
 The `theme()` layer lets you modulate many components of the theme, including: 
@@ -318,6 +347,16 @@ The `theme()` layer lets you modulate many components of the theme, including:
 > - Angle, position, and other characteristics of legends (e.g. `legend.position = `).
 > - Characteristics of the background of the plot (e.g. `plot.background = `).
 > - For a full list of the components that can be modified, see the help file for `ggplot2::theme()`.
+
+## Example: Imports over time
+
+```{r theme manual}
+imports %>%
+  ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
+  scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
+  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
+  theme(axis.text.x=element_text(angle=45, hjust=1, size=12))
+```
 
 ## Coordinate system adjustment
 
@@ -381,13 +420,13 @@ long_merged_energy %>%
   labs(title="Output by energy source over time", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
 ```
 
-## Exercise: Colors and fill
+## Exercise 4: Colors and fill
 
 Task:<br>Create a line plot that compares generation of wind, solar, and geothermal energy over time.
 
 <small>Bonus: Set the line size to 1.5.</small>
 
-## Exercise: Colors and fill
+## Exercise 4: Colors and fill
 
 ```{r aes colors ex}
 long_merged_energy %>%
@@ -454,7 +493,7 @@ long_merged_energy %>%
 > - What if our goal is to compare what portion of output per day each source comprises?
 >     - We can use `position="fill"` to normalize height of stacked columns.
 
-## Example: Energy use by day
+## Example: Energy use by day (pos dodge)
 
 ```{r col dodge}
 long_merged_energy %>% 
@@ -466,7 +505,7 @@ long_merged_energy %>%
   labs(title="Energy use by day", x="Day", y="Output (MW)")
 ```
 
-## Example: Energy use by day
+## Example: Energy use by day (pos fill)
 
 ```{r col fill}
 long_merged_energy %>% 
@@ -484,7 +523,7 @@ long_merged_energy %>%
 > - Shapes and linetypes are two other ways.
 > - The idea here is to modify what the object actually looks like.
 
-## Example: Energy source group by day
+## Example: Energy source group, by day
 
 Task:<br>
 
@@ -499,6 +538,7 @@ Steps:
 ## Example: Energy source group by day
 
 ```{r prep shapes}
+# Prepare data
 long_merged_energy_regroup <- long_merged_energy %>%
   rename(type = source) %>% 
   merge(regroup, by = "type") %>% 
@@ -506,10 +546,11 @@ long_merged_energy_regroup <- long_merged_energy %>%
   group_by(date, group) %>%
   summarise(output=sum(output))
 
+# Take a look at our prepared data
 head(long_merged_energy_regroup)
 ```
 
-## Example: Energy source group by day
+## Example: Energy source group, by day
 
 ```{r aes shapes}
 long_merged_energy_regroup %>% 
@@ -519,7 +560,7 @@ long_merged_energy_regroup %>%
   labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
 ```
 
-## Example: Energy source group by day
+## Example: Energy source group, by day
 
 ```{r aes linetypes}
 long_merged_energy_regroup %>% 
@@ -532,15 +573,49 @@ long_merged_energy_regroup %>%
 
 > - `size=` and `alpha=` inside `aes()` modulate the size and transparency of geom objects based on some data value.
 > - They are particularly useful when you want to distinguish objects based on some *continuous* variable.
+> - Let's return to the Gapminder data for an example.
 
-## Example: Size
+## Example: Life expectancy over GDP
 
 ```{r aes size}
 gapminder07 %>% 
   ggplot() + 
-  geom_point(aes(x=gdpPercap, y=lifeExp, size=pop, col=continent)) + 
+  geom_point(aes(x=log(gdpPercap), y=lifeExp, size=pop, col=continent)) + 
   scale_size_continuous(name="Population") + scale_color_discrete(name="Continent") +
-  labs(title="Life expectancy as a function of GDP per capita in 2007", x="GDP per capita", y="Life expectancy")
+  labs(title="Life expectancy as a function of GDP per capita in 2007", x="Logged GDP per capita", y="Life expectancy")
+```
+
+## Exercise 5: Average hourly output by source
+
+Task:<br>Visualize the average output for each hour of the day, grouped by source.
+
+<small>You need to identify the output per source per hour (e.g. 01:00, 02:00, etc) averaged over all days.</small>
+
+- You will need to prepare your data using both `dplyr` and `lubridate` functions.
+- You can choose which `geom`(s) to use, and how to demarcate groups.
+- Bonus: use a scale layer to set a color palette (try `"Set3"`) and change the legend name.
+- Remember to add `labs()`!
+
+## Exercise 5: Average hourly output by source
+
+```{r exercise5 setup}
+ex5 <- long_merged_energy %>% 
+  mutate(hour=lubridate::hour(datetime)) %>% 
+  group_by(hour, source) %>% 
+  summarize(output=sum(output)) %>%
+  ggplot() + 
+  geom_area(aes(x=hour, y=output, fill=factor(source))) + 
+  scale_fill_brewer(palette="Set3", name="Source") + 
+  labs(title="Average hourly output by source", 
+       subtitle="Data collected during September 3-9",
+       x="Hour of the day", y="Output (MW)") + 
+  theme_bw()
+```
+
+## Exercise 5: Average hourly output by source
+
+```{r exercise5 plot}
+ex5
 ```
 
 ## Facets
@@ -596,7 +671,7 @@ long_gen %>%
   labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
 ```
 
-## Exercise: Facets
+## Exercise 6: Facets
 
 Task:<br>Compare generation patterns for each source in facets. Color the lines using the "group" variable in `regroup`.
 
@@ -605,7 +680,7 @@ Remember:
 - You will need to prepare your data. Think about the variables that you need: source/type, output, and group.
 - When you pipe modified data into ggplot, remember that you are grouping in two ways: source/type through facets, and group through color.
 
-## Exercise: Facets
+## Exercise 6: Facets
 
 ```{r data prep for facets ex}
 long_gen_regroup <- long_gen %>%
@@ -615,7 +690,7 @@ long_gen_regroup <- long_gen %>%
 head(long_gen_regroup)
 ```
 
-## Exercise: Facets
+## Exercise 6: Facets
 
 ```{r facets ex}
 long_gen_regroup %>% ggplot() + 
@@ -647,3 +722,17 @@ Three ways to save images created by ggplot:
 This is the end of the R lecture sessions.
 
 After a short break, we will return for a cumulative exercise that combines the skills you have learned since Monday. 
+
+# Final Exercise
+
+The instructions are in a markdown file in the `exercises` folder. Create a new RMarkdown file (save it using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`), in which you will complete the exercise.
+
+You can work in small groups, but write up your code separately.
+
+Raise your hand if you need help!
+
+## Optional Submissions
+
+You've created several RMarkdown files over the past three days. Since you stored these in a forked repo, it is possible to create a pull request and 'submit' these changes to the base repo. This is *optional*, but gives you a chance to explore Github functionality and share your work with your classmates. 
+
+Before you submit your completed exercises, *move every new file in your repo to the* `submissions` *folder*. This ensures that we won't inadvertently make changes to the session materials. Then, create a new pull request, asking to merge changes from your fork to the base repository.
