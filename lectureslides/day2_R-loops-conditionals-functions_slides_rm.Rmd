@@ -295,7 +295,7 @@ sapply(years, function(x) mean(gapminder$lifeExp[gapminder$year == x]))
 i <-  1952 # define the interator
 
 while (i < 1987) {
-  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  sd_le <- sd(gapminder$lifeExp[gapminder$year == i])
   print(paste0(i, ": ", sd_le)
         )
   i <- i + 5 # increase the iterator by the interval between years
@@ -312,7 +312,7 @@ while (i < 1987) {
 i <-  1987 # define the interator
 
 while (i <= 2002) {
-  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  sd_le <- sd(gapminder$lifeExp[gapminder$year == i])
   print(paste0(i, ": ", sd_le)
         )
   i <- i + 5 # increase the iterator by the interval between years
@@ -328,7 +328,7 @@ while (i <= 2002) {
 i <-  1987 # define the interator
 
 while (i <= 2002) {
-  sd_lf <- sd(gapminder$lifeExp[gapminder$year == i])
+  sd_le <- sd(gapminder$lifeExp[gapminder$year == i])
   print(paste0(i, ": ", sd_le)
         )
   # oops! forgot to increase i by 5! ESC! ESC! ESC!
@@ -493,7 +493,7 @@ get_values <-
 ```{r writing a function}
 report_mean_sd <- 
   function(df, variable, country) {
-    var <- gapminder[[variable]][gapminder$country == country]
+    var <- df[[variable]][df$country == country]
     m_le <- mean(var)
     sd_le <- sd(var)
     cat("Country:", country, 
@@ -515,7 +515,7 @@ report_mean_sd(gapminder, "lifeExp", "Bulgaria")
 ```{r your function}
 report_stats <-
   function(df, variable, continent) {
-    var <- gapminder[[variable]][gapminder$continent == continent]
+    var <- df[[variable]][df$continent == continent]
     min_le <- min(var)
     max_le <- max(var)
     cat("Continent:", continent,

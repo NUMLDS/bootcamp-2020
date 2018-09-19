@@ -11,7 +11,7 @@
 
 <meta name="author" content="Richard Paquin Morel" />
 
-<meta name="date" content="2018-09-17" />
+<meta name="date" content="2018-09-18" />
 
 <title>Advanced R - Reshaping, merging, and dplyr</title>
 
@@ -1475,7 +1475,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Advanced R - Reshaping, merging, and dplyr</h1>
 <h4 class="author"><em>Richard Paquin Morel</em></h4>
-<h4 class="date"><em>2018-09-17</em></h4>
+<h4 class="date"><em>2018-09-18</em></h4>
 
 </div>
 
@@ -1620,20 +1620,20 @@ head(imports$datetime)</code></pre>
 <pre class="r"><code>library(reshape2)
 long_gen &lt;- melt(generation, id.vars = &quot;datetime&quot;,
                            variable.name = &quot;source&quot;,
-                           value.name = &quot;output&quot;)
+                           value.name = &quot;usage&quot;)
 head(long_gen)</code></pre>
-<pre><code>##              datetime source output
-## 1 2018-09-03 00:00:00 biogas    239
-## 2 2018-09-03 01:00:00 biogas    240
-## 3 2018-09-03 02:00:00 biogas    237
-## 4 2018-09-03 03:00:00 biogas    241
-## 5 2018-09-03 04:00:00 biogas    240
-## 6 2018-09-03 05:00:00 biogas    239</code></pre>
+<pre><code>##              datetime source usage
+## 1 2018-09-03 00:00:00 biogas   239
+## 2 2018-09-03 01:00:00 biogas   240
+## 3 2018-09-03 02:00:00 biogas   237
+## 4 2018-09-03 03:00:00 biogas   241
+## 5 2018-09-03 04:00:00 biogas   240
+## 6 2018-09-03 05:00:00 biogas   239</code></pre>
 </div>
 <div id="melt-the-generation-data-1" class="section level2">
 <h2><code>melt</code> the generation data</h2>
 <pre class="r"><code>long_gen[order(long_gen$datetime)[1:20], ]</code></pre>
-<pre><code>##                 datetime      source   output
+<pre><code>##                 datetime      source    usage
 ## 1    2018-09-03 00:00:00      biogas  239.000
 ## 169  2018-09-03 00:00:00     biomass  413.000
 ## 337  2018-09-03 00:00:00  geothermal  974.000
@@ -1691,7 +1691,6 @@ head(long_gen)</code></pre>
 <li>Use <code>all.x = T</code> if you want to keep all the observation in the first dataframe (unmatched observations in <code>y</code> are dropped!)</li>
 <li>Use <code>all.y = T</code> if you want to keep all observations in the second dataframe (umatched observations in <code>x</code> are dropped!)</li>
 <li>Use both (or, simply <code>all = T</code>) to keep all observations!</li>
-<li>By <strong>default</strong> R will drop unmatched observations from <strong>both</strong> dataframe!</li>
 </ul></li>
 </ul>
 </div>
@@ -1738,15 +1737,15 @@ dim(merged_energy)</code></pre>
 <h2>Try reshaping the merged data!</h2>
 <pre class="r"><code>long_merged_energy &lt;- melt(merged_energy, id.vars = &quot;datetime&quot;,
                            variable.name = &quot;source&quot;,
-                           value.name = &quot;output&quot;)
+                           value.name = &quot;usage&quot;)
 head(long_merged_energy)</code></pre>
-<pre><code>##              datetime source output
-## 1 2018-09-03 00:00:00 biogas    239
-## 2 2018-09-03 01:00:00 biogas    240
-## 3 2018-09-03 02:00:00 biogas    237
-## 4 2018-09-03 03:00:00 biogas    241
-## 5 2018-09-03 04:00:00 biogas    240
-## 6 2018-09-03 05:00:00 biogas    239</code></pre>
+<pre><code>##              datetime source usage
+## 1 2018-09-03 00:00:00 biogas   239
+## 2 2018-09-03 01:00:00 biogas   240
+## 3 2018-09-03 02:00:00 biogas   237
+## 4 2018-09-03 03:00:00 biogas   241
+## 5 2018-09-03 04:00:00 biogas   240
+## 6 2018-09-03 05:00:00 biogas   239</code></pre>
 </div>
 </div>
 <div id="dplyr" class="section level1">
@@ -1773,7 +1772,7 @@ head(long_merged_energy)</code></pre>
 <ul>
 <li>select by name:
 <ul>
-<li><code>select(df, variable_1, variable_3)</code></li>
+<li><code>select(gapminder, continent, pop)</code></li>
 </ul></li>
 <li>select by position:
 <ul>
@@ -1781,11 +1780,11 @@ head(long_merged_energy)</code></pre>
 </ul></li>
 <li>select by range:
 <ul>
-<li><code>select(df, variable_1:variable_10)</code> or <code>select(df, 1:10)</code></li>
+<li><code>select(df, country:pop)</code> or <code>select(df, 1:3)</code></li>
 </ul></li>
 <li>drop variables with <code>-</code>
 <ul>
-<li><code>select(df, -variable_7)</code></li>
+<li><code>select(df, -gdpPercap)</code></li>
 </ul></li>
 </ul>
 </div>
@@ -1859,37 +1858,37 @@ nrow(tmp)</code></pre>
 <ul>
 <li><code>mutate</code> creates new variables</li>
 </ul>
-<pre class="r"><code>tmp &lt;- mutate(long_merged_energy, log_output = log(output))
+<pre class="r"><code>tmp &lt;- mutate(long_merged_energy, log_usage = log(usage))
 head(tmp)</code></pre>
-<pre><code>##              datetime source output log_output
-## 1 2018-09-03 00:00:00 biogas    239   5.476464
-## 2 2018-09-03 01:00:00 biogas    240   5.480639
-## 3 2018-09-03 02:00:00 biogas    237   5.468060
-## 4 2018-09-03 03:00:00 biogas    241   5.484797
-## 5 2018-09-03 04:00:00 biogas    240   5.480639
-## 6 2018-09-03 05:00:00 biogas    239   5.476464</code></pre>
+<pre><code>##              datetime source usage log_usage
+## 1 2018-09-03 00:00:00 biogas   239  5.476464
+## 2 2018-09-03 01:00:00 biogas   240  5.480639
+## 3 2018-09-03 02:00:00 biogas   237  5.468060
+## 4 2018-09-03 03:00:00 biogas   241  5.484797
+## 5 2018-09-03 04:00:00 biogas   240  5.480639
+## 6 2018-09-03 05:00:00 biogas   239  5.476464</code></pre>
 </div>
 <div id="mutate-1" class="section level2">
 <h2><code>mutate</code></h2>
-<pre class="r"><code>tmp &lt;- mutate(long_merged_energy, log_output = log(output), output2 = output^2, output3 = output^3)
+<pre class="r"><code>tmp &lt;- mutate(long_merged_energy, log_usage = log(usage), usage2 = usage^2, usage3 = usage^3)
 head(tmp)</code></pre>
-<pre><code>##              datetime source output log_output output2  output3
-## 1 2018-09-03 00:00:00 biogas    239   5.476464   57121 13651919
-## 2 2018-09-03 01:00:00 biogas    240   5.480639   57600 13824000
-## 3 2018-09-03 02:00:00 biogas    237   5.468060   56169 13312053
-## 4 2018-09-03 03:00:00 biogas    241   5.484797   58081 13997521
-## 5 2018-09-03 04:00:00 biogas    240   5.480639   57600 13824000
-## 6 2018-09-03 05:00:00 biogas    239   5.476464   57121 13651919</code></pre>
+<pre><code>##              datetime source usage log_usage usage2   usage3
+## 1 2018-09-03 00:00:00 biogas   239  5.476464  57121 13651919
+## 2 2018-09-03 01:00:00 biogas   240  5.480639  57600 13824000
+## 3 2018-09-03 02:00:00 biogas   237  5.468060  56169 13312053
+## 4 2018-09-03 03:00:00 biogas   241  5.484797  58081 13997521
+## 5 2018-09-03 04:00:00 biogas   240  5.480639  57600 13824000
+## 6 2018-09-03 05:00:00 biogas   239  5.476464  57121 13651919</code></pre>
 </div>
 <div id="summarize" class="section level2">
 <h2><code>summarize</code></h2>
 <p><code>summarize</code> reduces observations to a single value based on functions - <code>mean</code>, <code>sum</code>, <code>sd</code>, <code>min</code>, <code>max</code>, etc.</p>
 <pre class="r"><code># total energy consumption
-summarize(long_merged_energy, total = sum(output, na.rm = T))</code></pre>
+summarize(long_merged_energy, total = sum(usage, na.rm = T))</code></pre>
 <pre><code>##     total
 ## 1 4857819</code></pre>
 <pre class="r"><code># mean energy consumption
-summarize(long_merged_energy, mean_cons = mean(output, na.rm = T))</code></pre>
+summarize(long_merged_energy, mean_cons = mean(usage, na.rm = T))</code></pre>
 <pre><code>##   mean_cons
 ## 1  2891.559</code></pre>
 </div>
@@ -1905,10 +1904,10 @@ summarize(long_merged_energy, mean_cons = mean(output, na.rm = T))</code></pre>
 long_merged_energy %&gt;% 
   filter(source == &quot;geothermal&quot;) %&gt;% 
   select(-datetime) %&gt;% 
-  mutate(log_output = log(output)) %&gt;% 
-  summarize(mean_log_output = mean(log_output, na.rm = T))</code></pre>
-<pre><code>##   mean_log_output
-## 1        6.855771</code></pre>
+  mutate(log_usage = log(usage)) %&gt;% 
+  summarize(mean_log_usage = mean(log_usage, na.rm = T))</code></pre>
+<pre><code>##   mean_log_usage
+## 1       6.855771</code></pre>
 </div>
 <div id="a-new-operator-the-pipe-1" class="section level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
@@ -1918,10 +1917,10 @@ long_merged_energy %&gt;%
 </ul>
 <pre class="r"><code>merged_energy %&gt;% 
   select(-datetime) %&gt;% 
-  mutate(total_output = rowSums(., na.rm = T)) %&gt;% 
-  summarize(total_output = sum(total_output, na.rm = T))</code></pre>
-<pre><code>##   total_output
-## 1      4857819</code></pre>
+  mutate(total_usage = rowSums(., na.rm = T)) %&gt;% 
+  summarize(total_usage = sum(total_usage, na.rm = T))</code></pre>
+<pre><code>##   total_usage
+## 1     4857819</code></pre>
 </div>
 <div id="a-new-operator-the-pipe-2" class="section level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
@@ -1931,8 +1930,8 @@ long_merged_energy %&gt;%
 </ul>
 <pre class="r"><code>merged_energy %&gt;% 
   select(-datetime) %&gt;% 
-  mutate(total_output = rowSums(merged_energy, na.rm = T)) %&gt;% 
-  summarize(total_output = sum(total_output, na.rm = T))</code></pre>
+  mutate(total_usage = rowSums(merged_energy, na.rm = T)) %&gt;% 
+  summarize(total_usage = sum(total_usage, na.rm = T))</code></pre>
 <pre><code>## Error in mutate_impl(.data, dots): Evaluation error: 'x' must be numeric.</code></pre>
 </div>
 <div id="try-piping" class="section level2">
@@ -1942,7 +1941,7 @@ long_merged_energy %&gt;%
 <ol style="list-style-type: decimal">
 <li>Select variables that contain the word “hydro”</li>
 <li>Create a new variable called <code>total_hydro</code> that is the sum of the retained hydro variables</li>
-<li>Find the mean output for <code>total_hydro</code></li>
+<li>Find the mean usage for <code>total_hydro</code></li>
 </ol></li>
 </ul>
 </div>
@@ -1965,20 +1964,20 @@ long_merged_energy %&gt;%
 </ul>
 <pre class="r"><code>long_merged_energy %&gt;% 
   group_by(source) %&gt;% 
-  summarize(sum_output = sum(output, na.rm = T))</code></pre>
+  summarize(sum_usage = sum(usage, na.rm = T))</code></pre>
 <pre><code>## # A tibble: 10 x 2
-##    source      sum_output
-##    &lt;fct&gt;            &lt;dbl&gt;
-##  1 biogas          39272 
-##  2 biomass         64667 
-##  3 geothermal     159559 
-##  4 large_hydro    707736.
-##  5 natural_gas   1353499.
-##  6 nuclear        376992 
-##  7 small_hydro     57960 
-##  8 solar          641450 
-##  9 wind           287037 
-## 10 imports       1169647</code></pre>
+##    source      sum_usage
+##    &lt;fct&gt;           &lt;dbl&gt;
+##  1 biogas         39272 
+##  2 biomass        64667 
+##  3 geothermal    159559 
+##  4 large_hydro   707736.
+##  5 natural_gas  1353499.
+##  6 nuclear       376992 
+##  7 small_hydro    57960 
+##  8 solar         641450 
+##  9 wind          287037 
+## 10 imports      1169647</code></pre>
 </div>
 <div id="group_by-versus-for-loops" class="section level2">
 <h2><code>group_by</code> versus <code>for</code> loops</h2>
@@ -2014,7 +2013,7 @@ gapminder %&gt;%
 <div id="find-the-mean-by-hour" class="section level2">
 <h2>Find the mean by hour</h2>
 <ul>
-<li>Use your knowledge of <code>dplyr</code> to find the mean output for small hydro, large hydro, biogas, and biomass</li>
+<li>Use your knowledge of <code>dplyr</code> to find the mean usage for small hydro, large hydro, biogas, and biomass</li>
 <li>Start with either the wide or long merged dataset</li>
 </ul>
 </div>
@@ -2024,16 +2023,16 @@ gapminder %&gt;%
   select(datetime, contains(&quot;hydro&quot;), contains(&quot;bio&quot;)) %&gt;% 
   melt(id.vars = &quot;datetime&quot;,
        variable.name = &quot;source&quot;,
-       value.name = &quot;output&quot;) %&gt;% 
+       value.name = &quot;usage&quot;) %&gt;% 
   group_by(source) %&gt;% 
-  summarize(mean_output = mean(output, na.rm = T))</code></pre>
+  summarize(mean_usage = mean(usage, na.rm = T))</code></pre>
 <pre><code>## # A tibble: 4 x 2
-##   source      mean_output
-##   &lt;fct&gt;             &lt;dbl&gt;
-## 1 large_hydro       4213.
-## 2 small_hydro        345 
-## 3 biogas             234.
-## 4 biomass            385.</code></pre>
+##   source      mean_usage
+##   &lt;fct&gt;            &lt;dbl&gt;
+## 1 large_hydro      4213.
+## 2 small_hydro       345 
+## 3 biogas            234.
+## 4 biomass           385.</code></pre>
 </div>
 <div id="merging-in-dplyr-with-_join-functions" class="section level2">
 <h2>Merging in <code>dplyr</code> with <code>*_join</code> functions</h2>

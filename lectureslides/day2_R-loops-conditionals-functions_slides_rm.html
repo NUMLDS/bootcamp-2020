@@ -2325,18 +2325,18 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">i &lt;-<span class="st">  </span><span class="dv">1952</span> <span class="co"># define the interator</span></a>
 <a class="sourceLine" id="cb44-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb44-3" data-line-number="3"><span class="cf">while</span> (i <span class="op">&lt;</span><span class="st"> </span><span class="dv">1987</span>) {</a>
-<a class="sourceLine" id="cb44-4" data-line-number="4">  sd_lf &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
+<a class="sourceLine" id="cb44-4" data-line-number="4">  sd_le &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
 <a class="sourceLine" id="cb44-5" data-line-number="5">  <span class="kw">print</span>(<span class="kw">paste0</span>(i, <span class="st">&quot;: &quot;</span>, sd_le)</a>
 <a class="sourceLine" id="cb44-6" data-line-number="6">        )</a>
 <a class="sourceLine" id="cb44-7" data-line-number="7">  i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">5</span> <span class="co"># increase the iterator by the interval between years</span></a>
 <a class="sourceLine" id="cb44-8" data-line-number="8">}</a></code></pre></div>
-<pre><code>## [1] &quot;1952: 0.729027091403335&quot;
-## [1] &quot;1957: 0.729027091403335&quot;
-## [1] &quot;1962: 0.729027091403335&quot;
-## [1] &quot;1967: 0.729027091403335&quot;
-## [1] &quot;1972: 0.729027091403335&quot;
-## [1] &quot;1977: 0.729027091403335&quot;
-## [1] &quot;1982: 0.729027091403335&quot;</code></pre>
+<pre><code>## [1] &quot;1952: 12.2259557776501&quot;
+## [1] &quot;1957: 12.2312861234041&quot;
+## [1] &quot;1962: 12.0972450062645&quot;
+## [1] &quot;1967: 11.7188577789887&quot;
+## [1] &quot;1972: 11.3819531380937&quot;
+## [1] &quot;1977: 11.2272293919197&quot;
+## [1] &quot;1982: 10.7706178327824&quot;</code></pre>
 </section><section id="try-a-while-loop" class="slide level2">
 <h2>try a <code>while</code> loop</h2>
 <ul>
@@ -2347,15 +2347,15 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">i &lt;-<span class="st">  </span><span class="dv">1987</span> <span class="co"># define the interator</span></a>
 <a class="sourceLine" id="cb46-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb46-3" data-line-number="3"><span class="cf">while</span> (i <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2002</span>) {</a>
-<a class="sourceLine" id="cb46-4" data-line-number="4">  sd_lf &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
+<a class="sourceLine" id="cb46-4" data-line-number="4">  sd_le &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
 <a class="sourceLine" id="cb46-5" data-line-number="5">  <span class="kw">print</span>(<span class="kw">paste0</span>(i, <span class="st">&quot;: &quot;</span>, sd_le)</a>
 <a class="sourceLine" id="cb46-6" data-line-number="6">        )</a>
 <a class="sourceLine" id="cb46-7" data-line-number="7">  i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">5</span> <span class="co"># increase the iterator by the interval between years</span></a>
 <a class="sourceLine" id="cb46-8" data-line-number="8">}</a></code></pre></div>
-<pre><code>## [1] &quot;1987: 0.729027091403335&quot;
-## [1] &quot;1992: 0.729027091403335&quot;
-## [1] &quot;1997: 0.729027091403335&quot;
-## [1] &quot;2002: 0.729027091403335&quot;</code></pre>
+<pre><code>## [1] &quot;1987: 10.5562851721688&quot;
+## [1] &quot;1992: 11.2273795265798&quot;
+## [1] &quot;1997: 11.5594390582383&quot;
+## [1] &quot;2002: 12.2798227122797&quot;</code></pre>
 </section><section id="the-infinite-loop---a-while-loop-cautionary-tale" class="slide level2">
 <h2>the infinite loop - a <code>while</code> loop cautionary tale</h2>
 <ul>
@@ -2365,7 +2365,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">i &lt;-<span class="st">  </span><span class="dv">1987</span> <span class="co"># define the interator</span></a>
 <a class="sourceLine" id="cb48-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb48-3" data-line-number="3"><span class="cf">while</span> (i <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2002</span>) {</a>
-<a class="sourceLine" id="cb48-4" data-line-number="4">  sd_lf &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">  sd_le &lt;-<span class="st"> </span><span class="kw">sd</span>(gapminder<span class="op">$</span>lifeExp[gapminder<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>i])</a>
 <a class="sourceLine" id="cb48-5" data-line-number="5">  <span class="kw">print</span>(<span class="kw">paste0</span>(i, <span class="st">&quot;: &quot;</span>, sd_le)</a>
 <a class="sourceLine" id="cb48-6" data-line-number="6">        )</a>
 <a class="sourceLine" id="cb48-7" data-line-number="7">  <span class="co"># oops! forgot to increase i by 5! ESC! ESC! ESC!</span></a>
@@ -2521,7 +2521,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 </ul>
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">report_mean_sd &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb71-2" data-line-number="2"><span class="st">  </span><span class="cf">function</span>(df, variable, country) {</a>
-<a class="sourceLine" id="cb71-3" data-line-number="3">    var &lt;-<span class="st"> </span>gapminder[[variable]][gapminder<span class="op">$</span>country <span class="op">==</span><span class="st"> </span>country]</a>
+<a class="sourceLine" id="cb71-3" data-line-number="3">    var &lt;-<span class="st"> </span>df[[variable]][df<span class="op">$</span>country <span class="op">==</span><span class="st"> </span>country]</a>
 <a class="sourceLine" id="cb71-4" data-line-number="4">    m_le &lt;-<span class="st"> </span><span class="kw">mean</span>(var)</a>
 <a class="sourceLine" id="cb71-5" data-line-number="5">    sd_le &lt;-<span class="st"> </span><span class="kw">sd</span>(var)</a>
 <a class="sourceLine" id="cb71-6" data-line-number="6">    <span class="kw">cat</span>(<span class="st">&quot;Country:&quot;</span>, country, </a>
@@ -2543,7 +2543,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <h2>Create your own function</h2>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1">report_stats &lt;-</a>
 <a class="sourceLine" id="cb73-2" data-line-number="2"><span class="st">  </span><span class="cf">function</span>(df, variable, continent) {</a>
-<a class="sourceLine" id="cb73-3" data-line-number="3">    var &lt;-<span class="st"> </span>gapminder[[variable]][gapminder<span class="op">$</span>continent <span class="op">==</span><span class="st"> </span>continent]</a>
+<a class="sourceLine" id="cb73-3" data-line-number="3">    var &lt;-<span class="st"> </span>df[[variable]][df<span class="op">$</span>continent <span class="op">==</span><span class="st"> </span>continent]</a>
 <a class="sourceLine" id="cb73-4" data-line-number="4">    min_le &lt;-<span class="st"> </span><span class="kw">min</span>(var)</a>
 <a class="sourceLine" id="cb73-5" data-line-number="5">    max_le &lt;-<span class="st"> </span><span class="kw">max</span>(var)</a>
 <a class="sourceLine" id="cb73-6" data-line-number="6">    <span class="kw">cat</span>(<span class="st">&quot;Continent:&quot;</span>, continent,</a>

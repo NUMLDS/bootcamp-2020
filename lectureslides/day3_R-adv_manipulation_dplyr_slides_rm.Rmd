@@ -109,7 +109,7 @@ head(generation)
 library(reshape2)
 long_gen <- melt(generation, id.vars = "datetime",
                            variable.name = "source",
-                           value.name = "output")
+                           value.name = "usage")
 head(long_gen)
 ```
 
@@ -177,7 +177,7 @@ head(merged_energy)
 ```{r melt exercise}
 long_merged_energy <- melt(merged_energy, id.vars = "datetime",
                            variable.name = "source",
-                           value.name = "output")
+                           value.name = "usage")
 head(long_merged_energy)
 ```
 
@@ -200,13 +200,13 @@ head(long_merged_energy)
 ## Trying out `dplyr` verbs - `select`
 
 - select by name: 
-  - `select(df, variable_1, variable_3)`
+  - `select(gapminder, continent, pop)`
 - select by position: 
   - `select(df, c(1, 3, 10))`
 - select by range:
-  - `select(df, variable_1:variable_10)` or `select(df, 1:10)`
+  - `select(df, country:pop)` or `select(df, 1:3)`
 - drop variables with `-`
-  - `select(df, -variable_7)`
+  - `select(df, -gdpPercap)`
 
 ## Trying out `dplyr` verbs - `select`
 ```{r select}
@@ -248,14 +248,14 @@ head(tmp)
 - `mutate` creates new variables
 
 ```{r mutate}
-tmp <- mutate(long_merged_energy, log_output = log(output))
+tmp <- mutate(long_merged_energy, log_usage = log(usage))
 head(tmp)
 ```
 
 ## `mutate`
 
 ```{r multi mutate}
-tmp <- mutate(long_merged_energy, log_output = log(output), output2 = output^2, output3 = output^3)
+tmp <- mutate(long_merged_energy, log_usage = log(usage), usage2 = usage^2, usage3 = usage^3)
 head(tmp)
 ```
 
@@ -266,10 +266,10 @@ head(tmp)
 
 ```{r summarize}
 # total energy consumption
-summarize(long_merged_energy, total = sum(output, na.rm = T))
+summarize(long_merged_energy, total = sum(usage, na.rm = T))
 
 # mean energy consumption
-summarize(long_merged_energy, mean_cons = mean(output, na.rm = T))
+summarize(long_merged_energy, mean_cons = mean(usage, na.rm = T))
 ```
 
 ## A new operator: the pipe `%>%`
@@ -284,8 +284,8 @@ summarize(long_merged_energy, mean_cons = mean(output, na.rm = T))
 long_merged_energy %>% 
   filter(source == "geothermal") %>% 
   select(-datetime) %>% 
-  mutate(log_output = log(output)) %>% 
-  summarize(mean_log_output = mean(log_output, na.rm = T))
+  mutate(log_usage = log(usage)) %>% 
+  summarize(mean_log_usage = mean(log_usage, na.rm = T))
 ```
 
 
@@ -297,8 +297,8 @@ long_merged_energy %>%
 ```{r dot}
 merged_energy %>% 
   select(-datetime) %>% 
-  mutate(total_output = rowSums(., na.rm = T)) %>% 
-  summarize(total_output = sum(total_output, na.rm = T))
+  mutate(total_usage = rowSums(., na.rm = T)) %>% 
+  summarize(total_usage = sum(total_usage, na.rm = T))
 ```
 
 ## A new operator: the pipe `%>%`
@@ -309,8 +309,8 @@ merged_energy %>%
 ```{r oops, error = T}
 merged_energy %>% 
   select(-datetime) %>% 
-  mutate(total_output = rowSums(merged_energy, na.rm = T)) %>% 
-  summarize(total_output = sum(total_output, na.rm = T))
+  mutate(total_usage = rowSums(merged_energy, na.rm = T)) %>% 
+  summarize(total_usage = sum(total_usage, na.rm = T))
 ```
 
 ## Try piping
@@ -318,7 +318,7 @@ merged_energy %>%
 - Using the (wide) merged CA energy data `merged_energy` do the following with pipes:
   1. Select variables that contain the word "hydro"
   2. Create a new variable called `total_hydro` that is the sum of the retained hydro variables
-  3. Find the mean output for `total_hydro`
+  3. Find the mean usage for `total_hydro`
 
 ## Try piping
 
@@ -337,7 +337,7 @@ merged_energy %>%
 ```{r group_by}
 long_merged_energy %>% 
   group_by(source) %>% 
-  summarize(sum_output = sum(output, na.rm = T))
+  summarize(sum_usage = sum(usage, na.rm = T))
 ```
 
 ## `group_by` versus `for` loops
@@ -358,7 +358,7 @@ gapminder %>%
 
 ## Find the mean by hour
 
-- Use your knowledge of `dplyr` to find the mean output for small hydro, large hydro, biogas, and biomass
+- Use your knowledge of `dplyr` to find the mean usage for small hydro, large hydro, biogas, and biomass
 - Start with either the wide or long merged dataset
 
 ## Find the mean by hour
@@ -368,9 +368,9 @@ merged_energy %>%
   select(datetime, contains("hydro"), contains("bio")) %>% 
   melt(id.vars = "datetime",
        variable.name = "source",
-       value.name = "output") %>% 
+       value.name = "usage") %>% 
   group_by(source) %>% 
-  summarize(mean_output = mean(output, na.rm = T))
+  summarize(mean_usage = mean(usage, na.rm = T))
 ```
 
 ## Merging in `dplyr` with `*_join` functions
