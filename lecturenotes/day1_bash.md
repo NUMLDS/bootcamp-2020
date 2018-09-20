@@ -47,19 +47,17 @@
             Wednesday
             ```
             
-            Whereas in Powershell, `date` returns an object:
-            ```powershell
+            Whereas in Powershell, the  `date` returns an object:
+            ```
             PS C:\Users\lewis> date
-            ```
-            ```
-            Wednesday, September 19, 2018 11:25:50 AM   # there's actually a whole object behind this
-            ```
-            ```powershell
-            PS C:\Users\lewis> date | get-member DayOfWeek  # this selects a property of this object
-               TypeName: System.DateTime
-            Name      MemberType Definition
-            ----      ---------- ----------
-            DayOfWeek Property   System.DayOfWeek DayOfWeek {get;}
+
+            Wednesday, September 19, 2018 4:30:37 PM  # this is an object with a bunch of methods available
+
+
+            PS C:\Users\lewis> $(date).IsDaylightSavingTime()
+            True
+            PS C:\Users\lewis> $(date).AddDays(60).IsDaylightSavingTime()
+            False
             ```
     * terminology: 
         * Unix: a family of operating systems defined by their adherence to a specific 
