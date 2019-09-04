@@ -324,6 +324,15 @@ gapminder <- read_csv("data/gapminder5.csv")
 > - You can read files using RStudio's interface through the "Files" tab
 > - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
 
+# Roadmap for the rest of the R sessions
+
+- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
+- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
+- So why teach these skills in base R?
+    - This helps you understand how R works
+    - Many packages rely on how these tasks work in base R
+    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
+
 # Data manipulation
 
 ## Exploring data frames
