@@ -187,6 +187,16 @@ mean(vec)
 mean(vec, na.rm=TRUE)
 ```
 
+## Interlude: Missing Values
+
+You can check if a vector contains missing values by the function `is.na()`. Since this returns a logical vector, you can use `sum()` or `mean()` on the result to count the number or proportion of `TRUE` values.
+
+```{r missing values 2}
+is.na(vec)
+sum(is.na(vec))
+mean(is.na(vec))
+```
+
 ## Factors
 
 > - Factors are a special type of vector that are useful for categorical variables
