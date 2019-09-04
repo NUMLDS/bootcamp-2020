@@ -68,15 +68,9 @@ Today, we will briefly review the above topics, and then turn to new material on
 
 ## Copy relevant folders
 
-We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.
+We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2019 github repository.
 
-- The R session materials are stored in the following read-only directory: `/team/bootcamp/2018/R_sessions`
-- Copy the "data" and "exercises" subfolders (and others if you want) to a directory in your home folder.
-- Ways to do this:
-    - Bash in the Terminal
-        - Remember to use `cp -R`
-    - File explorer in your remote desktop
-    - "Files" tab in the bottom-right pane or RStudio
+Recall that yesterday, you learned and practiced how to do this using the Terminal. R Studio includes a Terminal tab (if you don't see it, go to the Tools > Terminal > Move Focus to Terminal), and we will use this today.
 
 # Review: Basics and data types 
 
