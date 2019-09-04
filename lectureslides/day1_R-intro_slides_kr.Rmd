@@ -68,15 +68,9 @@ Today, we will briefly review the above topics, and then turn to new material on
 
 ## Copy relevant folders
 
-We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.
+We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2019 github repository.
 
-- The R session materials are stored in the following read-only directory: `/team/bootcamp/2018/R_sessions`
-- Copy the "data" and "exercises" subfolders (and others if you want) to a directory in your home folder.
-- Ways to do this:
-    - Bash in the Terminal
-        - Remember to use `cp -R`
-    - File explorer in your remote desktop
-    - "Files" tab in the bottom-right pane or RStudio
+Recall that yesterday, you learned and practiced how to do this using the Terminal. R Studio includes a Terminal tab (if you don't see it, go to the Tools > Terminal > Move Focus to Terminal), and we will use this today.
 
 # Review: Basics and data types 
 
@@ -191,6 +185,16 @@ Variables in datasets sometimes include missing variables. In R, missing values 
 vec <- c(1, 8, NA, 7, 3)
 mean(vec)
 mean(vec, na.rm=TRUE)
+```
+
+## Interlude: Missing Values
+
+You can check if a vector contains missing values by the function `is.na()`. Since this returns a logical vector, you can use `sum()` or `mean()` on the result to count the number or proportion of `TRUE` values.
+
+```{r missing values 2}
+is.na(vec)
+sum(is.na(vec))
+mean(is.na(vec))
 ```
 
 ## Factors
@@ -319,6 +323,17 @@ gapminder <- read_csv("data/gapminder5.csv")
 > - You can also read files from the full local path or from URLs
 > - You can read files using RStudio's interface through the "Files" tab
 > - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
+
+# Roadmap
+
+## Roadmap for the rest of the R sessions
+
+- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
+- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
+- So why teach these skills in base R?
+    - This helps you understand how R works
+    - Many packages rely on how these tasks work in base R
+    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
 
 # Data manipulation
 

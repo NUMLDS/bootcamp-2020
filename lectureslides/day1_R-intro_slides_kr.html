@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Kumar Ramanathan" />
-  <meta name="dcterms.date" content="2018-09-17" />
+  <meta name="dcterms.date" content="2019-09-03" />
   <title>Intro to R: Day 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,7 +489,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Intro to R: Day 1</h1>
     <h2 class="author">Kumar Ramanathan</h2>
-    <h3 class="date">2018-09-17</h3>
+    <h3 class="date">2019-09-03</h3>
 </section>
 
 <section><section id="introduction" class="titleslide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
@@ -534,20 +534,8 @@ Today, we will briefly review the above topics, and then turn to new material on
 </aside>
 </section><section id="copy-relevant-folders" class="slide level2">
 <h2>Copy relevant folders</h2>
-<p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to copy relevant materials to your home folder.</p>
-<ul>
-<li>The R session materials are stored in the following read-only directory: <code>/team/bootcamp/2018/R_sessions</code></li>
-<li>Copy the “data” and “exercises” subfolders (and others if you want) to a directory in your home folder.</li>
-<li>Ways to do this:
-<ul>
-<li>Bash in the Terminal
-<ul>
-<li>Remember to use <code>cd -R</code></li>
-</ul></li>
-<li>File explorer in your remote desktop</li>
-<li>“Files” tab in the bottom-right pane or RStudio</li>
-</ul></li>
-</ul>
+<p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2019 github repository.</p>
+<p>Recall that yesterday, you learned and practiced how to do this using the Terminal. R Studio includes a Terminal tab (if you don’t see it, go to the Tools &gt; Terminal &gt; Move Focus to Terminal), and we will use this today.</p>
 </section></section>
 <section><section id="review-basics-and-data-types" class="titleslide slide level1"><h1>Review: Basics and data types</h1></section><section id="arithmetic-exercise" class="slide level2">
 <h2>Arithmetic: exercise</h2>
@@ -662,6 +650,15 @@ x1[<span class="op">-</span><span class="dv">3</span>]</code></pre></div>
 <pre><code>## [1] NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(vec, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>## [1] 4.75</code></pre>
+</section><section id="interlude-missing-values-1" class="slide level2">
+<h2>Interlude: Missing Values</h2>
+<p>You can check if a vector contains missing values by the function <code>is.na()</code>. Since this returns a logical vector, you can use <code>sum()</code> or <code>mean()</code> on the result to count the number or proportion of <code>TRUE</code> values.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">is.na</span>(vec)</code></pre></div>
+<pre><code>## [1] FALSE FALSE  TRUE FALSE FALSE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">is.na</span>(vec))</code></pre></div>
+<pre><code>## [1] 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">is.na</span>(vec))</code></pre></div>
+<pre><code>## [1] 0.2</code></pre>
 </section><section id="factors" class="slide level2">
 <h2>Factors</h2>
 <ul>
@@ -756,13 +753,14 @@ The above code is what you will usually see and use. The below code breaks down 
 </section><section id="reading-files-exercise-1" class="slide level2">
 <h2>Reading files: exercise</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
-<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2018&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
-gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2019&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)</code></pre></div>
+<pre><code>## Warning: package &#39;readr&#39; was built under R version 3.4.4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   country = col_character(),
-##   year = col_integer(),
+##   year = col_double(),
 ##   pop = col_double(),
 ##   continent = col_character(),
 ##   lifeExp = col_double(),
@@ -774,6 +772,19 @@ gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span c
 <li class="fragment">You can also read files from the full local path or from URLs</li>
 <li class="fragment">You can read files using RStudio’s interface through the “Files” tab</li>
 <li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
+</ul>
+</section></section>
+<section><section id="roadmap" class="titleslide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
+<h2>Roadmap for the rest of the R sessions</h2>
+<ul>
+<li>Today we will learn how to do basic <strong>data manipulation</strong> and <strong>data visualization</strong> in base R</li>
+<li>Most commonly, you will do these tasks using specialized packages such as <code>tidyverse</code> or <code>data.table</code></li>
+<li>So why teach these skills in base R?
+<ul>
+<li>This helps you understand how R works</li>
+<li>Many packages rely on how these tasks work in base R</li>
+<li>Useful for simple tasks in workflows that otherwise don’t involve much manipulation or visualization</li>
+</ul></li>
 </ul>
 </section></section>
 <section><section id="data-manipulation" class="titleslide slide level1"><h1>Data manipulation</h1></section><section id="exploring-data-frames" class="slide level2">
@@ -872,7 +883,7 @@ The most obvious use case of subsetting is to create and store smaller data fram
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),])</code></pre></div>
 <pre><code>## # A tibble: 6 x 6
 ##   country        year        pop continent lifeExp gdpPercap
-##   &lt;chr&gt;         &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##   &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 China          2007 1318683096 Asia         73.0     4959.
 ## 2 India          2007 1110396331 Asia         64.7     2452.
 ## 3 United States  2007  301139947 Americas     78.2    42952.

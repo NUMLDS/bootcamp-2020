@@ -1,19 +1,20 @@
-# 2018 MSiA boot camp
+# 2019 MSiA boot camp
 
-This Github repository contains materials for the 2018 Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources as you continue to develop your skills. 
+This Github repository contains materials for the 2019 Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources as you continue to develop your skills. 
 
 ## Workshop materials
 
+*NOTE: LINKS CURRENTLY POINT TO FILES FROM THE BOOTCAMP-2018 REPO, AND WILL BE UPDATED ONCE MATERIALS FOR 2019 ARE FINALIZED*
+
 |Session|Content|Lecture notes|Slides|Exercises|
 |-------|-------|-------------|------|---------|
-|Day 1, part 1|The Unix shell|[Lecture notes](https://github.com/MSIA/bootcamp-2018/blob/master/lecturenotes/day1_bash.md)||
-|Day 1|Review; Reading and writing files; Data manipulation in base R; Data visualization in base R|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day1_R-intro_lecturenotes_kr.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day1_R-intro_slides_kr.html#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day1_R-intro_exercises.R)|
-|Day 2|RMarkdown; Loops, conditionals, and functions; R and Github|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day2_R-loops-conditionals-functions_lecturenotes_rm.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/)|[Exercises](https://msia.github.io/bootcamp-2018/exercises/day2_exercises_no_answers.html)|
-|Day 3, part 1|Advanced manipulation: reshaping, merging, and dplyr|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-adv_manipulation_dplyr_lecturenotes_rm.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_dplyr_slides_rm#/)|[Exercises](https://msia.github.io/bootcamp-2018/exercises/day3_dplyr_exercises_no_answers.html)|
-|Day 3, part 2|Advanced manipulation and data.table|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-adv_manipulation_datatable_lecturenotes_ae.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_datatable_slides_ae.html)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_datatable_exercises_no_answers.R)|
-|Day 3, part 3|Data visualization with ggplot|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-pt3-ggplot_lecturenotes_kr.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-ggplot_slides_kr#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_ggplot_exercises.md)|
+|Tue, 9/17 (morning)|Review; Reading and writing files; Data manipulation in base R; Data visualization in base R|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day1_R-intro_lecturenotes_kr.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day1_R-intro_slides_kr.html#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day1_R-intro_exercises.R)|
+|Tue, 9/17 (afternoon)|RMarkdown; Loops, conditionals, and functions; R and Github|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day2_R-loops-conditionals-functions_lecturenotes_rm.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day2_R-loops-conditionals-functions_slides_rm#/)|[Exercises](https://msia.github.io/bootcamp-2018/exercises/day2_exercises_no_answers.html)|
+|Wed, 9/18 (afternoon, pt 1) |Advanced manipulation: reshaping, merging, and dplyr|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-adv_manipulation_dplyr_lecturenotes_rm.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_dplyr_slides_rm#/)|[Exercises](https://msia.github.io/bootcamp-2018/exercises/day3_dplyr_exercises_no_answers.html)|
+|Wed, 9/18 (afternoon, pt 2)|Advanced manipulation and data.table|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-adv_manipulation_datatable_lecturenotes_ae.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-adv_manipulation_datatable_slides_ae.html)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_datatable_exercises_no_answers.R)|
+|Thu, 9/19 (morning)|Data visualization with ggplot|[Lecture notes](https://msia.github.io/bootcamp-2018/lecturenotes/day3_R-pt3-ggplot_lecturenotes_kr.html)|[Slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-ggplot_slides_kr#/)|[Exercises](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_ggplot_exercises.md)|
 
-Instructions for the final exercise on Day 3 can be found [here](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_final-exercise-instructions.md).
+Instructions for the final exercise on 9/19 can be found [here](https://github.com/MSIA/bootcamp-2018/blob/master/exercises/day3_final-exercise-instructions.md).
 
 ## Resources
 
@@ -42,7 +43,7 @@ NUIT also has a [Git resource list](https://github.com/nuitrcs/gitworkshop).
 
 ## Authorship
 
-The R materials used in Days 1 and 2 are based on the [Intro to R workshop](https://github.com/nuitrcs/r_intro_june2018) from NUIT Research Computing Services, created by Christina Maimone. They have been expanded and modified by Kumar Ramanathan and Richard Morel, the instructors for the R sessions during Days 1 and 2 respectively. The materials for Day 3 are original and have been developed by Richard Morel, Ali Ehlen, and Kumar Ramanathan, who are the joint instructors for Day 3.
+The R materials used on 9/17 and 9/18 are based on the [Intro to R workshop](https://github.com/nuitrcs/r_intro_june2018) from NUIT Research Computing Services, created by Christina Maimone. They have been expanded and modified by Kumar Ramanathan and Richard Morel. The materials on data.table used on 9/18 were originally developed by Ali Ehlen. The materials on ggplot2 used on 9/19 were originally developed by Kumar Ramanathan. Richard Morel, Ali Ehlen, and Kumar Ramanathan all jointly developed the overarching sequence of the sessions as well as the synthetic final exercise on 9/19. 
 
 ## Contact information
 
