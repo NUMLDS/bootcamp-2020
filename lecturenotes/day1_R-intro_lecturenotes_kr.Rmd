@@ -347,7 +347,6 @@ as.numeric(c(TRUE, FALSE))
 
 Remember that different functions treat `NA` differently. With an input vector that includes `NA` values, `mean` results in `NA`. It has an option to exclude missing:
 
-
 ```{r}
 mean(tmp)
 mean(tmp, na.rm=TRUE)
