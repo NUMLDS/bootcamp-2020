@@ -17,9 +17,9 @@ gapminder07$lifeExp_highlow <- case_when(gapminder07$lifeExp>mean(gapminder07$li
                                          gapminder07$lifeExp<mean(gapminder07$lifeExp) ~ "Low")
 
 # Prep imports and generation
-imports <- read_csv(here("data/imports.csv"))
-generation <- read_csv(here("data/generation.csv"))
-regroup <- read_csv(here("data/regroup.csv"))
+imports <- read_csv(here("data/ca_energy_imports.csv"))
+generation <- read_csv(here("data/ca_energy_generation.csv"))
+regroup <- read_csv(here("data/ca_energy_regroup.csv"))
 
 # Prep long_gen
 long_gen <- melt(generation, id.vars = "datetime",
