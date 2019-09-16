@@ -14,6 +14,6 @@ For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio
     - Loops, conditionals, and functions
     - R and Github
 3. [Day 2, Part 1](https://msia.github.io/bootcamp-2019/lecturenotes/day2part1_R-adv_manipulation_dplyr_lecturenotes_kr): Advanced manipulation and dplyr
-4. [Dat 2, Part 2](https://msia.github.io/bootcamp-2019/lecturenotes/day2part2_R-adv_manipulation_datatable_lecturenotes_ae): Advanced manipulation and data.table
+4. [Day 2, Part 2](https://msia.github.io/bootcamp-2019/lecturenotes/day2part2_R-adv_manipulation_datatable_lecturenotes_ae): Advanced manipulation and data.table
 5. [Day 3](https://msia.github.io/bootcamp-2019/lecturenotes/day3_R-pt3-ggplot_lecturenotes_rm): Advanced visualization with ggplot
 6. For the final exercise, [see instructions here](https://github.com/MSIA/bootcamp-2019/blob/master/exercises/day3_final-exercise-instructions.md).
