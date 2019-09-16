@@ -79,6 +79,9 @@ vec <- c(1, 8, NA, 7, 3)
 # Calculate the mean of vec, excluding the NA value
 mean(vec, na.rm=TRUE)
 
+# Count the number of missing values in vec
+sum(is.na(vec))
+
 #### Factors ####
 
 # See lecture notes and DataCamp for guidance and practice

@@ -116,7 +116,7 @@ head(long_gen)
 ## `melt` the generation data
 
 ```{r reordering}
-long_gen[order(long_gen$datetime)[1:20], ]
+head(long_gen[order(long_gen$datetime), ])
 ```
 
 
@@ -171,6 +171,7 @@ head(merged_energy)
 
 - Our merged dataframe is still wide and untidy
   - Create a long version called `long_merged_energy`
+  - Take a peek to make sure the long version looks correct
 
 ## Try reshaping the merged data!
 
