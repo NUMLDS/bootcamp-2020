@@ -574,9 +574,9 @@ for (i in years) {
 - Rmarkdown runs R code, compiles, and produces a report in chosen format
 - This presentation was created using Rmarkdown!
 
-## Day 2 Exercise
+## Day 1, Part 2 Exercise
 
 1) Open the `rmd_exercise_template.Rmd`
-2) Save as: `Day2RExercise_LastnameFirstname.Rmd`.
+2) Save as: `Day1Part2RExercise_LastnameFirstname.Rmd`.
 2) Read in the gapminder data set
 3) As you answer questions, be sure to annotate your work with as much detail as possible!
