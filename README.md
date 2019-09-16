@@ -48,5 +48,5 @@ The R materials used on 9/17 and 9/18 are based on the [Intro to R workshop](htt
 ## Contact information
 
 - Kumar Ramanathan: [Email](mailto:kumar.ramanathan@u.northwestern.edu) | [Website](http://www.kumar.fyi)
-- Richard Morel: [Email](mailto:richard.morel@u.northwestern.edu) | [Website](https://sites.northwestern.edu/paquinmorel/)
+- Richard Morel: [Email](mailto:richard.morel@u.northwestern.edu) | [Website](http://ramorel.github.io)
 - Ali Ehlen: [Email](mailto:AnnalieseEhlen2020@u.northwestern.edu)
