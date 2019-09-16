@@ -11,7 +11,7 @@
 
 <meta name="author" content="Kumar Ramanathan (based on materials by Christina Maimone)" />
 
-<meta name="date" content="2018-09-16" />
+<meta name="date" content="2019-09-16" />
 
 <title>Intro to R: Day 1</title>
 
@@ -74,9 +74,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -101,21 +99,82 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -204,6 +263,16 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -221,8 +290,8 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Intro to R: Day 1</h1>
-<h4 class="author"><em>Kumar Ramanathan (based on materials by Christina Maimone)</em></h4>
-<h4 class="date"><em>2018-09-16</em></h4>
+<h4 class="author">Kumar Ramanathan (based on materials by Christina Maimone)</h4>
+<h4 class="date">2019-09-16</h4>
 
 </div>
 
@@ -251,12 +320,12 @@ div.tocify {
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;, repos=&quot;http://cran.wustl.edu/&quot;)</code></pre>
 <p>After you install a package, you have to load it with the <code>library</code> function to actually use it.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ------------------------------------------------------------------------------------------------------------ tidyverse 1.2.1 --</code></pre>
-<pre><code>## v ggplot2 3.0.0     v purrr   0.2.5
-## v tibble  1.4.2     v dplyr   0.7.6
-## v tidyr   0.8.1     v stringr 1.3.1
-## v readr   1.1.1     v forcats 0.3.0</code></pre>
-<pre><code>## -- Conflicts --------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Attaching packages --------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.1.1       v purrr   0.3.2  
+## v tibble  2.1.1       v dplyr   0.8.0.1
+## v tidyr   0.8.3       v stringr 1.4.0  
+## v readr   1.3.1       v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------------------------------------------------ tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 </div>
@@ -688,33 +757,33 @@ color</code></pre>
 ## [17] &quot;blue&quot;  &quot;blue&quot;  &quot;blue&quot;  &quot;blue&quot;</code></pre>
 <pre class="r"><code>score&lt;-runif(20)
 score</code></pre>
-<pre><code>##  [1] 0.35448943 0.62951740 0.36925879 0.15391786 0.49879479 0.02624805
-##  [7] 0.55731052 0.38109965 0.43620806 0.21493019 0.32607681 0.16305469
-## [13] 0.35438788 0.98624642 0.92546906 0.83197664 0.78335862 0.93000622
-## [19] 0.68616774 0.20210345</code></pre>
+<pre><code>##  [1] 0.20354493 0.50185548 0.35535068 0.52583579 0.57558433 0.81498953
+##  [7] 0.83673077 0.62897844 0.21323122 0.69859791 0.34753467 0.90691752
+## [13] 0.57466982 0.79328765 0.55604629 0.07937945 0.67997536 0.99449463
+## [19] 0.68909116 0.57609978</code></pre>
 <pre class="r"><code>df&lt;-data.frame(id, color, score)
 df</code></pre>
 <pre><code>##    id color      score
-## 1   1   red 0.35448943
-## 2   2   red 0.62951740
-## 3   3   red 0.36925879
-## 4   4 green 0.15391786
-## 5   5 green 0.49879479
-## 6   6 green 0.02624805
-## 7   7 green 0.55731052
-## 8   8 green 0.38109965
-## 9   9 green 0.43620806
-## 10 10 green 0.21493019
-## 11 11 green 0.32607681
-## 12 12 green 0.16305469
-## 13 13 green 0.35438788
-## 14 14  blue 0.98624642
-## 15 15  blue 0.92546906
-## 16 16  blue 0.83197664
-## 17 17  blue 0.78335862
-## 18 18  blue 0.93000622
-## 19 19  blue 0.68616774
-## 20 20  blue 0.20210345</code></pre>
+## 1   1   red 0.20354493
+## 2   2   red 0.50185548
+## 3   3   red 0.35535068
+## 4   4 green 0.52583579
+## 5   5 green 0.57558433
+## 6   6 green 0.81498953
+## 7   7 green 0.83673077
+## 8   8 green 0.62897844
+## 9   9 green 0.21323122
+## 10 10 green 0.69859791
+## 11 11 green 0.34753467
+## 12 12 green 0.90691752
+## 13 13 green 0.57466982
+## 14 14  blue 0.79328765
+## 15 15  blue 0.55604629
+## 16 16  blue 0.07937945
+## 17 17  blue 0.67997536
+## 18 18  blue 0.99449463
+## 19 19  blue 0.68909116
+## 20 20  blue 0.57609978</code></pre>
 <p>Instead of making individual objects first, we could do it all together:</p>
 <pre class="r"><code>df&lt;-data.frame(id=1:20, 
                color=c(rep(&quot;red&quot;, 3), rep(&quot;green&quot;,10), rep(&quot;blue&quot;, 7)),
@@ -725,47 +794,47 @@ df</code></pre>
 ## Levels: blue green red</code></pre>
 <pre class="r"><code>df[1,]</code></pre>
 <pre><code>##   id color     score
-## 1  1   red 0.3007911</code></pre>
+## 1  1   red 0.2482876</code></pre>
 <pre class="r"><code>df[,3]</code></pre>
-<pre><code>##  [1] 0.300791116 0.901201044 0.629483142 0.957251180 0.495166630
-##  [6] 0.847443188 0.437754877 0.872048439 0.782935861 0.390369120
-## [11] 0.688745148 0.474597213 0.075085383 0.829901089 0.722287315
-## [16] 0.607302098 0.029408450 0.006842539 0.140815072 0.200647831</code></pre>
+<pre><code>##  [1] 0.24828757 0.06906664 0.34048913 0.08584947 0.23787852 0.15512797
+##  [7] 0.31793669 0.33260000 0.22951894 0.06794502 0.30247253 0.75979288
+## [13] 0.28629046 0.91565300 0.05544233 0.16628694 0.82199100 0.08954519
+## [19] 0.32176353 0.46035658</code></pre>
 <p>You can use negative values when indexing to exclude values:</p>
 <pre class="r"><code>df[,-2]</code></pre>
-<pre><code>##    id       score
-## 1   1 0.300791116
-## 2   2 0.901201044
-## 3   3 0.629483142
-## 4   4 0.957251180
-## 5   5 0.495166630
-## 6   6 0.847443188
-## 7   7 0.437754877
-## 8   8 0.872048439
-## 9   9 0.782935861
-## 10 10 0.390369120
-## 11 11 0.688745148
-## 12 12 0.474597213
-## 13 13 0.075085383
-## 14 14 0.829901089
-## 15 15 0.722287315
-## 16 16 0.607302098
-## 17 17 0.029408450
-## 18 18 0.006842539
-## 19 19 0.140815072
-## 20 20 0.200647831</code></pre>
+<pre><code>##    id      score
+## 1   1 0.24828757
+## 2   2 0.06906664
+## 3   3 0.34048913
+## 4   4 0.08584947
+## 5   5 0.23787852
+## 6   6 0.15512797
+## 7   7 0.31793669
+## 8   8 0.33260000
+## 9   9 0.22951894
+## 10 10 0.06794502
+## 11 11 0.30247253
+## 12 12 0.75979288
+## 13 13 0.28629046
+## 14 14 0.91565300
+## 15 15 0.05544233
+## 16 16 0.16628694
+## 17 17 0.82199100
+## 18 18 0.08954519
+## 19 19 0.32176353
+## 20 20 0.46035658</code></pre>
 <pre class="r"><code>df[-1:-10,]</code></pre>
-<pre><code>##    id color       score
-## 11 11 green 0.688745148
-## 12 12 green 0.474597213
-## 13 13 green 0.075085383
-## 14 14  blue 0.829901089
-## 15 15  blue 0.722287315
-## 16 16  blue 0.607302098
-## 17 17  blue 0.029408450
-## 18 18  blue 0.006842539
-## 19 19  blue 0.140815072
-## 20 20  blue 0.200647831</code></pre>
+<pre><code>##    id color      score
+## 11 11 green 0.30247253
+## 12 12 green 0.75979288
+## 13 13 green 0.28629046
+## 14 14  blue 0.91565300
+## 15 15  blue 0.05544233
+## 16 16  blue 0.16628694
+## 17 17  blue 0.82199100
+## 18 18  blue 0.08954519
+## 19 19  blue 0.32176353
+## 20 20  blue 0.46035658</code></pre>
 <p>You can also use the names of the columns after a <code>$</code> or in the indexing:</p>
 <pre class="r"><code>df$color</code></pre>
 <pre><code>##  [1] red   red   red   green green green green green green green green
@@ -795,57 +864,49 @@ df</code></pre>
 ## 19  blue
 ## 20  blue</code></pre>
 <pre class="r"><code>df[2:3]</code></pre>
-<pre><code>##    color       score
-## 1    red 0.300791116
-## 2    red 0.901201044
-## 3    red 0.629483142
-## 4  green 0.957251180
-## 5  green 0.495166630
-## 6  green 0.847443188
-## 7  green 0.437754877
-## 8  green 0.872048439
-## 9  green 0.782935861
-## 10 green 0.390369120
-## 11 green 0.688745148
-## 12 green 0.474597213
-## 13 green 0.075085383
-## 14  blue 0.829901089
-## 15  blue 0.722287315
-## 16  blue 0.607302098
-## 17  blue 0.029408450
-## 18  blue 0.006842539
-## 19  blue 0.140815072
-## 20  blue 0.200647831</code></pre>
+<pre><code>##    color      score
+## 1    red 0.24828757
+## 2    red 0.06906664
+## 3    red 0.34048913
+## 4  green 0.08584947
+## 5  green 0.23787852
+## 6  green 0.15512797
+## 7  green 0.31793669
+## 8  green 0.33260000
+## 9  green 0.22951894
+## 10 green 0.06794502
+## 11 green 0.30247253
+## 12 green 0.75979288
+## 13 green 0.28629046
+## 14  blue 0.91565300
+## 15  blue 0.05544233
+## 16  blue 0.16628694
+## 17  blue 0.82199100
+## 18  blue 0.08954519
+## 19  blue 0.32176353
+## 20  blue 0.46035658</code></pre>
 <p>Instead of index numbers or names, you can also select values by using logical statements. This is usually done with selecting rows.</p>
 <pre class="r"><code>df[df$color == &quot;green&quot;,]</code></pre>
 <pre><code>##    id color      score
-## 4   4 green 0.95725118
-## 5   5 green 0.49516663
-## 6   6 green 0.84744319
-## 7   7 green 0.43775488
-## 8   8 green 0.87204844
-## 9   9 green 0.78293586
-## 10 10 green 0.39036912
-## 11 11 green 0.68874515
-## 12 12 green 0.47459721
-## 13 13 green 0.07508538</code></pre>
+## 4   4 green 0.08584947
+## 5   5 green 0.23787852
+## 6   6 green 0.15512797
+## 7   7 green 0.31793669
+## 8   8 green 0.33260000
+## 9   9 green 0.22951894
+## 10 10 green 0.06794502
+## 11 11 green 0.30247253
+## 12 12 green 0.75979288
+## 13 13 green 0.28629046</code></pre>
 <pre class="r"><code>df[df$score &gt; .5,]</code></pre>
 <pre><code>##    id color     score
-## 2   2   red 0.9012010
-## 3   3   red 0.6294831
-## 4   4 green 0.9572512
-## 6   6 green 0.8474432
-## 8   8 green 0.8720484
-## 9   9 green 0.7829359
-## 11 11 green 0.6887451
-## 14 14  blue 0.8299011
-## 15 15  blue 0.7222873
-## 16 16  blue 0.6073021</code></pre>
+## 12 12 green 0.7597929
+## 14 14  blue 0.9156530
+## 17 17  blue 0.8219910</code></pre>
 <pre class="r"><code>df[df$score &gt; .5 &amp; df$color == &quot;blue&quot;,]</code></pre>
-<pre><code>##    id color     score
-## 14 14  blue 0.8299011
-## 15 15  blue 0.7222873
-## 16 16  blue 0.6073021</code></pre>
+<pre><code>##    id color    score
+## 14 14  blue 0.915653
+## 17 17  blue 0.821991</code></pre>
 <p>You can assign names to the rows of a data frame as well as to the columns, and then use those names for indexing and selecting data.</p>
 <pre class="r"><code>rownames(df)</code></pre>
 <pre><code>##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot;
@@ -853,27 +914,27 @@ df</code></pre>
 <p>You can add columns or rows simply by assigning values to them. There are also <code>rbind</code> and <code>cbind</code> (for row bind and column bind) functions that can be useful.</p>
 <pre class="r"><code>df$year&lt;-1901:1920
 df</code></pre>
-<pre><code>##    id color       score year
-## 1   1   red 0.300791116 1901
-## 2   2   red 0.901201044 1902
-## 3   3   red 0.629483142 1903
-## 4   4 green 0.957251180 1904
-## 5   5 green 0.495166630 1905
-## 6   6 green 0.847443188 1906
-## 7   7 green 0.437754877 1907
-## 8   8 green 0.872048439 1908
-## 9   9 green 0.782935861 1909
-## 10 10 green 0.390369120 1910
-## 11 11 green 0.688745148 1911
-## 12 12 green 0.474597213 1912
-## 13 13 green 0.075085383 1913
-## 14 14  blue 0.829901089 1914
-## 15 15  blue 0.722287315 1915
-## 16 16  blue 0.607302098 1916
-## 17 17  blue 0.029408450 1917
-## 18 18  blue 0.006842539 1918
-## 19 19  blue 0.140815072 1919
-## 20 20  blue 0.200647831 1920</code></pre>
+<pre><code>##    id color      score year
+## 1   1   red 0.24828757 1901
+## 2   2   red 0.06906664 1902
+## 3   3   red 0.34048913 1903
+## 4   4 green 0.08584947 1904
+## 5   5 green 0.23787852 1905
+## 6   6 green 0.15512797 1906
+## 7   7 green 0.31793669 1907
+## 8   8 green 0.33260000 1908
+## 9   9 green 0.22951894 1909
+## 10 10 green 0.06794502 1910
+## 11 11 green 0.30247253 1911
+## 12 12 green 0.75979288 1912
+## 13 13 green 0.28629046 1913
+## 14 14  blue 0.91565300 1914
+## 15 15  blue 0.05544233 1915
+## 16 16  blue 0.16628694 1916
+## 17 17  blue 0.82199100 1917
+## 18 18  blue 0.08954519 1918
+## 19 19  blue 0.32176353 1919
+## 20 20  blue 0.46035658 1920</code></pre>
 <pre class="r"><code>df[22,]&lt;-list(21, &quot;green&quot;, 0.4, 1921)</code></pre>
 <p>Note that we had to use a list for adding a row because there are different data types.</p>
 </div>
@@ -891,7 +952,7 @@ setwd(&quot;C:\Users\username\Documents\workshop&quot;) # windows, absolute path
 <pre class="r"><code>setwd(&quot;~/team/bootcamp/2018/R session materials&quot;)</code></pre>
 <p>To check where your working directory is, use <code>getwd()</code>:</p>
 <pre class="r"><code>getwd()</code></pre>
-<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2018&quot;</code></pre>
+<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2019&quot;</code></pre>
 </div>
 <div id="reading" class="section level2">
 <h2>Reading</h2>
@@ -929,7 +990,7 @@ gapminder &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   country = col_character(),
-##   year = col_integer(),
+##   year = col_double(),
 ##   pop = col_double(),
 ##   continent = col_character(),
 ##   lifeExp = col_double(),
@@ -1061,7 +1122,7 @@ gapminder &lt;- read_csv(&quot;data/gapminder5.csv&quot;)</code></pre>
 <pre class="r"><code>head(gapminder07[order(gapminder07$lifeExp, decreasing=TRUE),])</code></pre>
 <pre><code>## # A tibble: 6 x 6
 ##   country          year       pop continent lifeExp gdpPercap
-##   &lt;chr&gt;           &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 Japan            2007 127467972 Asia         82.6    31656.
 ## 2 Hong Kong China  2007   6980412 Asia         82.2    39725.
 ## 3 Iceland          2007    301931 Europe       81.8    36181.

@@ -410,7 +410,7 @@ We might look at this plot and think it's not particularly helpful. To simplify 
 
 ```{r area stack 2}
 # Make sure regroup data has been imported
-regroup <- read_csv("data/regroup.csv")
+regroup <- read_csv("data/ca_energy_regroup.csv")
 # Prepare data frame
 long_merged_energy %>% 
   rename(type = source) %>% 

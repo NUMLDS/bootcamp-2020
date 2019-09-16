@@ -25,16 +25,16 @@ notes<-params$notes
 
 California energy data
 
-- file names: `generation.csv` and `imports.csv`
+- file names: `ca_energy_generation.csv` and `ca_energy_imports.csv`
 - Read these two files into your working environment
   - They are in the "data" folder
 
 ## Reading in the data
 
 ```{r importing}
-generation <- read.csv(here::here("data/generation.csv"), 
+generation <- read.csv(here::here("data/ca_energy_generation.csv"), 
                        stringsAsFactors = F)
-imports <- read.csv(here::here("data/imports.csv"), 
+imports <- read.csv(here::here("data/ca_energy_imports.csv"), 
                     stringsAsFactors = F)
 ```
 
