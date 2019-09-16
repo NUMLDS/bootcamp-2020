@@ -14,7 +14,7 @@
 # library(data.table)
 # library(lubridate)
 
-# data_file <- here::here("data", "generation.csv")
+# data_file <- here::here("data", "ca_energy_generation.csv")
 
 # read in two versions of data, one as a data.frame and one as a data.table
 # generation_df <- read.csv(data_file, stringsAsFactors = F)
@@ -109,7 +109,7 @@
 # -----------------------------------------------------------------------------|
 
 # from this morning
-# imports <- fread(here::here("data", "imports.csv"))
+# imports <- fread(here::here("data", "ca_energy_imports.csv"))
 # imports[,datetime := as_datetime(datetime)]
 
 # all_generation <- merge(generation_dt, imports, by = "datetime")
