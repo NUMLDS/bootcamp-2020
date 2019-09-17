@@ -33,7 +33,8 @@ notes<-params$notes
 
 > - RStudio refers to both the company and the software
 > - RStudio is an integrated development environment (IDE) for R
-> - You will be using RStudio Server Pro
+> - RStudio Server is a browser-based version of RStudio that runs on a remote Linux server
+> - We will be using RStudio today
 
 <aside class="notes">
 RStudio helps you organize your workflow and keep track of your work. 
@@ -51,11 +52,11 @@ You will hear these terms often this week:
 > - Functions
 > - Help files
 
-## Recall your DataCamp course
+## Basics
 
-By now, you have all completed the *Introduction to R* course on DataCamp. Congratulations! You already know quite a lot about how R works. 
+Some of you may have completed the *Introduction to R* course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, please help your classmates who did not have a chance to complete the course.
 
-To refresh, you covered the following material in your course:
+The DataCamp course covered the following material:
 
 > - Arithmetic with R
 > - Objects and variable assignment
@@ -70,9 +71,36 @@ Today, we will briefly review the above topics, and then turn to new material on
 
 We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2019 github repository.
 
-Recall that yesterday, you learned and practiced how to do this using the Terminal. R Studio includes a Terminal tab (if you don't see it, go to the Tools > Terminal > Move Focus to Terminal), and we will use this today.
+Let's walk through how to *fork* the repo to your GitHub account, and then *clone* it locally on your computer using the Git workflow within RStudio.
 
-# Review: Basics and data types 
+# Basics and data types 
+
+## Arithmetic
+
+- `<-` is the assignment operator
+- Standard arithmetic operators work: `+`, `-`, `/`, `*`, `^`
+- To run an operation, you can hit Ctrl+Return (Windows) or Cmd+Return (Mac)
+
+## Arithmetic 
+
+```{r arith 1}
+y <- 5
+y
+y + 2
+```
+
+## Functions
+
+- Functions take inputs and return outputs, e.g. `log(10)` results in `2.302585`
+- Functions can also take arguments, e.g. `log(10, base=10)`
+- All functions have a help file that you can call up, e.g. `?log`
+
+## Functions 
+
+```{r arith 2}
+log(10)
+log(10, base=10)
+```
 
 ## Arithmetic: exercise
 
@@ -94,6 +122,11 @@ log(x*3)-4
 (log(x*3)-4)^2
 ```
 
+## Comparisons and Logical Operators 
+
+- Common logical operators: `==` (is equal), `!=` (not equal), `<`, `>`, `&` (and), `|` (or)
+- If you evaluate statements with these operators, R will tell you if the statement is `TRUE` or `FALSE`
+
 ## Comparisons and Logical Operators: exercise
 
 - Check if 1 is bigger than 2
@@ -114,7 +147,7 @@ log(x*3)-4
 
 ## Packages
 
-- Load the package `tidyverse` <br><small>(It has already been installed for you on the system-level)</small>
+- Load the package `tidyverse` using the function `library()` <br><small>You may need to install it using `install.packages("tidyverse")` if you have not done so already</small>
 - Open the help file for the function `recode` <br><small>(Hint: remember what `?` does)</small>
 
 ## Packages
@@ -153,12 +186,20 @@ install.packages("tidyverse")
 >     - 'slice' position (`vec[1:3]`)
 >     - condition (`vec[vec>2]`).
 
+## Vectors
+
+```{r vectors example}
+example <- c(7,8,9)
+example[2]
+example[example>7]
+```
+
 ## Vectors: exercise
 
 Return to the exercise file and complete the following tasks:
 
 - Run the code to generate variables `x1` and `x2`
-- Select the 3rd element in `x1`
+- Select the 3rd element in `x1` <br><small>Hint: use `[]`</small>
 - Select the elements of x1 that are less than 0
 - Select the elements of x2 that are greater than 1
 - Create x3 containing the first five elements of x2
@@ -231,6 +272,15 @@ For more on lists, see the lecture notes or data camp.
 There is an example matrix for you to practice with in the exercises file, but we won't do it together.
 </aside>
 
+## Matricies
+
+```{r matrix}
+mat <- matrix(data=c(1,2,3,4,5,6,11,12,34), ncol=3)
+mat
+mat[1,]
+mat[1,3]
+```
+
 ## Data frames
 
 > - Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.
@@ -239,6 +289,20 @@ There is an example matrix for you to practice with in the exercises file, but w
 > - You can make make data frames with `data.frame()`, or by combining vectors with `cbind()` or `rbind()`.
 > - Data frames can be indexed in the same way as matricies: `df[row no, col no]`.
 > - Data frames can also be indexed by using variable/column names: `df$var` or `df["var"]`.
+
+## Data frames
+
+```{r data frames example}
+df <- data.frame(candidate=c("Biden","Warren","Sanders"), 
+                 polle=c(26,17,17), 
+                 age=c(76,70,78))
+df
+df[1,3]
+df$age
+df$age[df$candidate=="Biden"]
+df$poll_max <- df$poll+3
+df
+```
 
 ## Data frames: exercise
 
