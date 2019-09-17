@@ -505,7 +505,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <ul>
 <li class="fragment">RStudio refers to both the company and the software</li>
 <li class="fragment">RStudio is an integrated development environment (IDE) for R</li>
-<li class="fragment">You will be using RStudio Server Pro</li>
+<li class="fragment">RStudio Server is a browser-based version of RStudio that runs on a remote Linux server</li>
+<li class="fragment">We will be using RStudio today</li>
 </ul>
 <aside class="notes">
 RStudio helps you organize your workflow and keep track of your work. The top-left pane is where you open, work on, and save script files. The bottom-left pane includes the console, which is where your code actually “runs”. The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
@@ -519,10 +520,10 @@ RStudio helps you organize your workflow and keep track of your work. The top-le
 <li class="fragment">Functions</li>
 <li class="fragment">Help files</li>
 </ul>
-</section><section id="recall-your-datacamp-course" class="slide level2">
-<h2>Recall your DataCamp course</h2>
-<p>By now, you have all completed the <em>Introduction to R</em> course on DataCamp. Congratulations! You already know quite a lot about how R works.</p>
-<p>To refresh, you covered the following material in your course:</p>
+</section><section id="basics" class="slide level2">
+<h2>Basics</h2>
+<p>Some of you may have completed the <em>Introduction to R</em> course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, please help your classmates who did not have a chance to complete the course.</p>
+<p>The DataCamp course covered the following material:</p>
 <ul>
 <li class="fragment">Arithmetic with R</li>
 <li class="fragment">Objects and variable assignment</li>
@@ -535,9 +536,36 @@ Today, we will briefly review the above topics, and then turn to new material on
 </section><section id="copy-relevant-folders" class="slide level2">
 <h2>Copy relevant folders</h2>
 <p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2019 github repository.</p>
-<p>Recall that yesterday, you learned and practiced how to do this using the Terminal. R Studio includes a Terminal tab (if you don’t see it, go to the Tools &gt; Terminal &gt; Move Focus to Terminal), and we will use this today.</p>
+<p>Let’s walk through how to <em>fork</em> the repo to your GitHub account, and then <em>clone</em> it locally on your computer using the Git workflow within RStudio.</p>
 </section></section>
-<section><section id="review-basics-and-data-types" class="titleslide slide level1"><h1>Review: Basics and data types</h1></section><section id="arithmetic-exercise" class="slide level2">
+<section><section id="basics-and-data-types" class="titleslide slide level1"><h1>Basics and data types</h1></section><section id="arithmetic" class="slide level2">
+<h2>Arithmetic</h2>
+<ul>
+<li><code>&lt;-</code> is the assignment operator</li>
+<li>Standard arithmetic operators work: <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
+<li>To run an operation, you can hit Ctrl+Return (Windows) or Cmd+Return (Mac)</li>
+</ul>
+</section><section id="arithmetic-1" class="slide level2">
+<h2>Arithmetic</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="dv">5</span>
+y</code></pre></div>
+<pre><code>## [1] 5</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y <span class="op">+</span><span class="st"> </span><span class="dv">2</span></code></pre></div>
+<pre><code>## [1] 7</code></pre>
+</section><section id="functions" class="slide level2">
+<h2>Functions</h2>
+<ul>
+<li>Functions take inputs and return outputs, e.g. <code>log(10)</code> results in <code>2.302585</code></li>
+<li>Functions can also take arguments, e.g. <code>log(10, base=10)</code></li>
+<li>All functions have a help file that you can call up, e.g. <code>?log</code></li>
+</ul>
+</section><section id="functions-1" class="slide level2">
+<h2>Functions</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(<span class="dv">10</span>)</code></pre></div>
+<pre><code>## [1] 2.302585</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(<span class="dv">10</span>, <span class="dt">base=</span><span class="dv">10</span>)</code></pre></div>
+<pre><code>## [1] 1</code></pre>
+</section><section id="arithmetic-exercise" class="slide level2">
 <h2>Arithmetic: exercise</h2>
 <p>Open up the file <code>day1_exercises.R</code> in RStudio. <br> Do the following tasks:</p>
 <ul>
@@ -558,6 +586,12 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 <pre><code>## [1] -1.29195</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>)<span class="op">-</span><span class="dv">4</span>)<span class="op">^</span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 1.669134</code></pre>
+</section><section id="comparisons-and-logical-operators" class="slide level2">
+<h2>Comparisons and Logical Operators</h2>
+<ul>
+<li>Common logical operators: <code>==</code> (is equal), <code>!=</code> (not equal), <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code> (and), <code>|</code> (or)</li>
+<li>If you evaluate statements with these operators, R will tell you if the statement is <code>TRUE</code> or <code>FALSE</code></li>
+</ul>
 </section><section id="comparisons-and-logical-operators-exercise" class="slide level2">
 <h2>Comparisons and Logical Operators: exercise</h2>
 <ul>
@@ -582,7 +616,7 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="packages" class="slide level2">
 <h2>Packages</h2>
 <ul>
-<li>Load the package <code>tidyverse</code> <br><small>(It has already been installed for you on the system-level)</small></li>
+<li>Load the package <code>tidyverse</code> using the function <code>library()</code> <br><small>You may need to install it using <code>install.packages(&quot;tidyverse&quot;)</code> if you have not done so already</small></li>
 <li>Open the help file for the function <code>recode</code> <br><small>(Hint: remember what <code>?</code> does)</small></li>
 </ul>
 </section><section id="packages-1" class="slide level2">
@@ -617,12 +651,19 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 <li class="fragment">condition (<code>vec[vec&gt;2]</code>).</li>
 </ul></li>
 </ul>
+</section><section id="vectors-1" class="slide level2">
+<h2>Vectors</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>)
+example[<span class="dv">2</span>]</code></pre></div>
+<pre><code>## [1] 8</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example[example<span class="op">&gt;</span><span class="dv">7</span>]</code></pre></div>
+<pre><code>## [1] 8 9</code></pre>
 </section><section id="vectors-exercise" class="slide level2">
 <h2>Vectors: exercise</h2>
 <p>Return to the exercise file and complete the following tasks:</p>
 <ul>
 <li>Run the code to generate variables <code>x1</code> and <code>x2</code></li>
-<li>Select the 3rd element in <code>x1</code></li>
+<li>Select the 3rd element in <code>x1</code> <br><small>Hint: use <code>[]</code></small></li>
 <li>Select the elements of x1 that are less than 0</li>
 <li>Select the elements of x2 that are greater than 1</li>
 <li>Create x3 containing the first five elements of x2</li>
@@ -693,6 +734,18 @@ For more on lists, see the lecture notes or data camp.
 <aside class="notes">
 There is an example matrix for you to practice with in the exercises file, but we won’t do it together.
 </aside>
+</section><section id="matricies-1" class="slide level2">
+<h2>Matricies</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">data=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">34</span>), <span class="dt">ncol=</span><span class="dv">3</span>)
+mat</code></pre></div>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4   11
+## [2,]    2    5   12
+## [3,]    3    6   34</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat[<span class="dv">1</span>,]</code></pre></div>
+<pre><code>## [1]  1  4 11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat[<span class="dv">1</span>,<span class="dv">3</span>]</code></pre></div>
+<pre><code>## [1] 11</code></pre>
 </section><section id="data-frames" class="slide level2">
 <h2>Data frames</h2>
 <ul>
@@ -703,6 +756,28 @@ There is an example matrix for you to practice with in the exercises file, but w
 <li class="fragment">Data frames can be indexed in the same way as matricies: <code>df[row no, col no]</code>.</li>
 <li class="fragment">Data frames can also be indexed by using variable/column names: <code>df$var</code> or <code>df[&quot;var&quot;]</code>.</li>
 </ul>
+</section><section id="data-frames-1" class="slide level2">
+<h2>Data frames</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">candidate=</span><span class="kw">c</span>(<span class="st">&quot;Biden&quot;</span>,<span class="st">&quot;Warren&quot;</span>,<span class="st">&quot;Sanders&quot;</span>), 
+                 <span class="dt">polle=</span><span class="kw">c</span>(<span class="dv">26</span>,<span class="dv">17</span>,<span class="dv">17</span>), 
+                 <span class="dt">age=</span><span class="kw">c</span>(<span class="dv">76</span>,<span class="dv">70</span>,<span class="dv">78</span>))
+df</code></pre></div>
+<pre><code>##   candidate polle age
+## 1     Biden    26  76
+## 2    Warren    17  70
+## 3   Sanders    17  78</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df[<span class="dv">1</span>,<span class="dv">3</span>]</code></pre></div>
+<pre><code>## [1] 76</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>age</code></pre></div>
+<pre><code>## [1] 76 70 78</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>age[df<span class="op">$</span>candidate<span class="op">==</span><span class="st">&quot;Biden&quot;</span>]</code></pre></div>
+<pre><code>## [1] 76</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>poll_max &lt;-<span class="st"> </span>df<span class="op">$</span>poll<span class="op">+</span><span class="dv">3</span>
+df</code></pre></div>
+<pre><code>##   candidate polle age poll_max
+## 1     Biden    26  76       29
+## 2    Warren    17  70       20
+## 3   Sanders    17  78       20</code></pre>
 </section><section id="data-frames-exercise" class="slide level2">
 <h2>Data frames: exercise</h2>
 <ul>
@@ -727,12 +802,25 @@ There is an example matrix for you to practice with in the exercises file, but w
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>cylsq &lt;-<span class="st"> </span>(mtcars<span class="op">$</span>cyl)<span class="op">^</span><span class="dv">2</span></code></pre></div>
 </section></section>
 <section><section id="break" class="titleslide slide level1"><h1>Break!</h1></section></section>
+<section><section id="roadmap" class="titleslide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
+<h2>Roadmap for the rest of the R sessions</h2>
+<ul>
+<li>Today we will learn how to do basic <strong>data manipulation</strong> and <strong>data visualization</strong> in base R</li>
+<li>Most commonly, you will do these tasks using specialized packages such as <code>tidyverse</code> or <code>data.table</code></li>
+<li>So why teach these skills in base R?
+<ul>
+<li>This helps you understand how R works</li>
+<li>Many packages rely on how these tasks work in base R</li>
+<li>Useful for simple tasks in workflows that otherwise don’t involve much manipulation or visualization</li>
+</ul></li>
+</ul>
+</section></section>
 <section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
 <h2>Working directories</h2>
-<p>The working directory is the folder where R scripts and projects look for files by default.</p>
-<p>You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;/nfs/home/krn5889/R sessions&quot;</span>)</code></pre></div>
-<p>In the exercises script file, set your working directory now.</p>
+<p>The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio’s projects feature, your working directory is set already. Check where it is as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
+<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2019&quot;</code></pre>
+<p>If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> function.</p>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
@@ -745,15 +833,12 @@ The above code is what you will usually see and use. The below code breaks down 
 </section><section id="reading-files-exercise" class="slide level2">
 <h2>Reading files: exercise</h2>
 <ul>
-<li>Check your working directory with <code>getwd()</code>.</li>
 <li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
-<li>Load the <code>readr</code> package. <br><small>(It as has already been installed on the system-level as part of <code>tidyverse</code>)</small></li>
+<li>Load the <code>readr</code> package.</li>
 <li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
 </ul>
 </section><section id="reading-files-exercise-1" class="slide level2">
 <h2>Reading files: exercise</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
-<pre><code>## [1] &quot;C:/Users/kumar/OneDrive - Northwestern University - Student Advantage/Assistantships &amp; Jobs/MSiA/bootcamp-2019&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)</code></pre></div>
 <pre><code>## Warning: package &#39;readr&#39; was built under R version 3.4.4</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
@@ -772,19 +857,6 @@ The above code is what you will usually see and use. The below code breaks down 
 <li class="fragment">You can also read files from the full local path or from URLs</li>
 <li class="fragment">You can read files using RStudio’s interface through the “Files” tab</li>
 <li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
-</ul>
-</section></section>
-<section><section id="roadmap" class="titleslide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
-<h2>Roadmap for the rest of the R sessions</h2>
-<ul>
-<li>Today we will learn how to do basic <strong>data manipulation</strong> and <strong>data visualization</strong> in base R</li>
-<li>Most commonly, you will do these tasks using specialized packages such as <code>tidyverse</code> or <code>data.table</code></li>
-<li>So why teach these skills in base R?
-<ul>
-<li>This helps you understand how R works</li>
-<li>Many packages rely on how these tasks work in base R</li>
-<li>Useful for simple tasks in workflows that otherwise don’t involve much manipulation or visualization</li>
-</ul></li>
 </ul>
 </section></section>
 <section><section id="data-manipulation" class="titleslide slide level1"><h1>Data manipulation</h1></section><section id="exploring-data-frames" class="slide level2">
@@ -807,8 +879,8 @@ Notice that any data frames which have been read in or created, like all other o
 <ul>
 <li>Run <code>summary()</code> on the gapminder data</li>
 <li>Find the mean of the variable <code>pop</code></li>
-<li>Create a frequency table of the variable <code>year</code> <br><small>(Hint: use <code>table()</code>)</small></li>
-<li>Create a proportion table of the variable <code>continent</code> <br><small>(Hint: use <code>prop.table()</code>)</small></li>
+<li>Create a frequency table of the variable, using <code>table()</code></li>
+<li>Create a proportion table of the variable <code>continent</code>, using <code>prop.table()</code> <br><small>(Hint: the input for <code>prop.table()</code> is the output of <code>table()</code>)</small></li>
 </ul>
 </section><section id="exploring-data-frames-exercise-1" class="slide level2">
 <h2>Exploring data frames: exercise</h2>
