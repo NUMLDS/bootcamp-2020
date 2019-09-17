@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
 notes<-params$notes
 ```
 
-## Remember our data from yesterday...
+## Remember our data from this morning...
 
 ```{r revisiting the data}
 gapminder <- read.csv(here::here("data", "gapminder5.csv"))
@@ -33,7 +33,7 @@ here::here()
 here::here("data", "gapminder.csv")
 ```
 
-## Remember our data from yesterday...
+## Remember our data this morning...
 
 ```{r revisiting the data 2}
 gapminder <- read.csv(here::here("data", "gapminder5.csv"))
@@ -570,9 +570,9 @@ for (i in years) {
 - Rmarkdown runs R code, compiles, and produces a report in chosen format
 - This presentation was created using Rmarkdown!
 
-## Day 2 Exercise
+## Day 1, Part 2 Exercise
 
 1) Open the `rmd_exercise_template.Rmd`
-2) Save as: `Day2RExercise_LastnameFirstname.Rmd`.
+2) Save as: `Day1Part2RExercise_LastnameFirstname.Rmd`.
 2) Read in the gapminder data set
 3) As you answer questions, be sure to annotate your work with as much detail as possible!
