@@ -15,5 +15,5 @@ For each part, there is an RMarkdown file (`*.Rmd`) that you can open in RStudio
     - R and Github
 3. [Day 2, Part 1](https://msia.github.io/bootcamp-2019/lectureslides/day2part1_R-adv_manipulation_dplyr_slides_kr.html): Advanced manipulation: reshaping, merging, and dplyr
 4. [Day 2, Part 2](https://msia.github.io/bootcamp-2019/lectureslides/day2part2_R-adv_manipulation_datatable_slides_ae.html): Advanced manipulation: data.table
-5. [Day 3](https://msia.github.io/bootcamp-2019/lectureslides/day3_R-ggplot_slides_rm.html): Data visualization with ggplot
+5. [Day 3](https://msia.github.io/bootcamp-2019/lectureslides/day3_R-ggplot_slides_kr.html): Data visualization with ggplot
 6. For the final exercise, [see instructions here](https://github.com/MSIA/bootcamp-2019/blob/master/exercises/day3_final-exercise-instructions.md).
