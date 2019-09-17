@@ -200,31 +200,10 @@ $(document).ready(function () {
 <div id="load-the-data" class="section level2">
 <h2>Load the data</h2>
 <p>Read both California energy datasets. Make sure you use <code>lubridate</code> to recode the <code>datetime</code> variable. Use <code>dplyr</code> to do this.</p>
-<div id="answer" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>library(dplyr)
-library(lubridate)
-generation &lt;- read.csv(here::here(&quot;data/ca_energy_generation.csv&quot;), 
-                       stringsAsFactors = F)
-imports &lt;- read.csv(here::here(&quot;data/ca_energy_imports.csv&quot;), 
-                    stringsAsFactors = F)
-
-generation &lt;- mutate(generation, datetime = as_datetime(datetime))
-imports &lt;- mutate(imports, datetime = as_datetime(datetime))</code></pre>
-</div>
 </div>
 <div id="merge-and-reshape-the-data" class="section level2">
 <h2>Merge and reshape the data</h2>
 <p>Using dplyr and pipes, merge the two datasets and then melt the resulting dataframe to make it tidy.</p>
-<div id="answer-1" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>library(reshape2)
-long_ca_energy &lt;- generation %&gt;%
-  inner_join(imports, by = &quot;datetime&quot;) %&gt;% 
-  melt(id.vars = &quot;datetime&quot;,
-       variable.name = &quot;source&quot;,
-       value.name = &quot;output&quot;)</code></pre>
-</div>
 </div>
 <div id="creating-new-variables" class="section level2">
 <h2>Creating new variables</h2>
@@ -235,16 +214,6 @@ long_ca_energy &lt;- generation %&gt;%
 <li><strong>Challenge</strong>: <code>per_output</code>, which is the percent of daily output represented by each observation. You will need to use <code>group_by</code> and to create a new variable with the total output for the day. (Make sure to use <code>ungroup()</code> after this!)</li>
 </ol>
 <p>Try to this all in one pipe!</p>
-<div id="answer-2" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>long_ca_energy &lt;- long_ca_energy %&gt;%
-  mutate(day = as_date(datetime),
-         log_output = log(output)) %&gt;%
-  group_by(day) %&gt;%
-  mutate(total_daily_output = sum(output, na.rm = T)) %&gt;% 
-  ungroup() %&gt;% 
-  mutate(per_output = output/total_daily_output)</code></pre>
-</div>
 </div>
 <div id="summarizing-and-analyzing-data" class="section level2">
 <h2>Summarizing and analyzing data</h2>
@@ -253,123 +222,6 @@ long_ca_energy &lt;- generation %&gt;%
 <li>Which source has the greatest mean output by day? Which has the least?</li>
 <li>Which sources has the greatest variance in usage over the course of a dataset? Which has the least?</li>
 </ol>
-<div id="answer-3" class="section level3">
-<h3>Answer</h3>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(source) %&gt;% 
-  summarize(mean_hourly = mean(output, na.rm = T)) %&gt;% 
-  arrange(desc(mean_hourly))</code></pre>
-<pre><code>## # A tibble: 12 x 2
-##    source      mean_hourly
-##    &lt;fct&gt;             &lt;dbl&gt;
-##  1 natural_gas    10634.  
-##  2 imports         6683.  
-##  3 solar           3930.  
-##  4 large_hydro     2968.  
-##  5 wind            2620.  
-##  6 nuclear         2254.  
-##  7 geothermal       965.  
-##  8 small_hydro      419.  
-##  9 biomass          374.  
-## 10 biogas           235.  
-## 11 coal               9.09
-## 12 other              0</code></pre>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(source) %&gt;% 
-  summarize(mean_hourly = mean(output, na.rm = T)) %&gt;% 
-  arrange(mean_hourly)</code></pre>
-<pre><code>## # A tibble: 12 x 2
-##    source      mean_hourly
-##    &lt;fct&gt;             &lt;dbl&gt;
-##  1 other              0   
-##  2 coal               9.09
-##  3 biogas           235.  
-##  4 biomass          374.  
-##  5 small_hydro      419.  
-##  6 geothermal       965.  
-##  7 nuclear         2254.  
-##  8 wind            2620.  
-##  9 large_hydro     2968.  
-## 10 solar           3930.  
-## 11 imports         6683.  
-## 12 natural_gas    10634.</code></pre>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(day, source) %&gt;% 
-  summarize(mean_daily = mean(output, na.rm = T)) %&gt;% 
-  arrange(desc(mean_daily))</code></pre>
-<pre><code>## # A tibble: 84 x 3
-## # Groups:   day [7]
-##    day        source      mean_daily
-##    &lt;date&gt;     &lt;fct&gt;            &lt;dbl&gt;
-##  1 2019-09-05 natural_gas     15403.
-##  2 2019-09-04 natural_gas     14928.
-##  3 2019-09-03 natural_gas     13051.
-##  4 2019-09-06 natural_gas     12786.
-##  5 2019-09-07 natural_gas      7508.
-##  6 2019-09-03 imports          7076.
-##  7 2019-09-09 imports          7058.
-##  8 2019-09-07 imports          6746.
-##  9 2019-09-08 imports          6720.
-## 10 2019-09-04 imports          6684.
-## # ... with 74 more rows</code></pre>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(day, source) %&gt;% 
-  summarize(mean_daily = mean(output, na.rm = T)) %&gt;% 
-  arrange(mean_daily)</code></pre>
-<pre><code>## # A tibble: 84 x 3
-## # Groups:   day [7]
-##    day        source mean_daily
-##    &lt;date&gt;     &lt;fct&gt;       &lt;dbl&gt;
-##  1 2019-09-03 other        0   
-##  2 2019-09-04 other        0   
-##  3 2019-09-05 other        0   
-##  4 2019-09-06 other        0   
-##  5 2019-09-07 other        0   
-##  6 2019-09-08 other        0   
-##  7 2019-09-09 other        0   
-##  8 2019-09-07 coal         6.57
-##  9 2019-09-08 coal         7.24
-## 10 2019-09-06 coal         8.89
-## # ... with 74 more rows</code></pre>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(source) %&gt;% 
-  summarize(sd_output = sd(output, na.rm = T)) %&gt;% 
-  arrange(desc(sd_output))</code></pre>
-<pre><code>## # A tibble: 12 x 2
-##    source      sd_output
-##    &lt;fct&gt;           &lt;dbl&gt;
-##  1 natural_gas   5275.  
-##  2 solar         4466.  
-##  3 imports       1761.  
-##  4 wind          1291.  
-##  5 large_hydro   1054.  
-##  6 small_hydro     30.7 
-##  7 biomass         23.0 
-##  8 geothermal       8.54
-##  9 nuclear          6.63
-## 10 biogas           4.22
-## 11 coal             2.72
-## 12 other            0</code></pre>
-<pre class="r"><code>long_ca_energy %&gt;% 
-  group_by(source) %&gt;% 
-  summarize(sd_output = sd(output, na.rm = T)) %&gt;% 
-  arrange(sd_output)</code></pre>
-<pre><code>## # A tibble: 12 x 2
-##    source      sd_output
-##    &lt;fct&gt;           &lt;dbl&gt;
-##  1 other            0   
-##  2 coal             2.72
-##  3 biogas           4.22
-##  4 nuclear          6.63
-##  5 geothermal       8.54
-##  6 biomass         23.0 
-##  7 small_hydro     30.7 
-##  8 large_hydro   1054.  
-##  9 wind          1291.  
-## 10 imports       1761.  
-## 11 solar         4466.  
-## 12 natural_gas   5275.</code></pre>
-</div>
 </div>
 <div id="analyzing-renewable-versus-non-renewable-energy-sources" class="section level2">
 <h2>Analyzing renewable versus non-renewable energy sources</h2>

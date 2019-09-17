@@ -1,5 +1,5 @@
 ---
-title: "Advanced R - Reshaping, merging, and dplyr"
+title: "Advanced R: Reshaping, merging, and dplyr"
 author: "Richard Paquin Morel"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
