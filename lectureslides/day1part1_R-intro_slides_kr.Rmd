@@ -337,19 +337,28 @@ mtcars$cylsq <- (mtcars$cyl)^2
 
 Let's take a break and return to learn two new skills: **reading files** and basic **data manipulation**.
 
+# Roadmap
+
+## Roadmap for the rest of the R sessions
+
+- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
+- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
+- So why teach these skills in base R?
+    - This helps you understand how R works
+    - Many packages rely on how these tasks work in base R
+    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
+
 # Reading files
 
 ## Working directories
 
-The working directory is the folder where R scripts and projects look for files by default.
+The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio's projects feature, your working directory is set already. Check where it is as follows:
 
-You can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the "More" menu. Or you can use the `setwd()` as follows:
-
-```{r, eval=FALSE}
-setwd("/nfs/home/krn5889/R sessions")
+```{r}
+getwd()
 ```
 
-In the exercises script file, set your working directory now.
+If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the "More" menu. Or you can use the `setwd()` function.
 
 ## Reading files: read.csv()
 
@@ -369,15 +378,13 @@ The above code is what you will usually see and use. The below code breaks down 
 
 ## Reading files: exercise
 
-- Check your working directory with `getwd()`.
 - Run the `read.csv()` code provided and see what happens in the Environment tab.
-- Load the `readr` package. <br><small>(It as has already been installed on the system-level as part of `tidyverse`)</small>
+- Load the `readr` package. 
 - Use `read_csv()` to load the gapminder data. Read the message generated in the console.
 
 ## Reading files: exercise
 
 ```{r read_csv, message=TRUE}
-getwd()
 library(readr)
 gapminder <- read_csv("data/gapminder5.csv")
 ```
@@ -387,17 +394,6 @@ gapminder <- read_csv("data/gapminder5.csv")
 > - You can also read files from the full local path or from URLs
 > - You can read files using RStudio's interface through the "Files" tab
 > - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
-
-# Roadmap
-
-## Roadmap for the rest of the R sessions
-
-- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
-- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
-- So why teach these skills in base R?
-    - This helps you understand how R works
-    - Many packages rely on how these tasks work in base R
-    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
 
 # Data manipulation
 
@@ -418,8 +414,8 @@ Notice that any data frames which have been read in or created, like all other o
 
 - Run `summary()` on the gapminder data
 - Find the mean of the variable `pop`
-- Create a frequency table of the variable `year` <br><small>(Hint: use `table()`)</small>
-- Create a proportion table of the variable `continent` <br><small>(Hint: use `prop.table()`)</small>
+- Create a frequency table of the variable, using `table()`
+- Create a proportion table of the variable `continent`, using `prop.table()` <br><small>(Hint: the input for `prop.table()` is the output of `table()`)</small>
 
 ## Exploring data frames: exercise
 

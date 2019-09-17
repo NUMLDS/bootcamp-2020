@@ -128,11 +128,7 @@ data(mtcars)
 
 #### READING FILES ####
 
-# Set your working directory with setwd()
-# Choose the folder where you have copied the "data" and "exercises" subfolders
-
-
-# Check your working directory
+# Check your working directory. It should be the root folder where you downloaded the boot camp materials. If that's not the case, set your working directory accordingly.
 
 
 # Read gapminder data with read.csv()
