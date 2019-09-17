@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75, message 
 notes<-params$notes
 ```
 
-# R Day 3 - Advanced manipulation and dplyr
+# Advanced R: Reshaping, merging, and dplyr
 
 ## A new dataset
 
@@ -181,6 +181,18 @@ long_merged_energy <- melt(merged_energy, id.vars = "datetime",
                            value.name = "usage")
 head(long_merged_energy)
 ```
+
+# Data manipulation
+
+## Two approaches to data manipulation
+
+* <span style="color:orange">`dplyr`</span>,  and <span style="color:blue">`data.table`</span>, are two packages used to process data in tabular form
+* it is useful to be familiar with both because:
+  * answers to questions on stack overflow will often be presented in a <span style="color:orange">`dplyr`</span> version and a <span style="color:blue">`data.table`</span> version
+  * each is built around a different philosophy, so you can choose which suits you most
+    * <span style="color:orange">`dplyr`</span>: chain together a few, simple functions
+    * <span style="color:blue">`data.table`</span>: compact, syntax-based commands
+  * <span style="color:blue">`data.table`</span> is much faster on large data (<span style="color:orange">`dplyr`</span> is explicitly meant for small-to-medium data)
 
 # dplyr!
 
