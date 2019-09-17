@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Kumar Ramanathan" />
-  <meta name="dcterms.date" content="2019-09-16" />
+  <meta name="dcterms.date" content="2019-09-17" />
   <title>Intro to R: Day 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,7 +489,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Intro to R: Day 1</h1>
     <h2 class="author">Kumar Ramanathan</h2>
-    <h3 class="date">2019-09-16</h3>
+    <h3 class="date">2019-09-17</h3>
 </section>
 
 <section><section id="introduction" class="titleslide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
@@ -589,7 +589,13 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="comparisons-and-logical-operators" class="slide level2">
 <h2>Comparisons and Logical Operators</h2>
 <ul>
-<li>Common logical operators: <code>==</code> (is equal), <code>!=</code> (not equal), <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code> (and), <code>|</code> (or)</li>
+<li>Common logical operators:
+<ul>
+<li><code>==</code> (is equal)</li>
+<li><code>!=</code> (not equal)</li>
+<li><code>&lt;</code> (greater than), <code>&gt;</code> (less than)</li>
+<li><code>&amp;</code> (and), <code>|</code> (or)</li>
+</ul></li>
 <li>If you evaluate statements with these operators, R will tell you if the statement is <code>TRUE</code> or <code>FALSE</code></li>
 </ul>
 </section><section id="comparisons-and-logical-operators-exercise" class="slide level2">
@@ -759,13 +765,13 @@ mat</code></pre></div>
 </section><section id="data-frames-1" class="slide level2">
 <h2>Data frames</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">candidate=</span><span class="kw">c</span>(<span class="st">&quot;Biden&quot;</span>,<span class="st">&quot;Warren&quot;</span>,<span class="st">&quot;Sanders&quot;</span>), 
-                 <span class="dt">polle=</span><span class="kw">c</span>(<span class="dv">26</span>,<span class="dv">17</span>,<span class="dv">17</span>), 
+                 <span class="dt">poll=</span><span class="kw">c</span>(<span class="dv">26</span>,<span class="dv">17</span>,<span class="dv">17</span>), 
                  <span class="dt">age=</span><span class="kw">c</span>(<span class="dv">76</span>,<span class="dv">70</span>,<span class="dv">78</span>))
 df</code></pre></div>
-<pre><code>##   candidate polle age
-## 1     Biden    26  76
-## 2    Warren    17  70
-## 3   Sanders    17  78</code></pre>
+<pre><code>##   candidate poll age
+## 1     Biden   26  76
+## 2    Warren   17  70
+## 3   Sanders   17  78</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df[<span class="dv">1</span>,<span class="dv">3</span>]</code></pre></div>
 <pre><code>## [1] 76</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>age</code></pre></div>
@@ -774,10 +780,10 @@ df</code></pre></div>
 <pre><code>## [1] 76</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>poll_max &lt;-<span class="st"> </span>df<span class="op">$</span>poll<span class="op">+</span><span class="dv">3</span>
 df</code></pre></div>
-<pre><code>##   candidate polle age poll_max
-## 1     Biden    26  76       29
-## 2    Warren    17  70       20
-## 3   Sanders    17  78       20</code></pre>
+<pre><code>##   candidate poll age poll_max
+## 1     Biden   26  76       29
+## 2    Warren   17  70       20
+## 3   Sanders   17  78       20</code></pre>
 </section><section id="data-frames-exercise" class="slide level2">
 <h2>Data frames: exercise</h2>
 <ul>

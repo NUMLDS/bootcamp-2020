@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Richard Paquin Morel" />
-  <meta name="dcterms.date" content="2019-09-16" />
+  <meta name="dcterms.date" content="2019-09-17" />
   <title>Advanced R: Reshaping, merging, and dplyr</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,10 +489,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Advanced R: Reshaping, merging, and dplyr</h1>
     <h2 class="author">Richard Paquin Morel</h2>
-    <h3 class="date">2019-09-16</h3>
+    <h3 class="date">2019-09-17</h3>
 </section>
 
-<section><section id="r-day-3---advanced-manipulation-and-dplyr" class="titleslide slide level1"><h1>R Day 3 - Advanced manipulation and dplyr</h1></section><section id="a-new-dataset" class="slide level2">
+<section><section id="advanced-r-reshaping-merging-and-dplyr" class="titleslide slide level1"><h1>Advanced R: Reshaping, merging, and dplyr</h1></section><section id="a-new-dataset" class="slide level2">
 <h2>A new dataset</h2>
 <p>California energy data</p>
 <ul>
@@ -716,6 +716,20 @@ long_gen &lt;-<span class="st"> </span><span class="kw">melt</span>(generation, 
 ## 4 2019-09-03 03:00:00 biogas 238.9167
 ## 5 2019-09-03 04:00:00 biogas 237.9167
 ## 6 2019-09-03 05:00:00 biogas 237.1667</code></pre>
+</section></section>
+<section><section id="data-manipulation" class="titleslide slide level1"><h1>Data manipulation</h1></section><section id="two-approaches-to-data-manipulation" class="slide level2">
+<h2>Two approaches to data manipulation</h2>
+<ul>
+<li><span style="color:orange"><code>dplyr</code></span>, and <span style="color:blue"><code>data.table</code></span>, are two packages used to process data in tabular form</li>
+<li>it is useful to be familiar with both because:</li>
+<li>answers to questions on stack overflow will often be presented in a <span style="color:orange"><code>dplyr</code></span> version and a <span style="color:blue"><code>data.table</code></span> version</li>
+<li>each is built around a different philosophy, so you can choose which suits you most
+<ul>
+<li><span style="color:orange"><code>dplyr</code></span>: chain together a few, simple functions</li>
+<li><span style="color:blue"><code>data.table</code></span>: compact, syntax-based commands</li>
+</ul></li>
+<li><span style="color:blue"><code>data.table</code></span> is much faster on large data (<span style="color:orange"><code>dplyr</code></span> is explicitly meant for small-to-medium data)</li>
+</ul>
 </section></section>
 <section><section id="dplyr" class="titleslide slide level1"><h1>dplyr!</h1></section><section id="dplyr---an-idiosyncratic-approach-to-data-manipulation" class="slide level2">
 <h2>dplyr - an idiosyncratic approach to data manipulation</h2>
