@@ -1,6 +1,5 @@
 ---
-title: 'Advanced R: Day 3, part 3'
-subtitle: 'Data viz with ggplot'
+title: 'Advanced R: Data viz with ggplot'
 author: "Kumar Ramanathan"
 date: "`r Sys.Date()`"
 output: 

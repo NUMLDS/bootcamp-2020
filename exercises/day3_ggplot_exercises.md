@@ -1,4 +1,4 @@
-## Day 3, part 3: ggplot - Exercises
+## Day 3: Data viz with ggplot - Exercises
 
 This document contains the instructions for exercises during the Day 3: ggplot session, drawn from the slides. Suggested answers are included in the [slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-ggplot_slides_kr#/).
 
