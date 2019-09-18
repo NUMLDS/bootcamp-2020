@@ -1,6 +1,6 @@
 # 2019 MSiA boot camp
 
-This Github repository contains materials for the 2019 Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources as you continue to develop your skills. 
+This Github repository contains materials for the R sessions of the 2019 Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources as you continue to develop your skills. 
 
 ## Workshop materials
 
