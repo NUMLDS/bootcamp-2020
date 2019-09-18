@@ -1,6 +1,6 @@
 ---
 title: "Advanced R: Reshaping, merging, and dplyr - exercises"
-author: "Richard Paquin Morel, adapted from exercises by Christina Maimone"
+author: "Richard Paquin Morel and Ali Ehlen, adapted from exercises by Christina Maimone"
 date: "`r Sys.Date()`"
 output: html_document
 params:
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo=answers, eval=answers,
 
 ## Load the data
 
-Read both California energy datasets. Make sure you use `lubridate` to recode the `datetime` variable.
+Read both California energy datasets. Make sure the `datetime` variable is in an appropriate data type (i.e. not character). 
 
 ```{asis}
 ### Answer 
@@ -71,6 +71,7 @@ Merge the two datasets and then melt the resulting dataframe/datatable to make i
 ```
 
 ```{r}
+# We chose to use dplyr::inner_join here to illustrate how this can be done in a single piped operation, but you can also use base::merge
 library(reshape2)
 long_ca_energy_dp <- generation_dp %>%
   inner_join(imports_dp, by = "datetime") %>% 
@@ -108,7 +109,7 @@ Create a series of new variables:
 2. `log_output`, which is the natural log of the output.
 3. **Challenge**: `per_output`, which is the percent of daily output represented by each observation. You will need to use `group_by` and to create a new variable with the total output for the day. (Make sure to use `ungroup()` after this!)
 
-Try to this all in one pipe! (If you are using `dplyr`)
+Bonus: If you are using `dplyr`, try to do this all in one pipe!
 
 ```{asis}
 ### Answer
@@ -127,6 +128,8 @@ long_ca_energy_dp <- long_ca_energy_dp %>%
   ungroup() %>% 
   mutate(per_output = output/total_daily_output)
 
+# Check results
+long_ca_energy_dp %>% select(day, log_output, per_output) %>% head()
 ```
 
 ```{asis}
@@ -203,11 +206,13 @@ long_ca_energy_dt[,.(mean_hourly = mean(output)), by = source][mean_hourly %in% 
 
 ```{r}
 long_ca_energy_dp %>%
+  filter(output>0) %>% 
   group_by(day, source) %>%
   summarize(mean_daily = mean(output, na.rm = T)) %>%
   arrange(desc(mean_daily))
 
 long_ca_energy_dp %>%
+  filter(output>0) %>% 
   group_by(day, source) %>%
   summarize(mean_daily = mean(output, na.rm = T)) %>%
   arrange(mean_daily)
@@ -235,11 +240,13 @@ mean_dly[mean_daily %in% c(max(mean_daily), min(mean_daily))]
 
 ```{r}
 long_ca_energy_dp %>%
+  filter(output>0) %>%
   group_by(source) %>%
   summarize(sd_output = sd(output, na.rm = T)) %>%
   arrange(desc(sd_output))
 
 long_ca_energy_dp %>%
+  filter(output>0) %>% 
   group_by(source) %>%
   summarize(sd_output = sd(output, na.rm = T)) %>%
   arrange(sd_output)

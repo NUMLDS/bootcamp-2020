@@ -10,7 +10,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Richard Paquin Morel, adapted from exercises by Christina Maimone" />
+<meta name="author" content="Richard Paquin Morel and Ali Ehlen, adapted from exercises by Christina Maimone" />
 
 <meta name="date" content="2019-09-18" />
 
@@ -364,7 +364,7 @@ summary {
 
 
 <h1 class="title toc-ignore">Advanced R: Reshaping, merging, and dplyr - exercises</h1>
-<h4 class="author">Richard Paquin Morel, adapted from exercises by Christina Maimone</h4>
+<h4 class="author">Richard Paquin Morel and Ali Ehlen, adapted from exercises by Christina Maimone</h4>
 <h4 class="date">2019-09-18</h4>
 
 </div>
@@ -372,7 +372,7 @@ summary {
 
 <div id="load-the-data" class="section level2">
 <h2>Load the data</h2>
-<p>Read both California energy datasets. Make sure you use <code>lubridate</code> to recode the <code>datetime</code> variable.</p>
+<p>Read both California energy datasets. Make sure the <code>datetime</code> variable is in an appropriate data type (i.e. not character).</p>
 </div>
 <div id="merge-and-reshape-the-data" class="section level2">
 <h2>Merge and reshape the data</h2>
@@ -386,7 +386,7 @@ summary {
 <li><code>log_output</code>, which is the natural log of the output.</li>
 <li><strong>Challenge</strong>: <code>per_output</code>, which is the percent of daily output represented by each observation. You will need to use <code>group_by</code> and to create a new variable with the total output for the day. (Make sure to use <code>ungroup()</code> after this!)</li>
 </ol>
-<p>Try to this all in one pipe! (If you are using <code>dplyr</code>)</p>
+<p>Bonus: If you are using <code>dplyr</code>, try to do this all in one pipe!</p>
 </div>
 <div id="summarizing-and-analyzing-data" class="section level2">
 <h2>Summarizing and analyzing data</h2>
