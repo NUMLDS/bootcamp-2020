@@ -1,6 +1,6 @@
 ---
 title: "Advanced R: Reshaping, merging, and dplyr"
-author: "Richard Paquin Morel"
+author: "Richard Paquin Morel, adapted by Kumar Ramanathan"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
 params:
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75, message 
 notes<-params$notes
 ```
 
-# Advanced R: Reshaping, merging, and dplyr
+# Let's get set up
 
 ## A new dataset
 
@@ -23,15 +23,15 @@ California energy data
 
 - file names: `ca_energy_generation.csv` and `ca_energy_imports.csv`
 - Read these two files into your working environment
-  - They are in the "data" folder
+    - They are in the "data" folder
 
 ## Reading in the data
 
 ```{r importing}
-generation <- read.csv(here::here("data/ca_energy_generation.csv"), 
-                       stringsAsFactors = F)
-imports <- read.csv(here::here("data/ca_energy_imports.csv"), 
-                    stringsAsFactors = F)
+library(here)
+library(readr)
+generation <- read.csv(here::here("data/ca_energy_generation.csv"), stringsAsFactors=F)
+imports <- read.csv(here::here("data/ca_energy_imports.csv"), stringsAsFactors=F)
 ```
 
 ## Exploring the data
@@ -52,8 +52,9 @@ class(imports$datetime)
 
 ## Dealing with dates/times with `lubridate`
 
-- The best way to deal with date-time data is to use the `lubridate` package and the `as_datetime` function
-- Recode the `datetime` variable in the `imports` dataframe
+- The best way to deal with date-time data is to use the `lubridate` package
+- You can convert character variables into datetime format using the `as_datetime` function
+    - One advantage of `readr::read_csv` is that it will often detect and convert datetime variables when importing
 
 ```{r datetime}
 library(lubridate)
@@ -65,6 +66,7 @@ head(generation$datetime)
 ## Dealing with dates/times with `lubridate`
 ```{r}
 imports$datetime <- as_datetime(imports$datetime)
+class(imports$datetime)
 head(imports$datetime)
 ```
 
@@ -77,6 +79,8 @@ head(imports$datetime)
   2. Each observation must have its own row.
   3. Each value must have its own cell.
 - Often, we want to make wide data long (or tidy) for analysis
+
+![Wide vs long data; image from RStudio Data Wrangling cheat sheet](figures/widevslong.jpg)
 
 ## Wide versus long data
 
@@ -108,8 +112,8 @@ head(generation)
 ```{r melting}
 library(reshape2)
 long_gen <- melt(generation, id.vars = "datetime",
-                           variable.name = "source",
-                           value.name = "usage")
+                             variable.name = "source",
+                             value.name = "usage")
 head(long_gen)
 ```
 
@@ -118,7 +122,6 @@ head(long_gen)
 ```{r reordering}
 head(long_gen[order(long_gen$datetime), ])
 ```
-
 
 
 # Merging data
@@ -150,12 +153,11 @@ merge(x, y, by.x = "id", by.y = "cd", all.x = T, all.y = T)
   - Use `all.x = T` if you want to keep all the observation in the first dataframe (unmatched observations in `y` are dropped!)
   - Use `all.y = T` if you want to keep all observations in the second dataframe (umatched observations in `x` are dropped!)
   - Use both (or, simply `all = T`) to keep all observations!
-  - By **default** R will drop unmatched observations from **both** dataframe!
+  - By **default** R will drop unmatched observations from **both** dataframes!
 
 ## Merge by `datetime`
 
 - Use `merge` to join the `generation` and `imports` dataframes, using the `datetime` variable to match
-
 
 ## Merge by `datetime`
 
@@ -199,8 +201,14 @@ head(long_merged_energy)
 ## dplyr - an idiosyncratic approach to data manipulation
 
 - `dplyr` is an R package for data manipulation developed by Hadley Wickham with help from lots of other R developers
-- https://dplyr.tidyverse.org/
+- See https://dplyr.tidyverse.org/ for more guidance
 - Principles: consistent syntax, meaningful naming conventions, fewer arguments/more functions 
+
+## Load `tidyverse`
+
+```{r load tidyverse}
+library(tidyverse)
+```
 
 ## `dplyr` verbs
 
@@ -208,7 +216,6 @@ head(long_merged_energy)
 - `filter` --> subset observations based on conditions
 - `mutate` --> add new variables
 - `summarize` --> reduce multiple observations to a single value (e.g., find the mean)
-
 
 ## Trying out `dplyr` verbs - `select`
 
@@ -223,7 +230,6 @@ head(long_merged_energy)
 
 ## Trying out `dplyr` verbs - `select`
 ```{r select}
-library(dplyr)
 tmp <- select(merged_energy, biogas, biomass, geothermal, solar)
 names(tmp)
 tmp <- select(merged_energy, -biogas, -biomass, -geothermal, -solar)
@@ -301,6 +307,39 @@ long_merged_energy %>%
   summarize(mean_log_usage = mean(log_usage, na.rm = T))
 ```
 
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 1}
+long_merged_energy %>% 
+  filter(source == "geothermal")
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 2}
+long_merged_energy %>% 
+  filter(source == "geothermal") %>% 
+  select(-datetime)
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 3}
+long_merged_energy %>% 
+  filter(source == "geothermal") %>% 
+  select(-datetime) %>% 
+  mutate(log_usage = log(usage))
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 4}
+long_merged_energy %>% 
+  filter(source == "geothermal") %>% 
+  select(-datetime) %>% 
+  mutate(log_usage = log(usage)) %>% 
+  summarize(mean_log_usage = mean(log_usage, na.rm = T))
+```
 
 ## A new operator: the pipe `%>%`
 
