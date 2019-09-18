@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
-  <meta name="dcterms.date" content="2019-09-17" />
+  <meta name="dcterms.date" content="2019-09-18" />
   <title>Advanced R: Day 3</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -516,10 +516,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
   <h1 class="subtitle">Data visualization with ggplot2</h1>
     <h2 class="author"><div class="line-block">Richard Paquin Morel<br />
 (slides created by Kumar Ramanathan)</div></h2>
-    <h3 class="date">2019-09-17</h3>
+    <h3 class="date">2019-09-18</h3>
 </section>
 
-<section><section id="introduction-to-ggplot" class="title-slide slide level1"><h1>Introduction to ggplot</h1></section><section id="why-ggplot" class="slide level2">
+<section><section id="introduction-to-ggplot" class="title-slide slide level1"><h1>Introduction to ggplot</h1><p>Part of the <code>tidyverse</code>, <code>ggplot2</code> is an R package that implements the “grammar of graphics” in R.</p>
+<p>In ggplot, graphics are built by supplying <em>data</em> and <em>mapping</em> of data values to aesthetics, and then adding <em>layers</em> that build geometric objects, scales, labels, and more.</p></section><section id="why-ggplot" class="slide level2">
 <h2>Why ggplot?</h2>
 <ul>
 <li class="fragment">Highly customizable and extensible.</li>
@@ -541,7 +542,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>If you still have <code>imports</code>, <code>generation</code>, <code>merged_energy</code>, <code>long_gen</code> and <code>long_merged_energy</code> in your Enrivorment, read in <code>gapminder</code> and recreate <code>gapminder07</code>.</li>
 <li>Alternatively, or if you are missing any of those objects from your workspace, run the following line of code:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">source</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/day3_objects.R&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">source</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/day3_objects.R&quot;</span>))</a></code></pre></div>
 </section></section>
 <section><section id="basics-grammar-of-graphics" class="title-slide slide level1"><h1>Basics: grammar of graphics</h1></section><section id="components-of-a-basic-plot" class="slide level2">
 <h2>Components of a basic plot</h2>
@@ -551,8 +552,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li class="fragment"><strong>aesthetic mapping</strong>: the mapping from the data to the geometric objects, provided in an <code>aes()</code> function nested within the chosen <code>geom</code> function</li>
 <li class="fragment">connected with the <code>+</code> operator</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> <span class="op">&lt;</span>DATA FRAME<span class="op">&gt;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="st">  </span><span class="er">&lt;</span>GEOM_FUNCTION<span class="op">&gt;</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="op">&lt;</span>VARIABLES<span class="op">&gt;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> <span class="op">&lt;</span>DATA FRAME<span class="op">&gt;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="st">  </span><span class="er">&lt;</span>GEOM_FUNCTION<span class="op">&gt;</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="op">&lt;</span>VARIABLES<span class="op">&gt;</span>))</a></code></pre></div>
 <aside class="notes">
 Write this on the board, without data= and mapping= specified.
 </aside>
@@ -567,15 +568,15 @@ Write this on the board, without data= and mapping= specified.
 </ol>
 </section><section id="example-scatterplot-from-day-1-1" class="slide level2">
 <h2>Example: Scatterplot from Day 1</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> gapminder07) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> gdpPercap, <span class="dt">y =</span> lifeExp))</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> gapminder07) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> gdpPercap, <span class="dt">y =</span> lifeExp))</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/scatterplot%201-1.png" width="768" /></p>
 </section><section id="example-scatterplot-from-day-1-2" class="slide level2">
 <h2>Example: Scatterplot from Day 1</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">ggplot</span>(gapminder07) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdpPercap, <span class="dt">y =</span> lifeExp)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, </a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">       <span class="dt">x =</span> <span class="st">&quot;GDP per capita&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Life expectancy&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">ggplot</span>(gapminder07) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> gdpPercap, <span class="dt">y =</span> lifeExp)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, </a>
+<a class="sourceLine" id="cb4-4" title="4">       <span class="dt">x =</span> <span class="st">&quot;GDP per capita&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Life expectancy&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/scatterplot%202-1.png" width="768" /></p>
 </section><section id="exercise-1-scatterplot" class="slide level2">
 <h2>Exercise 1: Scatterplot</h2>
@@ -586,29 +587,34 @@ You can create a new script file for your exercises in this session, or you can 
 </aside>
 </section><section id="exercise-1-scatterplot-1" class="slide level2">
 <h2>Exercise 1: Scatterplot</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">ggplot</span>(gapminder07) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log</span>(pop), <span class="dt">y =</span> <span class="kw">log</span>(gdpPercap))) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Relationship between GDP per capita and population in 2007&quot;</span>, <span class="dt">x =</span> <span class="st">&quot;Logged GDP per capita&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Logged life expectancy&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">ggplot</span>(gapminder07) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log</span>(pop), <span class="dt">y =</span> <span class="kw">log</span>(gdpPercap))) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Relationship between GDP per capita and population in 2007&quot;</span>, <span class="dt">x =</span> <span class="st">&quot;Logged GDP per capita&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Logged life expectancy&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/scatterplot%20exercise-1.png" width="768" /></p>
 </section></section>
-<section><section id="preparing-your-data" class="title-slide slide level1"><h1>Preparing your data</h1></section><section id="example-energy-generated-over-time" class="slide level2">
+<section><section id="preparing-your-data" class="title-slide slide level1"><h1>Preparing your data</h1><ul>
+<li class="fragment">Recall the role of pipes (<code>%&gt;%</code>) in <code>dplyr</code> this morning.</li>
+<li class="fragment"><code>dplyr</code> and <code>ggplot2</code> are designed to work well together.</li>
+<li class="fragment">You can use a series of pipes to prepare your data before plotting.</li>
+<li class="fragment">To see examples, let’s turn to the California energy data.</li>
+</ul></section><section id="example-energy-generated-over-time" class="slide level2">
 <h2>Example: Energy generated over time</h2>
 <p>Task:<br>Plot a <em>column chart</em> of <em>total</em> energy generated over time.</p>
 <p>Steps:</p>
 <ol type="1">
-<li class="fragment">Choose long-format generation data, i.e. <code>long_gen</code>.</li>
+<li class="fragment">Choose long-format generation data, i.e. <code>long_gen</code>.</li>
 <li class="fragment">Manipulate data frame to calculate total output per date-time.</li>
 <li class="fragment">Pipe manipulated data frame into plot.</li>
 <li class="fragment">Select <code>geom_col()</code> and map appropriate <code>x</code> and <code>y</code> variables.</li>
 </ol>
 </section><section id="example-energy-generated-over-time-1" class="slide level2">
 <h2>Example: Energy generated over time</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/data%20prep%202-1.png" width="768" /></p>
 </section><section id="exercise-2-hydro-power-generated-over-time" class="slide level2">
 <h2>Exercise 2: Hydro power generated over time</h2>
@@ -616,29 +622,34 @@ You can create a new script file for your exercises in this session, or you can 
 <p><small>Hint: There are two types of hydroelectric sources in the data: <code>large_hydro</code> and <code>small_hydro</code>.</small></p>
 </section><section id="exercise-2-hydro-power-generated-over-time-1" class="slide level2">
 <h2>Exercise 2: Hydro power generated over time</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;large_hydro&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;small_hydro&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total hydro power generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;large_hydro&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;small_hydro&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total hydro power generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/data%20prep%20ex1-1.png" width="768" /></p>
 </section><section id="exercise-2-hydro-power-generated-over-time-2" class="slide level2">
 <h2>Exercise 2: Hydro power generated over time</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">hydro=</span>large_hydro<span class="op">+</span>small_hydro) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>hydro)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total hydro power generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">hydro=</span>large_hydro<span class="op">+</span>small_hydro) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>hydro)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total hydro power generated, by hour&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/data%20prep%20ex2-1.png" width="768" /></p>
 </section></section>
-<section><section id="geometric-objects" class="title-slide slide level1"><h1>Geometric objects</h1></section><section id="line-plots-geom_line" class="slide level2">
+<section><section id="geometric-objects" class="title-slide slide level1"><h1>Geometric objects</h1><p>We have already seen examples of two kinds of plots:</p>
+<ul>
+<li>Scatterplots, generated with <code>geom_point()</code></li>
+<li>Column charts, generated with <code>geom_col()</code></li>
+</ul>
+<p>Let’s see a few more.</p></section><section id="line-plots-geom_line" class="slide level2">
 <h2>Line plots: <code>geom_line()</code></h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/geom_line%201-1.png" width="768" /></p>
 </section><section id="interlude-changing-geom-characteristics" class="slide level2">
 <h2>Interlude: changing geom characteristics</h2>
@@ -650,24 +661,24 @@ You can create a new script file for your exercises in this session, or you can 
 </ul>
 </section><section id="interlude-changing-geom-characteristics-1" class="slide level2">
 <h2>Interlude: changing geom characteristics</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">size=</span><span class="fl">1.2</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">size=</span><span class="fl">1.2</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/geom_line%202-1.png" width="768" /></p>
 </section><section id="area-plots-geom_area" class="slide level2">
 <h2>Area plots: <code>geom_area()</code></h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_area</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>wind), <span class="dt">fill=</span><span class="st">&quot;darkblue&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Hourly wind power generation, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="st">  </span><span class="kw">geom_area</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>wind), <span class="dt">fill=</span><span class="st">&quot;darkblue&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Hourly wind power generation, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/area%20plot-1.png" width="768" /></p>
 </section><section id="box-plots-geom_boxplot" class="slide level2">
 <h2>Box plots: <code>geom_boxplot()</code></h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>source, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Amount of energy generated by each source, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Source type&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>source, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Amount of energy generated by each source, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Source type&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/box%20plot-1.png" width="768" /></p>
 </section><section id="multiple-geoms-in-one-plot" class="slide level2">
 <h2>Multiple geoms in one plot</h2>
@@ -683,30 +694,30 @@ You can create a new script file for your exercises in this session, or you can 
 </ol>
 </section><section id="multiple-geoms-in-one-plot-1" class="slide level2">
 <h2>Multiple geoms in one plot</h2>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>large_hydro), <span class="dt">col=</span><span class="st">&quot;turquoise3&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>large_hydro)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Hydroelectric (large) generation per hour, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">generation <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>large_hydro), <span class="dt">col=</span><span class="st">&quot;turquoise3&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>large_hydro)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Hydroelectric (large) generation per hour, Sept 3-9&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/multiple%20geoms-1.png" width="768" /></p>
 </section><section id="exercise-3-total-output-per-source" class="slide level2">
 <h2>Exercise 3: Total output per source</h2>
 <p>Task:<br>Create a column chart that shows the total output per source.</p>
 <ul>
-<li>Change the color of the columns to <code>&quot;darkred&quot;</code>.</li>
+<li>Change the color of the columns to <code>"darkred"</code>.</li>
 <li>Add a horizontal line indicating the mean output across all sources. Use the cheatsheet to identify the <code>geom</code> function that you need.</li>
 <li>Add a meaningful title and axis labels using <code>labs()</code>.</li>
 </ul>
 </section><section id="exercise-3-total-output-per-source-1" class="slide level2">
 <h2>Exercise 3: Total output per source</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>source, <span class="dt">y=</span>output), <span class="dt">fill=</span><span class="st">&quot;darkred&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept=</span><span class="kw">mean</span>(output))) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total output per energy source over Sept 3-9&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Source&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">long_merged_energy <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>source, <span class="dt">y=</span>output), <span class="dt">fill=</span><span class="st">&quot;darkred&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept=</span><span class="kw">mean</span>(output))) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-7" title="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total output per energy source over Sept 3-9&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Source&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/exercise3-1.png" width="768" /></p>
 </section></section>
 <section><section id="additional-layers" class="title-slide slide level1"><h1>Additional layers</h1></section><section id="labels" class="slide level2">
@@ -717,11 +728,11 @@ You can create a new script file for your exercises in this session, or you can 
 </ul>
 </section><section id="labels-1" class="slide level2">
 <h2>Labels</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>,</a>
-<a class="sourceLine" id="cb16-5" data-line-number="5">       <span class="dt">caption=</span><span class="st">&quot;Source: California Energy Commission&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>,</a>
+<a class="sourceLine" id="cb16-5" title="5">       <span class="dt">caption=</span><span class="st">&quot;Source: California Energy Commission&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/labels-1.png" width="768" /></p>
 <aside class="notes">
 No exercise this time, but we will practice this later.
@@ -754,11 +765,11 @@ No exercise this time, but we will practice this later.
 </ol>
 </section><section id="example-imports-over-time" class="slide level2">
 <h2>Example: Imports over time</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/scales%20dates-1.png" width="768" /></p>
 <aside class="notes">
 See lecture notes for details on what’s going on inside the scale function. Or read the help file. No exercise this time, but we will practice this later.
@@ -774,28 +785,28 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ul>
 </section><section id="example-imports-over-time-1" class="slide level2">
 <h2>Example: Imports over time</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_minimal</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="st">  </span><span class="kw">theme_minimal</span>()</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/theme%20preset-1.png" width="768" /></p>
 </section><section id="themes-manual" class="slide level2">
 <h2>Themes: manual</h2>
 <p>The <code>theme()</code> layer lets you modulate many components of the theme, including:</p>
 <ul>
-<li class="fragment">Angle, position, and other characteristics of axis labels (e.g. <code>axis.labels.x =</code>).</li>
-<li class="fragment">Angle, position, and other characteristics of legends (e.g. <code>legend.position =</code>).</li>
-<li class="fragment">Characteristics of the background of the plot (e.g. <code>plot.background =</code>).</li>
+<li class="fragment">Angle, position, and other characteristics of axis labels (e.g. <code>axis.labels.x =</code>).</li>
+<li class="fragment">Angle, position, and other characteristics of legends (e.g. <code>legend.position =</code>).</li>
+<li class="fragment">Characteristics of the background of the plot (e.g. <code>plot.background =</code>).</li>
 <li class="fragment">For a full list of the components that can be modified, see the help file for <code>ggplot2::theme()</code>.</li>
 </ul>
 </section><section id="example-imports-over-time-2" class="slide level2">
 <h2>Example: Imports over time</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">imports <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_text</span>(<span class="dt">angle=</span><span class="dv">45</span>, <span class="dt">hjust=</span><span class="dv">1</span>, <span class="dt">size=</span><span class="dv">12</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">imports <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>imports), <span class="dt">col=</span><span class="st">&quot;red&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">date_labels=</span><span class="st">&quot;%H:%M&quot;</span>, <span class="dt">date_breaks=</span><span class="st">&quot;12 hours&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy imports over time in California&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Amount imported (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-5" title="5"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_text</span>(<span class="dt">angle=</span><span class="dv">45</span>, <span class="dt">hjust=</span><span class="dv">1</span>, <span class="dt">size=</span><span class="dv">12</span>))</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/theme%20manual-1.png" width="768" /></p>
 </section><section id="coordinate-system-adjustment" class="slide level2">
 <h2>Coordinate system adjustment</h2>
@@ -807,20 +818,20 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ul>
 </section><section id="example-coord_flip" class="slide level2">
 <h2>Example: coord_flip()</h2>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(date) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(date) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/coord_flip%20pre-1.png" width="768" /></p>
 </section><section id="example-coord_flip-1" class="slide level2">
 <h2>Example: coord_flip()</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(date) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="st">  </span><span class="kw">coord_flip</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(date) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Total energy generated, by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-6" title="6"><span class="st">  </span><span class="kw">coord_flip</span>()</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/coord_flip%20post-1.png" width="768" /></p>
 </section><section id="stats" class="slide level2">
 <h2>Stats</h2>
@@ -831,7 +842,14 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li class="fragment">For more, see <a href="http://r4ds.had.co.nz/data-visualisation.html#statistical-transformations">Chapter 3.7 of the R for data science online textbook</a>.</li>
 </ul>
 </section></section>
-<section><section id="visualizing-grouped-data" class="title-slide slide level1"><h1>Visualizing grouped data</h1></section><section id="colors-and-fill" class="slide level2">
+<section><section id="visualizing-grouped-data" class="title-slide slide level1"><h1>Visualizing grouped data</h1><ul>
+<li class="fragment">We often want to visualize multiple variables, or a variable that can be divided into groups, in one graphic.</li>
+<li class="fragment">There are two broad principles for visualizing grouped variables in R:
+<ul>
+<li class="fragment">Identify a grouping variable in a <code>geom()</code> using the <code>group =</code> argument, and demarcate the distinct objects created per group in some way.</li>
+<li class="fragment">Use facets to generate geometric objects in separate coordinate systems for each group.</li>
+</ul></li>
+</ul></section><section id="colors-and-fill" class="slide level2">
 <h2>Colors and fill</h2>
 <p>Task:<br>Create a line plot of energy output over time, with separate lines for each source.</p>
 <p>Steps:</p>
@@ -843,10 +861,10 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ol>
 </section><section id="colors-and-fill-1" class="slide level2">
 <h2>Colors and fill</h2>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by energy source over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">long_merged_energy <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by energy source over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20colors%201-1.png" width="768" /></p>
 </section><section id="exercise-4-colors-and-fill" class="slide level2">
 <h2>Exercise 4: Colors and fill</h2>
@@ -854,19 +872,19 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <p><small>Bonus: Set the line size to 1.5.</small></p>
 </section><section id="exercise-4-colors-and-fill-1" class="slide level2">
 <h2>Exercise 4: Colors and fill</h2>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;wind&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;solar&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="fl">1.5</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Wind vs. Solar vs. Geothermal generation&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">long_merged_energy <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;wind&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;solar&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-3" title="3"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-4" title="4"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="fl">1.5</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Wind vs. Solar vs. Geothermal generation&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20colors%20ex-1.png" width="768" /></p>
 </section><section id="customizing-with-scale_color-layers" class="slide level2">
 <h2>Customizing with scale_color layers</h2>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;wind&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;solar&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="fl">1.5</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="st">  </span><span class="kw">scale_color_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Accent&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Energy source&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Wind vs. Solar vs. Geothermal generation&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(source<span class="op">==</span><span class="st">&quot;wind&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;solar&quot;</span><span class="op">|</span>source<span class="op">==</span><span class="st">&quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="fl">1.5</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="st">  </span><span class="kw">scale_color_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Accent&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Energy source&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Wind vs. Solar vs. Geothermal generation&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20colors%202-1.png" width="768" /></p>
 </section><section id="colors-and-fill-2" class="slide level2">
 <h2>Colors and fill</h2>
@@ -902,13 +920,13 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ol>
 </section><section id="example-energy-use-by-day-1" class="slide level2">
 <h2>Example: Energy use by day</h2>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-7" data-line-number="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-6" title="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb25-7" title="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/col%20stack-1.png" width="768" /></p>
 </section><section id="example-energy-use-by-day-2" class="slide level2">
 <h2>Example: Energy use by day</h2>
@@ -916,32 +934,32 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li class="fragment">This column chart is useful if our main goal is to examine total output over time across sources.</li>
 <li class="fragment">But what if our main goal is to compare trends across sources?
 <ul>
-<li class="fragment">We can use <code>position=&quot;dodge&quot;</code> in <code>geom_col()</code> ‘unstack’ the columns for each source.</li>
+<li class="fragment">We can use <code>position="dodge"</code> in <code>geom_col()</code> ‘unstack’ the columns for each source.</li>
 </ul></li>
 <li class="fragment">What if our goal is to compare what portion of output per day each source comprises?
 <ul>
-<li class="fragment">We can use <code>position=&quot;fill&quot;</code> to normalize height of stacked columns.</li>
+<li class="fragment">We can use <code>position="fill"</code> to normalize height of stacked columns.</li>
 </ul></li>
 </ul>
 </section><section id="example-energy-use-by-day-pos-dodge" class="slide level2">
 <h2>Example: Energy use by day (pos dodge)</h2>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source), <span class="dt">position=</span><span class="st">&quot;dodge&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb26-7" data-line-number="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-5" title="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-6" title="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source), <span class="dt">position=</span><span class="st">&quot;dodge&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-7" title="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/col%20dodge-1.png" width="768" /></p>
 </section><section id="example-energy-use-by-day-pos-fill" class="slide level2">
 <h2>Example: Energy use by day (pos fill)</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source), <span class="dt">position=</span><span class="st">&quot;fill&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-7" data-line-number="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(date, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-5" title="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-6" title="6"><span class="st">  </span><span class="kw">geom_col</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">fill=</span>source), <span class="dt">position=</span><span class="st">&quot;fill&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-7" title="7"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Energy use by day&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/col%20fill-1.png" width="768" /></p>
 </section><section id="shapes-and-linetypes" class="slide level2">
 <h2>Shapes and linetypes</h2>
@@ -965,40 +983,40 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ol>
 </section><section id="example-energy-source-group-by-day-1" class="slide level2">
 <h2>Example: Energy source group by day</h2>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="co"># Prepare data</span></a>
-<a class="sourceLine" id="cb28-2" data-line-number="2">long_merged_energy_regroup &lt;-<span class="st"> </span>long_merged_energy <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">type =</span> source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="st">  </span><span class="kw">merge</span>(regroup, <span class="dt">by =</span> <span class="st">&quot;type&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="st">  </span><span class="kw">group_by</span>(date, group) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb28-7" data-line-number="7"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output))</a>
-<a class="sourceLine" id="cb28-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb28-9" data-line-number="9"><span class="co"># Take a look at our prepared data</span></a>
-<a class="sourceLine" id="cb28-10" data-line-number="10"><span class="kw">head</span>(long_merged_energy_regroup)</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="co"># Prepare data</span></a>
+<a class="sourceLine" id="cb28-2" title="2">long_merged_energy_regroup &lt;-<span class="st"> </span>long_merged_energy <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-3" title="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">type =</span> source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb28-4" title="4"><span class="st">  </span><span class="kw">merge</span>(regroup, <span class="dt">by =</span> <span class="st">&quot;type&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb28-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">date=</span>lubridate<span class="op">::</span><span class="kw">date</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb28-6" title="6"><span class="st">  </span><span class="kw">group_by</span>(date, group) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-7" title="7"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">output=</span><span class="kw">sum</span>(output))</a>
+<a class="sourceLine" id="cb28-8" title="8"></a>
+<a class="sourceLine" id="cb28-9" title="9"><span class="co"># Take a look at our prepared data</span></a>
+<a class="sourceLine" id="cb28-10" title="10"><span class="kw">head</span>(long_merged_energy_regroup)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 3
-## # Groups:   date [2]
-##   date       group        output
-##   &lt;date&gt;     &lt;chr&gt;         &lt;dbl&gt;
-## 1 2018-09-03 hydro        96808.
-## 2 2018-09-03 imports     174288 
-## 3 2018-09-03 natural_gas 152894.
-## 4 2018-09-03 nuclear      53856 
-## 5 2018-09-03 renewable   166340 
-## 6 2018-09-04 hydro       122112.</code></pre>
+## # Groups:   date [1]
+##   date       group      output
+##   &lt;date&gt;     &lt;chr&gt;       &lt;dbl&gt;
+## 1 2019-09-03 hydro      93919.
+## 2 2019-09-03 imports   169826.
+## 3 2019-09-03 nuclear    53926.
+## 4 2019-09-03 other          0 
+## 5 2019-09-03 renewable 183304.
+## 6 2019-09-03 thermal   313436.</code></pre>
 </section><section id="example-energy-source-group-by-day-2" class="slide level2">
 <h2>Example: Energy source group, by day</h2>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">col=</span>group), <span class="dt">size=</span><span class="fl">0.8</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">shape=</span>group)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by source group over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Date&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">col=</span>group), <span class="dt">size=</span><span class="fl">0.8</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb30-4" title="4"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">shape=</span>group)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by source group over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Date&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20shapes-1.png" width="768" /></p>
 </section><section id="example-energy-source-group-by-day-3" class="slide level2">
 <h2>Example: Energy source group, by day</h2>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb31-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">linetype=</span>group), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb31-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by source group over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Date&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">long_merged_energy_regroup <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>date, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">linetype=</span>group), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb31-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Output by source group over time&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Date&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20linetypes-1.png" width="768" /></p>
 </section><section id="sizes-and-alpha" class="slide level2">
 <h2>Sizes and alpha</h2>
@@ -1009,11 +1027,11 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ul>
 </section><section id="example-life-expectancy-over-gdp" class="slide level2">
 <h2>Example: Life expectancy over GDP</h2>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">gapminder07 <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">log</span>(gdpPercap), <span class="dt">y=</span>lifeExp, <span class="dt">size=</span>pop, <span class="dt">col=</span>continent)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="st">  </span><span class="kw">scale_size_continuous</span>(<span class="dt">name=</span><span class="st">&quot;Population&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_discrete</span>(<span class="dt">name=</span><span class="st">&quot;Continent&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Life expectancy as a function of GDP per capita in 2007&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Logged GDP per capita&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Life expectancy&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">gapminder07 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb32-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb32-3" title="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">log</span>(gdpPercap), <span class="dt">y=</span>lifeExp, <span class="dt">size=</span>pop, <span class="dt">col=</span>continent)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb32-4" title="4"><span class="st">  </span><span class="kw">scale_size_continuous</span>(<span class="dt">name=</span><span class="st">&quot;Population&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_discrete</span>(<span class="dt">name=</span><span class="st">&quot;Continent&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb32-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Life expectancy as a function of GDP per capita in 2007&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Logged GDP per capita&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Life expectancy&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/aes%20size-1.png" width="768" /></p>
 </section><section id="exercise-5-average-hourly-output-by-source" class="slide level2">
 <h2>Exercise 5: Average hourly output by source</h2>
@@ -1022,25 +1040,25 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <ul>
 <li>You will need to prepare your data using both <code>dplyr</code> and <code>lubridate</code> functions.</li>
 <li>You can choose which <code>geom</code>(s) to use, and how to demarcate groups.</li>
-<li>Bonus: use a scale layer to set a color palette (try <code>&quot;Set3&quot;</code>) and change the legend name.</li>
+<li>Bonus: use a scale layer to set a color palette (try <code>"Set3"</code>) and change the legend name.</li>
 <li>Remember to add <code>labs()</code>!</li>
 </ul>
 </section><section id="exercise-5-average-hourly-output-by-source-1" class="slide level2">
 <h2>Exercise 5: Average hourly output by source</h2>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">ex5 &lt;-<span class="st"> </span>long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">hour=</span>lubridate<span class="op">::</span><span class="kw">hour</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(hour, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb33-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_area</span>(<span class="kw">aes</span>(<span class="dt">x=</span>hour, <span class="dt">y=</span>output, <span class="dt">fill=</span><span class="kw">factor</span>(source))) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-7" data-line-number="7"><span class="st">  </span><span class="kw">scale_fill_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Set3&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Source&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-8" data-line-number="8"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Average hourly output by source&quot;</span>, </a>
-<a class="sourceLine" id="cb33-9" data-line-number="9">       <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9&quot;</span>,</a>
-<a class="sourceLine" id="cb33-10" data-line-number="10">       <span class="dt">x=</span><span class="st">&quot;Hour of the day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-11" data-line-number="11"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">ex5 &lt;-<span class="st"> </span>long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">hour=</span>lubridate<span class="op">::</span><span class="kw">hour</span>(datetime)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(hour, source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">output=</span><span class="kw">sum</span>(output)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-5" title="5"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-6" title="6"><span class="st">  </span><span class="kw">geom_area</span>(<span class="kw">aes</span>(<span class="dt">x=</span>hour, <span class="dt">y=</span>output, <span class="dt">fill=</span><span class="kw">factor</span>(source))) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-7" title="7"><span class="st">  </span><span class="kw">scale_fill_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Set3&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Source&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-8" title="8"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Average hourly output by source&quot;</span>, </a>
+<a class="sourceLine" id="cb33-9" title="9">       <span class="dt">subtitle=</span><span class="st">&quot;Data collected during September 3-9&quot;</span>,</a>
+<a class="sourceLine" id="cb33-10" title="10">       <span class="dt">x=</span><span class="st">&quot;Hour of the day&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-11" title="11"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
 </section><section id="exercise-5-average-hourly-output-by-source-2" class="slide level2">
 <h2>Exercise 5: Average hourly output by source</h2>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">ex5</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">ex5</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/exercise5%20plot-1.png" width="768" /></p>
 </section><section id="facets" class="slide level2">
 <h2>Facets</h2>
@@ -1059,10 +1077,10 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ol>
 </section><section id="example-comparing-generation-patterns-1" class="slide level2">
 <h2>Example: Comparing generation patterns</h2>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">long_gen <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb35-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">long_gen <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb35-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb35-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>source, <span class="dt">col=</span>source), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb35-4" title="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/why%20facet-1.png" width="768" /></p>
 </section><section id="example-comparing-generation-patterns-2" class="slide level2">
 <h2>Example: Comparing generation patterns</h2>
@@ -1075,19 +1093,19 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ul>
 </section><section id="example-comparing-generation-patterns-3" class="slide level2">
 <h2>Example: Comparing generation patterns</h2>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> datetime, <span class="dt">y =</span> output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-4" data-line-number="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>source) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> datetime, <span class="dt">y =</span> output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-4" title="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>source) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/facet%201-1.png" width="768" /></p>
 </section><section id="example-comparing-generation-patterns-4" class="slide level2">
 <h2>Example: Comparing generation patterns</h2>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> datetime, <span class="dt">y =</span> output)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-4" data-line-number="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>source, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">long_gen <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-2" title="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x =</span> datetime, <span class="dt">y =</span> output)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-4" title="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>source, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/facet%202-1.png" width="768" /></p>
 </section><section id="exercise-6-facets" class="slide level2">
 <h2>Exercise 6: Facets</h2>
@@ -1099,26 +1117,26 @@ See lecture notes for details on what’s going on inside the scale function. Or
 </ul>
 </section><section id="exercise-6-facets-1" class="slide level2">
 <h2>Exercise 6: Facets</h2>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">long_gen_regroup &lt;-<span class="st"> </span>long_gen <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb38-2" data-line-number="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">type =</span> source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="st">  </span><span class="kw">merge</span>(regroup, <span class="dt">by=</span><span class="st">&quot;type&quot;</span>)</a>
-<a class="sourceLine" id="cb38-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb38-5" data-line-number="5"><span class="kw">head</span>(long_gen_regroup)</a></code></pre></div>
-<pre><code>##     type            datetime output     group
-## 1 biogas 2018-09-03 00:00:00    239 renewable
-## 2 biogas 2018-09-03 01:00:00    240 renewable
-## 3 biogas 2018-09-03 02:00:00    237 renewable
-## 4 biogas 2018-09-03 03:00:00    241 renewable
-## 5 biogas 2018-09-03 04:00:00    240 renewable
-## 6 biogas 2018-09-03 05:00:00    239 renewable</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">long_gen_regroup &lt;-<span class="st"> </span>long_gen <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">type =</span> source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb38-3" title="3"><span class="st">  </span><span class="kw">merge</span>(regroup, <span class="dt">by=</span><span class="st">&quot;type&quot;</span>)</a>
+<a class="sourceLine" id="cb38-4" title="4"></a>
+<a class="sourceLine" id="cb38-5" title="5"><span class="kw">head</span>(long_gen_regroup)</a></code></pre></div>
+<pre><code>##     type            datetime   output     group
+## 1 biogas 2019-09-03 00:00:00 238.9167 renewable
+## 2 biogas 2019-09-03 01:00:00 239.0000 renewable
+## 3 biogas 2019-09-03 02:00:00 239.0000 renewable
+## 4 biogas 2019-09-03 03:00:00 238.9167 renewable
+## 5 biogas 2019-09-03 04:00:00 237.9167 renewable
+## 6 biogas 2019-09-03 05:00:00 237.1667 renewable</code></pre>
 </section><section id="exercise-6-facets-2" class="slide level2">
 <h2>Exercise 6: Facets</h2>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">long_gen_regroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">col=</span>group), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="st">  </span><span class="kw">scale_color_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Set1&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Type of energy source&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb40-4" data-line-number="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>type, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb40-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb40-6" data-line-number="6"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">long_gen_regroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>datetime, <span class="dt">y=</span>output, <span class="dt">group=</span>group, <span class="dt">col=</span>group), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-3" title="3"><span class="st">  </span><span class="kw">scale_color_brewer</span>(<span class="dt">palette=</span><span class="st">&quot;Set1&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Type of energy source&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-4" title="4"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>type, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-5" title="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Generation over time, by energy source&quot;</span>, <span class="dt">subtitle=</span><span class="st">&quot;Hourly data from September 3-9, 2018&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Output (MW)&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-6" title="6"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
 <p><img src="day3_R-ggplot_slides_kr_files/figure-revealjs/facets%20ex-1.png" width="768" /></p>
 </section></section>
 <section><section id="final-notes" class="title-slide slide level1"><h1>Final notes</h1></section><section id="comment-your-code" class="slide level2">
@@ -1134,8 +1152,11 @@ See lecture notes for details on what’s going on inside the scale function. Or
 <li>Add the function <code>ggsave()</code> as a layer to your plotting code</li>
 </ul>
 </section></section>
-<section id="break" class="title-slide slide level1"><h1>Break!</h1></section>
-<section><section id="final-exercise" class="title-slide slide level1"><h1>Final Exercise</h1></section><section id="optional-submissions" class="slide level2">
+<section id="break" class="title-slide slide level1"><h1>Break!</h1><p>This is the end of the R lecture sessions.</p>
+<p>After a short break, we will return for a cumulative exercise that combines the skills you have learned since Monday.</p></section>
+<section><section id="final-exercise" class="title-slide slide level1"><h1>Final Exercise</h1><p>The instructions are in a markdown file in the <code>exercises</code> folder. Create a new RMarkdown file (save it using this naming convention: <code>FinalRExercise_LastnameFirstname.Rmd</code>), in which you will complete the exercise.</p>
+<p>You can work in small groups, but write up your code separately.</p>
+<p>Raise your hand if you need help!</p></section><section id="optional-submissions" class="slide level2">
 <h2>Optional Submissions</h2>
 <p>You’ve created several RMarkdown files over the past three days. Since you stored these in a forked repo, it is possible to create a pull request and ‘submit’ these changes to the base repo. This is <em>optional</em>, but gives you a chance to explore Github functionality and share your work with your classmates.</p>
 <p>Before you submit your completed exercises, <em>move every new file in your repo to the</em> <code>submissions</code> <em>folder</em>. This ensures that we won’t inadvertently make changes to the session materials. Then, create a new pull request, asking to merge changes from your fork to the base repository.</p>
