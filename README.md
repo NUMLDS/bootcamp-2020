@@ -50,5 +50,5 @@ The R materials used on 8/26 - 9/8 and 9/10 are based on the [Intro to R worksho
 - Richard Morel: [Email](mailto:richard.morel@u.northwestern.edu) | [Website](http://ramorel.github.io)
 - Ali Ehlen: [Email](mailto:AnnalieseEhlen2020@u.northwestern.edu)
 - Emilio Lehoucq: [Email](mailto:emilio-l@u.northwestern.edu) | [Website](https://emiliolehoucq.com/)
-- Sarah Moore: [Email](mailto:sarahmoore2022@u.northwestern.edu)| [Website](https://blogsarahmoore.wordpress.com/)
-- Amanda Sahar d'Urso: [Email](mailto:asdurso@u.northwestern.edu)| [Website](https://sites.northwestern.edu/asdurso/)
+- Sarah Moore: [Email](mailto:sarahmoore2022@u.northwestern.edu) | [Website](https://blogsarahmoore.wordpress.com/)
+- Amanda Sahar d'Urso: [Email](mailto:asdurso@u.northwestern.edu) | [Website](https://sites.northwestern.edu/asdurso/)
