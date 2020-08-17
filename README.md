@@ -14,7 +14,7 @@ This Github repository contains materials for the R sessions of the 2020 Masters
 |Day 6<br />Wed, 9/9|Advanced data manipulation in data.table|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day6_datatable_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day6_datatable_slides.html)||
 |Day 7<br />Thur, 9/10|Data visualization with ggplot2|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day7_ggplot_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day7_ggplot_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day7_ggplot_exercises.md)|
 |Day 8<br /> Tue, 9/15|Final exercise|||[Instructions](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day8_final-exercise-instructions.md)|
-(https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day7_ggplot_exercises.md)
+
 ## Resources
 
 ### Shell
