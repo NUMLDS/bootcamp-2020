@@ -49,3 +49,4 @@ The R materials used on 8/26 - 9/8 and 9/10 are based on the [Intro to R worksho
 - Kumar Ramanathan: [Email](mailto:kumar.ramanathan@u.northwestern.edu) | [Website](http://www.kumar.fyi)
 - Richard Morel: [Email](mailto:richard.morel@u.northwestern.edu) | [Website](http://ramorel.github.io)
 - Ali Ehlen: [Email](mailto:AnnalieseEhlen2020@u.northwestern.edu)
+- Emilio Lehoucq: [Email](mailto:emilio-l@u.northwestern.edu) | [Website](https://emiliolehoucq.com/)
