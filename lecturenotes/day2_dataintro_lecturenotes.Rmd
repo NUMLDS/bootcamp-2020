@@ -1,0 +1,374 @@
+---
+title: "Day 2: Data Manipulation and Simple Visualization in R"
+author: "Kumar Ramanathan (based on materials by Christina Maimone)"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+params:
+  notes: no
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# Data manipulation in base R
+
+## Exploring a data frame
+
+In the previous section, we imported two datasets. For the rest of today, we will focus on the Gapminder data, which is stored in our environment as `gapminder`. To refresh yourself, you can view the data frame in R using the `View()` function.
+
+```{r read_csv, message=TRUE}
+library(readr)
+gapminder <- read_csv("data/gapminder5.csv")
+```
+
+```{r, eval=F}
+View(gapminder)
+```
+
+You can also see a list of variables using `names()`.
+
+```{r}
+names(gapminder)
+```
+
+Other useful functions are `dim()` which shows the dimensions of the data frame, `str()` which shows the dimensions of the data frame along with the names of variables and the first few values in each variable, `nrow()` and `ncol()` which show the number of rows and colums, and `head()` which shows the first few rows of the data frame (5 rows by default).
+
+When applied to a data frame, the `summary()` function provides useful summary statistics for each variable (i.e. column) in the data frame. Let's try it with the Gapminder data:
+
+```{r}
+summary(gapminder)
+```
+
+We can also use functions like `mean()`, `median()`, `var()`, `sd()`, and `quantile()` to calculate other summary statistics for individual variables. For example, let's calculate the mean of life expectancy. Recall that we can use the `$` operator to call up a variable within a data frame using its name.
+
+```{r}
+mean(gapminder$lifeExp)
+```
+
+A useful way to examine a discrete or categorical variable is to use a frequency table. These are easy to make in R, using the `table()` function:
+
+```{r}
+table(gapminder$continent)
+```
+
+`prop.table()` is a useful wrapper around `table()`, showing the proportion of rows in each category:
+
+```{r}
+prop.table(table(gapminder$continent))
+```
+
+You can generate a frequency table with more than one variable as well:
+
+```{r}
+table(gapminder$continent, gapminder$year)
+```
+
+## Subsetting
+
+Notice that each row in the data frame represents one country in a given year. Perhaps we are interested in analyzing only data from one year. To do this, we will have to "subset" our data frame to include only those rows that we want to keep. 
+
+The `subset()` function lets you select rows and columns you want to keep. You can either name columns or rows, or include a logical statement such that only rows/columns where the statement is true are retained.
+
+```{r, eval=FALSE}
+subset(data.frame, 
+       subset=condition indicating rows to keep,
+       select=condition indicating columns to keep)
+```
+
+For eaxmple, let's create a new data frame containing only 2007 data by subsetting the original data frame.
+
+```{r}
+gapminder07 <- subset(gapminder, subset = year==2007)
+```
+
+Look at the number of rows in the new data frame: it is only 142, whereas the original data frame has 1704 rows.
+
+```{r}
+nrow(gapminder07)
+```
+
+## Sorting
+
+The `sort()` function reorders elements, in ascending order by default. You can flip the order by using the `decreasing = TRUE` argument.
+
+```{r}
+sort(gapminder07$lifeExp)
+sort(gapminder07$lifeExp, decreasing=TRUE)
+```
+
+The `order()` function gives you the index positions in sorted order:
+
+```{r}
+order(gapminder07$lifeExp)
+```
+
+`order()` is useful for arranging data frames. Combined with `head()`, which shows the first 5 rows of a data frame, we can use this to view the rows of the data frame with the highest life expectancy:
+
+```{r}
+head(gapminder07[order(gapminder07$lifeExp, decreasing=TRUE),])
+```
+
+Sorting a table is often useful. For example:
+
+```{r}
+sort(table(gapminder07$continent))
+```
+
+## Adding and removing columns
+
+You can add variables to a data frame in several ways. Here, we will show two standard methods using base R. On Day 3, you will learn about alternatives using the `data.table` and `dplyr` approaches.
+
+To demonstrate, let's first create a vector with the same number of values as the number of rows in the data frame. If you want to learn what is going on in this code, look at the help file for the function `sample()`.
+
+```{r}
+newvar <- sample(1:5000, 1704, replace = FALSE)
+```
+
+You can add a variable/column by using the `cbind()` function:
+
+```{r}
+gapminder <- cbind(gapminder, newvar)
+```
+
+You can add a variable/column by assigning it to data frame directly:
+
+```{r}
+gapminder$newvar <- newvar
+```
+
+To remove a variable/column from a data frame, you can assign a `NULL` value to the variable:
+
+```{r}
+gapminder$newvar <- NULL
+```
+
+You can also remove a variable/column by negatively indexing the data frame:
+
+```{r, eval = F}
+gapminder <- gapminder[-"newvar"]
+gapminder <- gapminder[,-c("newvar")] 
+# The second method is equivalent to the first, but can be used to remove multiple columns at the same time.
+```
+
+To add rows, you can use the function `rbind()`. Remember that rows may include different data types, in which case you would need to use the function `list()`.
+
+## Recoding variables
+
+To recode a variable, you could make a new column, or overwrite the existing one entirely. For example, let's create a new variable for life expectancy containing rounded values, using the `round()` function.
+
+```{r}
+gapminder07$lifeExp_rounded <- round(gapminder07$lifeExp)
+```
+
+If you just want to replace part of a column (or vector), you can assign to a subset. For example, let's say we want to create a new variable that marks all cases where life expectancy is higher than the mean as "High" and those where it is lower than the mean as "Low".
+
+```{r}
+# Start by creating a new variable with all missing values
+gapminder07$lifeExp_highlow <- NA
+# Replace higher-than-mean values with "High"
+gapminder07$lifeExp_highlow[gapminder07$lifeExp>mean(gapminder07$lifeExp)] <- "High"
+# Replace lower-than-mean values with "Low"
+gapminder07$lifeExp_highlow[gapminder07$lifeExp<mean(gapminder07$lifeExp)] <- "Low"
+```
+
+There's also a `recode()` function in the `dplyr` library. You specify the reassignment of values. For example, let's create a new variable with abbreviated continent names.
+
+```{r}
+library(dplyr)
+gapminder07$continent_abrv <- recode(gapminder07$continent,
+                                     `Africa`="AF",
+                                     `Americas`="AM",
+                                     `Asia`="AS",
+                                     `Europe`="EU",
+                                     `Oceania`="OC")
+table(gapminder07$continent_abrv)
+```
+
+We will return to `recode()` and other `dplyr` functions on Day 3. The `ifelse()` function, covered in Day 2, is also useful for recoding.
+
+## Aggregating
+
+To compute summary statistics by groups in the data, one option is to use the `aggregate()` function. For example, we can calculate the mean of life expectancy for each continent:
+
+```{r}
+aggregate(gapminder07$lifeExp ~ gapminder07$continent, FUN=mean)
+```
+
+The `~` operator can be read as "by" or "as a function of", and is used in many contexts. A construction such as `y ~ x1 + x2` is referred to as a *formula*.
+
+We can also aggregate by two variables. For example, let's use the original Gapminder data (not just the 2007 data) and aggregate by continent *and* year.
+
+```{r}
+aggregate(gapminder$lifeExp ~ gapminder$year + gapminder$continent, FUN=mean)
+```
+
+## Statistics
+
+Now that we have a dataset ... we can do statistics! You will learn more about particular statistical models and methods over the course of your program. For now, let's do some basic things to get a feel for how R handles statistical analysis.
+
+### Correlations
+
+You can use the `cor()` function to calculate correlation (Pearson's r):
+
+```{r}
+cor(gapminder07$lifeExp, gapminder07$gdpPercap)
+```
+
+You can also find the covariance:
+
+```{r}
+cov(gapminder07$lifeExp, gapminder07$gdpPercap)
+```
+
+### T-test
+
+Do countries with high or low life expectancy have different GDP per capita? Apart from simply comparing the means for the two groups, we can use a T-test to evaluate the likelihood that these means are significantly different from each other.
+
+```{r}
+t.test(gapminder07$gdpPercap~gapminder07$lifeExp_highlow)
+```
+
+Remember: you can read `~` as "as a function of". So the above code reads "GDP per capita as a function of life expectancy", meaning grouped by or explained by.
+
+We don't have to use the formula syntax. We can specify data for two different groups. Let's see if GDP per capita is different when comparing the Americas and Asia.
+
+```{r}
+t.test(gapminder07$gdpPercap[gapminder07$continent=="Asia"], gapminder07$gdpPercap[gapminder07$continent=="Americas"])
+```
+
+By storing the output of the T-test (which is a list) as its own object, we can access different parts of the results.
+
+```{r}
+t1 <- t.test(gapminder07$gdpPercap~gapminder07$lifeExp_highlow)
+names(t1)
+```
+
+```{r}
+t1$p.value
+```
+
+### Regression
+
+Of course, the two life expectancy "groups" we used above to conduct a T-test are based on a continuous variable indicating life expectancy. We may be more interested in whether this variable predicts GDP per capita rather than the two "groups" that we created using an arbitrary threshold.
+
+The basic syntax for a liner regression is shown below. Note that instead of repeating `df$variablename` several times, we can indicate the data frame name using the `data = ` argument and simply use variable names.
+
+```{r, eval=FALSE}
+lm(y ~ x1 + x2 + x3, data=df_name)
+```
+
+Example: 
+
+```{r}
+lm(gdpPercap ~ lifeExp, data=gapminder07)
+```
+
+The default output isn't much. You get a lot more with `summary()`:
+
+```{r}
+r1 <- lm(gdpPercap ~ lifeExp, data=gapminder07)
+summary(r1)
+```
+
+Note that a constant (Intercept) term was added automatically.
+
+Let's try another regression with two indpendent variables. This time, we will predict life expectancy as a function of GDP per capita and population.
+
+```{r}
+r2 <- lm(lifeExp ~ gdpPercap + pop, data=gapminder07)
+summary(r2)
+```
+
+# Writing data files
+
+You will often want to save your work in R as well. There are a few different ways to save:
+
+## Writing a data file
+
+We imported the `gapminder` data earlier in CSV format, and manipulated it in several ways: we subsetted the 2007 data and added the variables `lifeExp_rounded`, `lifeExp_highlow`. and `continent_abrv`. 
+
+The best method for making your workflow and analysis reproducible is to write any data sets you create to plain text files.
+
+Let's try to save our subsetted and manipulated `gapminder07` data frame as a CSV. To write a CSV, there are `write.csv` and `write.table` functions, similar to their `read` counterparts. The one trick is that you usually want to NOT write row.names.
+
+```{r, eval=FALSE}
+write.csv(gapminder07, file="data/gapminder_2007_edited.csv", 
+          row.names=FALSE)
+```
+
+Or using `readr` package's equivalent:
+
+```{r, eval=FALSE}
+write_csv(schooldata, "data/gapminder_2007_edited.csv")
+```
+
+## Saving R objects
+
+You can use the `save` function to save multiple objects together in a file.  The standard file extension to use is `.RData`. Example:
+
+```{r, eval=FALSE}
+save(schooldata, gapminder, 
+     file = "workshopobjects.RData")
+```
+
+To later load in saved data, use the `load` function: 
+
+```{r, eval=FALSE}
+load("workshopobjects.RData")
+```
+
+This can be useful if you're working with multiple objects and want to be able to pick up your work easily later. But`.RData` files generally aren't portable to other programs, so think of them only as internal R working files -- not the format you want to keep data in long-term. Loading a `.RData` file will overwrite objects with the same name already in the environment.
+
+You can also save all the objects in your environment by using the `save.image()` function, or by clicking the "Save" icon in the Environment pane in RStudio.
+
+# Data visualization in base R
+
+We will spend a lot more time later in the boot camp on data visualization, but today we will briefly introduce some functions for visualization that are included in base R. These functions are useful to quickly visualize data in early phases of analysis, and their syntax is often incorporated into other packages. For more advanced and aesthetically pleasing data visualization, you will want to use the `ggplot2` package, which we will go over in detail on Day 3.
+
+## Histograms
+
+Histograms are a simple and useful way to visualize the distribution of a variable. For example, let's plot a histogram of life expectancy from the `gapminder07` data frame:
+
+```{r}
+hist(gapminder07$lifeExp)
+```
+
+By reading the help file for the `hist()` function, we can identify several arguments that can change the aesthetics of the plot. The `breaks = ` argument controls the number of breaks on the x-axis.
+
+```{r}
+hist(gapminder07$lifeExp, breaks=20,
+     main="Life expectancy (2007 data)", ylab="Frequency", xlab="Life expectancy")
+```
+
+## Scatterplots
+
+The simplest way to plot the relationship between two variables is a scatterplot. If you provide two variables to the `plot()` function in R, it produces a scatterplot. Let's try it with life expectancy and GDP per capita in the `gapminder07` data frame. Recall that `~` means "a function of", so we will put the y-axis variable on the left and the x-axis variable on the right.
+
+```{r}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap)
+```
+
+Again, we can add axes and labels:
+
+```{r}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap, main="Life expectancy as a function of GDP per capita (2007 data)", xlab="GDP per capita", ylab="Life expectancy")
+```
+
+Perhaps we want to add a line indicating the mean value of life expectancy. We can do this by using the `abline()` function to add a line after creating a plot. Adding multiple layers to a plot is much more intuitive and flexible with the `ggplot2` package, which we will explore on Day 3.
+
+```{r}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap, main="Life expectancy as a function of GDP per capita (2007 data)", xlab="GDP per capita", ylab="Life expectancy")
+abline(h = mean(gapminder07$lifeExp))
+```
+

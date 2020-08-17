@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Kumar Ramanathan" />
+  <meta name="dcterms.date" content="2020-08-17" />
+  <title>Day 2: Data Manipulation and Simple Visualization in R</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="day2_dataintro_slides_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="day2_dataintro_slides_files/reveal.js-3.3.0.1/css/theme/simple.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Day 2: Data Manipulation and Simple Visualization in R</h1>
+    <h2 class="author">Kumar Ramanathan</h2>
+    <h3 class="date">2020-08-17</h3>
+</section>
+
+<section><section id="data-manipulation" class="title-slide slide level1"><h1>Data manipulation</h1></section><section id="exploring-data-frames" class="slide level2">
+<h2>Exploring data frames</h2>
+<ul>
+<li class="fragment">Remember: you can view data frames in RStudio with <code>View()</code> and examine other characteristics with <code>str()</code>, <code>dim()</code>, <code>names()</code>, <code>nrow()</code>, and more.</li>
+<li class="fragment">When run on a data frame, <code>summary()</code> returns summary statistics for all variables.</li>
+<li class="fragment"><code>mean()</code>, <code>median()</code>, <code>var()</code>, <code>sd()</code>, and <code>quantile()</code> operate as expected.</li>
+<li class="fragment">Frequency tables are a simple and useful way to explore discrete/categorical variables in data frames
+<ul>
+<li class="fragment"><code>table()</code> creates a frequency table of one or more variables</li>
+<li class="fragment"><code>prop.table()</code> can turn a frequency table into a proportion table</li>
+</ul></li>
+</ul>
+<aside class="notes">
+Notice that any data frames which have been read in or created, like all other objects, can be seen in the environment
+</aside>
+</section><section id="exploring-data-frames-exercise" class="slide level2">
+<h2>Exploring data frames: exercise</h2>
+<ul>
+<li>Reload the gapminder data from Day 1</li>
+<li>Run <code>summary()</code> on the gapminder data</li>
+<li>Find the mean of the variable <code>pop</code></li>
+<li>Create a frequency table of the variable, using <code>table()</code></li>
+<li>Create a proportion table of the variable <code>continent</code>, using <code>prop.table()</code> <br><small>(Hint: the input for <code>prop.table()</code> is the output of <code>table()</code>)</small></li>
+</ul>
+</section><section id="exploring-data-frames-exercise-1" class="slide level2">
+<h2>Exploring data frames: exercise</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(readr)</a>
+<a class="sourceLine" id="cb1-2" title="2">gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</a></code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   country = col_character(),
+##   year = col_double(),
+##   pop = col_double(),
+##   continent = col_character(),
+##   lifeExp = col_double(),
+##   gdpPercap = col_double()
+## )</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">summary</span>(gapminder)</a></code></pre></div>
+<pre><code>##    country               year           pop             continent        
+##  Length:1704        Min.   :1952   Min.   :6.001e+04   Length:1704       
+##  Class :character   1st Qu.:1966   1st Qu.:2.794e+06   Class :character  
+##  Mode  :character   Median :1980   Median :7.024e+06   Mode  :character  
+##                     Mean   :1980   Mean   :2.960e+07                     
+##                     3rd Qu.:1993   3rd Qu.:1.959e+07                     
+##                     Max.   :2007   Max.   :1.319e+09                     
+##     lifeExp        gdpPercap       
+##  Min.   :23.60   Min.   :   241.2  
+##  1st Qu.:48.20   1st Qu.:  1202.1  
+##  Median :60.71   Median :  3531.8  
+##  Mean   :59.47   Mean   :  7215.3  
+##  3rd Qu.:70.85   3rd Qu.:  9325.5  
+##  Max.   :82.60   Max.   :113523.1</code></pre>
+</section><section id="exploring-data-frames-exercise-2" class="slide level2">
+<h2>Exploring data frames: exercise</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">mean</span>(gapminder<span class="op">$</span>pop)</a></code></pre></div>
+<pre><code>## [1] 29601212</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">table</span>(gapminder<span class="op">$</span>continent)</a></code></pre></div>
+<pre><code>## 
+##   Africa Americas     Asia   Europe  Oceania 
+##      624      300      396      360       24</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">prop.table</span>(<span class="kw">table</span>(gapminder<span class="op">$</span>continent))</a></code></pre></div>
+<pre><code>## 
+##     Africa   Americas       Asia     Europe    Oceania 
+## 0.36619718 0.17605634 0.23239437 0.21126761 0.01408451</code></pre>
+</section><section id="subsetting" class="slide level2">
+<h2>Subsetting</h2>
+<ul>
+<li class="fragment">One of the benefits of R is that we can work with multiple data frames at the same time</li>
+<li class="fragment">We will often want to <em>subset</em> a data frame, i.e. work with a portion of the data frame</li>
+<li class="fragment">There are two common ways to subset a data frame in base R
+<ul>
+<li class="fragment">Index the data frame: <code>gapminder[gapminder$continent=="Asia",]</code></li>
+<li class="fragment">Use the <code>subset()</code> function: <code>subset(gapminder, subset=continent=="Asia")</code></li>
+</ul></li>
+</ul>
+<aside class="notes">
+The most obvious use case of subsetting is to create and store smaller data frame, which we will do shortly. But think also about how useful it is to quickly subset a data frame: we can use subsets as inputs for statistical models, for example.
+</aside>
+</section><section id="sorting" class="slide level2">
+<h2>Sorting</h2>
+<ul>
+<li class="fragment">The <code>sort()</code> function reorders elements, in ascending order by default.
+<ul>
+<li class="fragment">You can flip the order by using the <code>decreasing = TRUE</code> argument.</li>
+</ul></li>
+<li class="fragment">The <code>order()</code> function gives you the index positions in sorted order.</li>
+<li class="fragment"><code>sort()</code> is useful for quickly viewing vectors; <code>order()</code> is useful for arranging data frames.</li>
+</ul>
+</section><section id="subsetting-and-sorting-exercise" class="slide level2">
+<h2>Subsetting and Sorting: exercise</h2>
+<ul>
+<li>Create a new data frame called <code>gapminder07</code> containing only those rows in the gapminder data where <code>year</code> is 2007</li>
+<li>Created a sorted frequency table of the variable <code>continent</code> in <code>gapminder07</code> <br><small>(Hint: use <code>table()</code> and <code>sort()</code>)</small></li>
+<li>Print out the population of Mexico in 2007</li>
+<li>Try the bonus question if you have time</li>
+</ul>
+</section><section id="subsetting-and-sorting-exercise-1" class="slide level2">
+<h2>Subsetting and Sorting: exercise</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">gapminder07 &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, <span class="dt">subset =</span> year<span class="op">==</span><span class="dv">2007</span>)</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="kw">sort</span>(<span class="kw">table</span>(gapminder07<span class="op">$</span>continent))</a></code></pre></div>
+<pre><code>## 
+##  Oceania Americas   Europe     Asia   Africa 
+##        2       25       30       33       52</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">gapminder07<span class="op">$</span>pop[gapminder07<span class="op">$</span>country<span class="op">==</span><span class="st">&quot;Mexico&quot;</span>]</a></code></pre></div>
+<pre><code>## [1] 108700891</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),])</a></code></pre></div>
+<pre><code>## # A tibble: 6 x 6
+##   country        year        pop continent lifeExp gdpPercap
+##   &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+## 1 China          2007 1318683096 Asia         73.0     4959.
+## 2 India          2007 1110396331 Asia         64.7     2452.
+## 3 United States  2007  301139947 Americas     78.2    42952.
+## 4 Indonesia      2007  223547000 Asia         70.6     3541.
+## 5 Brazil         2007  190010647 Americas     72.4     9066.
+## 6 Pakistan       2007  169270617 Asia         65.5     2606.</code></pre>
+<aside class="notes">
+Don’t worry too much about the bonus question if you find it confusing. The package <code>dplyr</code>, which we will cover on Thursday, will offer other ways to do this kind of task which some of you may find more intuitive.
+</aside>
+</section><section id="adding-and-removing-columns" class="slide level2">
+<h2>Adding and removing columns</h2>
+<p>When cleaning or wrangling datasets in RStudio, we will often want to create new variables.</p>
+<p>Two ways to add a vector as a new variable in R:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">gapminder<span class="op">$</span>newvar &lt;-<span class="st"> </span>newvar</a>
+<a class="sourceLine" id="cb17-2" title="2"></a>
+<a class="sourceLine" id="cb17-3" title="3">gapminder &lt;-<span class="st"> </span><span class="kw">cbind</span>(gapminder, newvar)</a></code></pre></div>
+<p>Removing columns is easy too:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">gapminder<span class="op">$</span>newvar &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb18-2" title="2"></a>
+<a class="sourceLine" id="cb18-3" title="3">gapminder &lt;-<span class="st"> </span>gapminder[<span class="op">-</span><span class="st">&quot;newvar&quot;</span>]</a></code></pre></div>
+</section><section id="recoding-variables" class="slide level2">
+<h2>Recoding variables</h2>
+<ul>
+<li class="fragment">A common task when cleaning/wrangling data is recoding variables.</li>
+<li class="fragment">Think about what the recoded variable should look like &amp; then decide on an approach.
+<ul>
+<li class="fragment">Sometimes, a single function can accomplish the recoding task needed. The new vector can then be assigned to a new column in the data frame.</li>
+<li class="fragment">If no single function comes to mind, we can initialize a new variable in the data frame, and assign values using indexes and conditional statements.</li>
+<li class="fragment">More complex recoding tasks can be accomplished with other packages like <code>dplyr</code>, which you can preview in the lecture notes.</li>
+</ul></li>
+</ul>
+</section><section id="recoding-variables-exercise" class="slide level2">
+<h2>Recoding variables: exercise</h2>
+<p>Use the data frame <code>gapminder07</code> throughout this exercise.</p>
+<ul>
+<li>Round the values of the variable <code>lifeExp</code> using <code>round()</code>, and store this as a new variable <code>lifeExp_round</code></li>
+<li>Print out the new variable to see what it looks like</li>
+<li>Read through the code that creates the new variable <code>lifeExp_over70</code> and try to understand what it does.</li>
+<li>Try to create a new variable <code>lifeExp_highlow</code> that has the value “High” when life expectancy is over the mean and the value “Low” when it is below the mean.</li>
+</ul>
+</section><section id="recoding-variables-exercise-1" class="slide level2">
+<h2>Recoding variables: exercise</h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">gapminder07<span class="op">$</span>lifeExp_round &lt;-<span class="st"> </span><span class="kw">round</span>(gapminder07<span class="op">$</span>lifeExp)</a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="kw">head</span>(gapminder07<span class="op">$</span>lifeExp_round)</a></code></pre></div>
+<pre><code>## [1] 44 76 72 43 75 81</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">gapminder07<span class="op">$</span>lifeExp_highlow &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb21-2" title="2">gapminder07<span class="op">$</span>lifeExp_highlow[gapminder07<span class="op">$</span>lifeExp<span class="op">&gt;</span><span class="kw">mean</span>(gapminder07<span class="op">$</span>lifeExp)] &lt;-<span class="st"> &quot;High&quot;</span></a>
+<a class="sourceLine" id="cb21-3" title="3">gapminder07<span class="op">$</span>lifeExp_highlow[gapminder07<span class="op">$</span>lifeExp<span class="op">&lt;</span><span class="kw">mean</span>(gapminder07<span class="op">$</span>lifeExp)] &lt;-<span class="st"> &quot;Low&quot;</span></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="kw">table</span>(gapminder07<span class="op">$</span>lifeExp_highlow)</a></code></pre></div>
+<pre><code>## 
+## High  Low 
+##   85   57</code></pre>
+</section><section id="aggregating" class="slide level2">
+<h2>Aggregating</h2>
+<ul>
+<li class="fragment">Notice that the observations (i.e. rows) in our data frame are grouped; specifically, each country is grouped into a continent.</li>
+<li class="fragment">We are often interested in summary statistics by groups.</li>
+<li class="fragment">The <code>aggregate()</code> function accomplishes this: <code>aggregate(y ~ x, FUN = mean)</code> gives the mean of vector <code>y</code> for each unique group in <code>x</code>.
+<ul>
+<li class="fragment"><code>mean</code> can be replaced by other functions here, such as <code>median</code>.</li>
+</ul></li>
+<li class="fragment"><strong>Try it</strong>! In the exercise file, find the mean of life expectancy in 2007 for each continent.</li>
+</ul>
+</section><section id="aggregating-exercise" class="slide level2">
+<h2>Aggregating: exercise</h2>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw">aggregate</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>continent, <span class="dt">FUN =</span> mean)</a></code></pre></div>
+<pre><code>##   gapminder07$continent gapminder07$lifeExp
+## 1                Africa            54.80604
+## 2              Americas            73.60812
+## 3                  Asia            70.72848
+## 4                Europe            77.64860
+## 5               Oceania            80.71950</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw">aggregate</span>(lifeExp <span class="op">~</span><span class="st"> </span>continent, <span class="dt">data =</span> gapminder07, <span class="dt">FUN =</span> mean)</a></code></pre></div>
+<pre><code>##   continent  lifeExp
+## 1    Africa 54.80604
+## 2  Americas 73.60812
+## 3      Asia 70.72848
+## 4    Europe 77.64860
+## 5   Oceania 80.71950</code></pre>
+</section><section id="statistics" class="slide level2">
+<h2>Statistics</h2>
+<ul>
+<li class="fragment">Here are some easy statistical analyses to conduct in R
+<ul>
+<li class="fragment">Correlations: <code>cor()</code>; Covariance: <code>cov()</code></li>
+<li class="fragment">T-tests: <code>t.test(var1 ~ var2)</code>, where <code>var2</code> is the grouping variable</li>
+<li class="fragment">Linear regression: <code>lm(y ~ x1 + x2, data = df)</code></li>
+</ul></li>
+<li class="fragment">You can store the results of these functions in objects, which is especially useful for statistical models with many components.</li>
+</ul>
+</section><section id="statistics-exercise" class="slide level2">
+<h2>Statistics: exercise</h2>
+<p>Use <code>gapminder07</code> for all the below exercises.</p>
+<p><small>You’re using some new functions, so refer to help files whenever you get stuck.</small></p>
+<ul>
+<li>Calculate the correlation between <code>lifeExp</code> and <code>gdpPercap</code>.</li>
+<li>Use a t-test to evaluate the difference between <code>gdpPercap</code> in “high” and “low” life expectancy countries. Store the results as <code>t1</code>, and then print out <code>t1</code>.</li>
+</ul>
+</section><section id="statistics-exercise-1" class="slide level2">
+<h2>Statistics: exercise</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">cor</span>(gapminder07<span class="op">$</span>lifeExp, gapminder07<span class="op">$</span>gdpPercap)</a></code></pre></div>
+<pre><code>## [1] 0.6786624</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">t1 &lt;-<span class="st"> </span><span class="kw">t.test</span>(gapminder07<span class="op">$</span>gdpPercap<span class="op">~</span>gapminder07<span class="op">$</span>lifeExp_highlow)</a>
+<a class="sourceLine" id="cb29-2" title="2">t1 &lt;-<span class="st"> </span><span class="kw">t.test</span>(gdpPercap<span class="op">~</span>lifeExp_highlow, <span class="dt">data=</span>gapminder07)</a>
+<a class="sourceLine" id="cb29-3" title="3">t1</a></code></pre></div>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  gdpPercap by lifeExp_highlow
+## t = 10.564, df = 95.704, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  12674.02 18539.14
+## sample estimates:
+## mean in group High  mean in group Low 
+##          17944.685           2338.104</code></pre>
+<p><small>Note that <code>t1</code> is stored as a list. You can now call up the components of the t-test when you need them.</small></p>
+</section><section id="statistics-exercise-2" class="slide level2">
+<h2>Statistics: exercise</h2>
+<ul>
+<li>Conduct a linear regression using <code>lm()</code> which predicts <code>lifeExp</code> as a function of <code>gdpPercap</code> and <code>pop</code>. Store the results as <code>reg1</code>.
+<ul>
+<li>You can define all the variables using the <code>df$var</code> syntax, or you can just use variable names and identify the data frame in the <code>data =</code> argument.</li>
+<li>Examples are shown at the bottom of the help file for <code>lm()</code></li>
+</ul></li>
+<li>Print out <code>reg1</code>.</li>
+<li>Run <code>summary()</code> on <code>reg1</code>.</li>
+</ul>
+</section><section id="statistics-exercise-3" class="slide level2">
+<h2>Statistics: exercise</h2>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">reg1 &lt;-<span class="st"> </span><span class="kw">lm</span>(lifeExp <span class="op">~</span><span class="st"> </span>gdpPercap <span class="op">+</span><span class="st"> </span>pop, <span class="dt">data =</span> gapminder07)</a>
+<a class="sourceLine" id="cb31-2" title="2">reg1</a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = lifeExp ~ gdpPercap + pop, data = gapminder07)
+## 
+## Coefficients:
+## (Intercept)    gdpPercap          pop  
+##   5.921e+01    6.416e-04    7.001e-09</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="kw">summary</span>(reg1)</a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = lifeExp ~ gdpPercap + pop, data = gapminder07)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -22.496  -6.119   1.899   7.018  13.383 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 5.921e+01  1.040e+00  56.906   &lt;2e-16 ***
+## gdpPercap   6.416e-04  5.818e-05  11.029   &lt;2e-16 ***
+## pop         7.001e-09  5.068e-09   1.381    0.169    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 8.87 on 139 degrees of freedom
+## Multiple R-squared:  0.4679, Adjusted R-squared:  0.4602 
+## F-statistic: 61.11 on 2 and 139 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section></section>
+<section><section id="writing-files" class="title-slide slide level1"><h1>Writing files</h1></section><section id="writing-a-data-file" class="slide level2">
+<h2>Writing a data file</h2>
+<ul>
+<li class="fragment">We will often want to save the data frames as data files after cleaning/wrangling/etc.</li>
+<li class="fragment">You can use <code>write.csv()</code> from base R or <code>write_csv()</code> from <code>readr</code> to do this.</li>
+<li class="fragment"><strong>Try it!</strong> Save the data frame <code>gapminder07</code> to the “data” subfolder in your working directory using the <code>write.csv</code> function. Set the argument <code>row.names = FALSE</code>.</li>
+</ul>
+</section><section id="writing-a-data-file-exercise" class="slide level2">
+<h2>Writing a data file: exercise</h2>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">write.csv</span>(gapminder07, <span class="dt">file =</span> <span class="st">&quot;data/gapminder07.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+</section><section id="save-r-objects" class="slide level2">
+<h2>Save R objects</h2>
+<ul>
+<li class="fragment">You can save all objects in your workspace using <code>save.image()</code> or by clicking the “Save” icon in the Environment tab.
+<ul>
+<li class="fragment">You can load all objects back in using <code>load.image()</code> or opening the <code>.RData</code> file that is created.</li>
+<li class="fragment">You can save specific objects in an <code>.RData</code> file with the <code>save()</code> function.</li>
+</ul></li>
+<li class="fragment">If your script file is well-written, you should be able to retrieve all your objects just by running your code again.</li>
+<li class="fragment">If you have a project with code that takes a long time to run, I would recommend using project files.</li>
+</ul>
+</section></section>
+<section><section id="data-visualization" class="title-slide slide level1"><h1>Data visualization</h1></section><section id="base-r-vs.-ggplot2" class="slide level2">
+<h2>Base R vs. ggplot2</h2>
+<ul>
+<li class="fragment">We will only cover visualization briefly today, using some functions included in base R. Data scientists generally use other packages for data visualization, especially <code>ggplot2</code>, which we will cover on Day 7.</li>
+<li class="fragment">So why learn data visualization in base R?
+<ul>
+<li class="fragment">Some of the simple functions are useful ways to explore data while doing analysis.</li>
+<li class="fragment">The syntax of visualization in base R is often adopted by other packages.</li>
+</ul></li>
+</ul>
+</section><section id="histograms" class="slide level2">
+<h2>Histograms</h2>
+<ul>
+<li class="fragment">Histograms are a useful way to examine the distribution of a single variable. The base R function for histograms is simple: <code>hist()</code>.</li>
+<li class="fragment"><strong>Try it!</strong> Create a histogram of the variable <code>lifeExp</code> in <code>gapminder07</code>.
+<ul>
+<li class="fragment">When you’re done, look at the help file and try to re-create the histogram, this time with a title and axis labels.</li>
+<li class="fragment">Bonus: Change the <code>breaks =</code> argument from its default setting and see what happens.</li>
+</ul></li>
+</ul>
+</section><section id="histograms-exercise" class="slide level2">
+<h2>Histograms: exercise</h2>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="kw">hist</span>(gapminder07<span class="op">$</span>lifeExp, </a>
+<a class="sourceLine" id="cb36-2" title="2">     <span class="dt">main=</span><span class="st">&quot;Distribution of life expectancy across countries in 2007&quot;</span>, </a>
+<a class="sourceLine" id="cb36-3" title="3">     <span class="dt">xlab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Frequency&quot;</span>)</a></code></pre></div>
+<p><img src="day2_dataintro_slides_files/figure-revealjs/histograms-1.png" width="768" /></p>
+</section><section id="scatterplots" class="slide level2">
+<h2>Scatterplots</h2>
+<ul>
+<li class="fragment">You can create a scatterplot by providing a formula containing two variables (i.e. <code>y ~ x</code>) to the <code>plot()</code> function in R.</li>
+<li class="fragment">Titles and axis labels can be added in <code>plot()</code> similarly to <code>hist()</code>.</li>
+<li class="fragment">The function <code>abline()</code> can “layer” straight lines on top of a <code>plot()</code> output.</li>
+</ul>
+</section><section id="scatterplots-exercise" class="slide level2">
+<h2>Scatterplots: exercise</h2>
+<ul>
+<li>Create a scatterplot with <code>lifeExp</code> on the y-axis and <code>gdpPercap</code> on the x-axis.</li>
+<li>Add a title and axis labels.</li>
+<li>Bonus: Add a horizontal line indicating the mean of <code>lifeExp</code> onto the plot using <code>abline()</code>.</li>
+</ul>
+</section><section id="scatterplots-exercise-1" class="slide level2">
+<h2>Scatterplots: exercise</h2>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap)</a></code></pre></div>
+<p><img src="day2_dataintro_slides_files/figure-revealjs/scatterplot%201-1.png" width="768" /></p>
+</section><section id="scatterplots-exercise-2" class="slide level2">
+<h2>Scatterplots: exercise</h2>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,</a>
+<a class="sourceLine" id="cb38-2" title="2">     <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, </a>
+<a class="sourceLine" id="cb38-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)</a></code></pre></div>
+<p><img src="day2_dataintro_slides_files/figure-revealjs/scatterplot%202-1.png" width="768" /></p>
+</section><section id="scatterplots-exercise-3" class="slide level2">
+<h2>Scatterplots: exercise</h2>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,</a>
+<a class="sourceLine" id="cb39-2" title="2">     <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, </a>
+<a class="sourceLine" id="cb39-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)</a>
+<a class="sourceLine" id="cb39-4" title="4"><span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">mean</span>(gapminder07<span class="op">$</span>lifeExp))</a></code></pre></div>
+<p><img src="day2_dataintro_slides_files/figure-revealjs/scatterplot%203-1.png" width="768" /></p>
+</section></section>
+<section id="the-end" class="title-slide slide level1"><h1>The End!</h1></section>
+    </div>
+  </div>
+
+  <script src="day2_dataintro_slides_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="day2_dataintro_slides_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: false,
+        // Transition style
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'day2_dataintro_slides_files/reveal.js-3.3.0.1/plugin/notes/notes.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

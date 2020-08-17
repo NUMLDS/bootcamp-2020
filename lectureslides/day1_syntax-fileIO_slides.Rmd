@@ -1,0 +1,402 @@
+---
+title: 'Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files'
+author: "Kumar Ramanathan"
+date: "`r Sys.Date()`"
+output: 
+  revealjs::revealjs_presentation:
+    fig_height: 4
+    self_contained: false
+    reveal_plugins: ["notes"]
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# Introduction
+
+## Why R?
+
+> - R is flexible
+> - R is customizable
+> - R is open source
+> - R has a large community of users
+
+## RStudio and RStudio Server
+
+> - RStudio refers to both the company and the software
+> - RStudio is an integrated development environment (IDE) for R
+> - RStudio Server is a browser-based version of RStudio that runs on a remote Linux server
+> - We will be using RStudio today
+
+<aside class="notes">
+RStudio helps you organize your workflow and keep track of your work. 
+The top-left pane is where you open, work on, and save script files. 
+The bottom-left pane includes the console, which is where your code actually "runs".
+The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
+</aside>
+
+## Some key concepts
+
+You will hear these terms often this week:
+
+> - Objects
+> - Packages
+> - Functions
+> - Help files
+
+## Basics
+
+Some of you may have completed the *Introduction to R* course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, please help your classmates who did not have a chance to complete the course.
+
+The DataCamp course covered the following material:
+
+> - Arithmetic with R
+> - Objects and variable assignment
+> - Data types, incl.: character, numeric, logical, factors
+> - Data structures, incl.: vectors, matricies, data frames, lists
+
+<aside class="notes">
+Today, we will briefly review the above topics, and then turn to new material on reading and writing files, data manipulation, and data visualization.
+</aside>
+
+## Copy relevant folders
+
+We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2020 github repository.
+
+Let's walk through how to *fork* the repo to your GitHub account, and then *clone* it locally on your computer using the Git workflow within RStudio.
+
+# Basics and data types 
+
+## Arithmetic
+
+- `<-` is the assignment operator
+- Standard arithmetic operators work: `+`, `-`, `/`, `*`, `^`
+- To run an operation, you can hit Ctrl+Return (Windows) or Cmd+Return (Mac)
+
+## Arithmetic 
+
+```{r arith 1}
+y <- 5
+y
+y + 2
+```
+
+## Functions
+
+- Functions take inputs and return outputs, e.g. `log(10)` results in `2.302585`
+- Functions can also take arguments, e.g. `log(10, base=10)`
+- All functions have a help file that you can call up, e.g. `?log`
+
+## Functions 
+
+```{r arith 2}
+log(10)
+log(10, base=10)
+```
+
+## Arithmetic: exercise
+
+Open up the file `day1_syntax-fileIO_exercises.R` in RStudio. <br> Do the following tasks:
+
+- Pick a number; save it as `x`
+- Multiply x by 3
+- Take the log of the above <br><small>(Hint, you need the function `log()` here)</small>
+- Subtract 4 from the above
+- Square the above
+
+## Arithmetic: exercise
+
+```{r arithmetic}
+x <- 5
+x*3
+log(x*3)
+log(x*3)-4
+(log(x*3)-4)^2
+```
+
+## Comparisons and Logical Operators 
+
+- Common logical operators: 
+    - `==` (is equal)
+    - `!=` (not equal)
+    - `<` (greater than), `>` (less than)
+    - `&` (and), `|` (or)
+- If you evaluate statements with these operators, R will tell you if the statement is `TRUE` or `FALSE`
+
+## Comparisons and Logical Operators: exercise
+
+- Check if 1 is bigger than 2
+- Check if 1 + 1 is equal to 2
+- Check if it is true that the strings "eat" and "drink" are not equal to each other
+- Check if it is true that 1 is equal to 1 *AND* 1 is equal to 2 <br><small>(Hint: remember what the operators `&` and `|` do)</small>
+- Check if it is true that 1 is equal to 1 *OR* 1 is equal to 2
+
+## Comparisons and Logical Operators: exercise
+
+```{r comparisons}
+1 > 2
+(1 + 1) == 2
+"eat" != 'drink'
+(1==1) & (1==2)
+(1==1) | (1==2)
+```
+
+## Packages
+
+- Load the package `tidyverse` using the function `library()` <br><small>You may need to install it using `install.packages("tidyverse")` if you have not done so already</small>
+- Open the help file for the function `recode` <br><small>(Hint: remember what `?` does)</small>
+
+## Packages
+
+```{r packages, eval=F}
+library(tidyverse)
+
+?recode
+```
+
+Remember, if you need to install a package:
+
+```{r packages install, eval=F}
+install.packages("tidyverse")
+```
+
+## Data types
+
+> - **logical**: `TRUE` or `FALSE` <br><small>(When coerced into numeric type, `TRUE`=`1` and `FALSE`=`0`)</small>
+> - **integer**: a specific type; most numbers are numeric instead
+> - **numeric**: real or decimal 
+> - **complex**: ex: `2+5i`
+> - **character**: `"text data"`, denoted with quotes <br><small>(`'single quotes'` and `"double quotes"` both work)</small>
+> - Use `typeof()` on an object to check its type
+
+# Review: Data structures
+
+## Vectors
+
+> - Vectors store multiple values of a single data type
+> - Create a vector using the `c()` function
+> - Vectors are *homogenous*: each vector can only contain one data type
+> - Arithmetic operators and many functions can apply to vectors
+> - Vectors can be *indexed* by:
+>     - element position (`vec[1]`)
+>     - 'slice' position (`vec[1:3]`)
+>     - condition (`vec[vec>2]`).
+
+## Vectors
+
+```{r vectors example}
+example <- c(7,8,9)
+example[2]
+example[example>7]
+```
+
+## Vectors: exercise
+
+Return to the exercise file and complete the following tasks:
+
+- Run the code to generate variables `x1` and `x2`
+- Select the 3rd element in `x1` <br><small>Hint: use `[]`</small>
+- Select the elements of x1 that are less than 0
+- Select the elements of x2 that are greater than 1
+- Create x3 containing the first five elements of x2
+- Select all but the third element of x1
+
+## Vectors: exercise
+
+```{r vectors}
+set.seed(1234) 
+x1 <- rnorm(5)
+x2 <- rnorm(20, mean=0.5)
+x1[3]
+x1[x1 < 0]
+x2[x2 > 1]
+x3 <- x2[1:5]
+x1[-3]
+```
+
+## Interlude: Missing Values
+
+Variables in datasets sometimes include missing variables. In R, missing values are stored as `NA`. Vectors containing any data type can contain missing values. Functions deal with missing values differently, and sometimes require arguments to specify how to deal with missing values.
+
+```{r missing values}
+vec <- c(1, 8, NA, 7, 3)
+mean(vec)
+mean(vec, na.rm=TRUE)
+```
+
+## Interlude: Missing Values
+
+You can check if a vector contains missing values by the function `is.na()`. Since this returns a logical vector, you can use `sum()` or `mean()` on the result to count the number or proportion of `TRUE` values.
+
+```{r missing values 2}
+is.na(vec)
+sum(is.na(vec))
+mean(is.na(vec))
+```
+
+## Factors
+
+> - Factors are a special type of vector that are useful for categorical variables
+> - Factors have a limited number of *levels* that the variable can take, set by the user
+> - For categorical variables with natural ordering between categories, we often want to use *ordered factors*
+> - Create factors with `factor()`, which includes an argument for `levels = `
+
+<aside class="notes">
+We won't spend any more time reivewing factors today. If you need a refresher, check the lecture notes or review data camp. Each one tells you about factors from a different angle. The lecture notes focus on the utility of ordered factors, whereas data camp spends additional time on unordered factors.
+</aside>
+
+## Lists
+
+> - Lists are like vectors, but more complex.
+> - Lists are *heterogenous*: they can store single elements, vectors, or even lists.
+> - You can keep multi-dimensional and ragged data in R using lists.
+> - You can index an element in a list using double brackets: `[[1]]`. Single brackets will return the element as a list.
+
+<aside class="notes">
+For more on lists, see the lecture notes or data camp.
+</aside>
+
+## Matricies
+
+> - Matrices in R are two-dimensional arrays. 
+> - Matrices are *homogenous*: all values of a matrix must be of the same data type. 
+> - You can initialize a matrix using the `matrix()` function.
+> - Matrices are used sparingly in R, primarly for numerical calculations or explicit matrix manipulation.
+> - Matrices are indexed as follows: `mat[row no, col no]`.
+
+<aside class="notes">
+There is an example matrix for you to practice with in the exercises file, but we won't do it together.
+</aside>
+
+## Matricies
+
+```{r matrix}
+mat <- matrix(data=c(1,2,3,4,5,6,11,12,34), ncol=3)
+mat
+mat[1,]
+mat[1,3]
+```
+
+## Data frames
+
+> - Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.
+> - Data frames are *heterogenous*: the vectors in a data frames can each be of a different data type.
+> - Columns are typically variables and rows are observations.
+> - You can make make data frames with `data.frame()`, or by combining vectors with `cbind()` or `rbind()`.
+> - Data frames can be indexed in the same way as matricies: `df[row no, col no]`.
+> - Data frames can also be indexed by using variable/column names: `df$var` or `df["var"]`.
+
+## Data frames
+
+```{r data frames example}
+df <- data.frame(candidate=c("Biden","Warren","Sanders"), 
+                 poll=c(26,17,17), 
+                 age=c(76,70,78))
+df
+df[1,3]
+df$age
+df$age[df$candidate=="Biden"]
+df$poll_max <- df$poll+3
+df
+```
+
+## Data frames: exercise
+
+- Load the example data frame using the code provided
+- Identify the number of observations (rows) and number of variables (columns)
+- Identify the names of the variables
+- Select the variable `mpg`
+- Select the 4th row
+- Square the value of the `cyl` variable and store this as a new variable `cylsq`
+
+## Data frames: exercise
+
+```{r data frames setup, include = F}
+data(mtcars)
+```
+
+```{r data frames 1}
+dim(mtcars) # str(mtcars) also okay here
+names(mtcars)
+```
+
+```{r data frames 2, eval=F}
+mtcars$mpg
+```
+
+```{r data frames 3}
+mtcars[4,]
+mtcars$cylsq <- (mtcars$cyl)^2
+```
+
+# Break!
+
+Let's take a break and return to learn two new skills: **reading files** and basic **data manipulation**.
+
+# Roadmap
+
+## Roadmap for the rest of the R sessions
+
+- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
+- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
+- So why teach these skills in base R?
+    - This helps you understand how R works
+    - Many packages rely on how these tasks work in base R
+    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
+
+# Reading files
+
+## Working directories
+
+The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio's projects feature, your working directory is set already. Check where it is as follows:
+
+```{r}
+getwd()
+```
+
+If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the "More" menu. Or you can use the `setwd()` function.
+
+## Reading files: read.csv()
+
+```{r read.csv intro, eval=F}
+gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
+```
+
+```{r read.csv breakdown, eval=F}
+gapminder <- read.csv(file = "data/gapminder5.csv",
+                       sep = ",",
+                       stringsAsFactors = FALSE)
+```
+
+<aside class="notes">
+The above code is what you will usually see and use. The below code breaks down what is going on inside.
+</aside>
+
+## Reading files: exercise
+
+- Run the `read.csv()` code provided and see what happens in the Environment tab.
+- Load the `readr` package. 
+- Use `read_csv()` to load the gapminder data. Read the message generated in the console.
+
+## Reading files: exercise
+
+```{r read_csv, message=TRUE}
+library(readr)
+gapminder <- read_csv("data/gapminder5.csv")
+```
+
+## Reading files
+
+> - You can also read files from the full local path or from URLs
+> - You can read files using RStudio's interface through the "Files" tab
+> - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
+
+# The End!

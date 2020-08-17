@@ -1,0 +1,203 @@
+---
+title: "Day 4: Rmarkdown, Advanced Data Manipulation 1"
+author: "Richard Paquin Morel"
+date: "`r Sys.Date()`"
+output: revealjs::revealjs_presentation
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# Reporting analysis with Rmarkdown and GitHub
+
+## Rmarkdown & GitHub
+
+- Rmarkdown creates dynamic reports in HTML, PDF, and Word
+- Combine text (using the markdown language) and R code
+- Rmarkdown runs R code, compiles, and produces a report in chosen format
+- This presentation was created using Rmarkdown!
+
+## Day 1, Part 2 Exercise
+
+1) Open the `day4_Rmd-datamanip1_exercises.Rmd`
+2) Save as: `Day4Exercise_LastnameFirstname.Rmd`.
+2) Read in the gapminder data set
+3) As you answer questions, be sure to annotate your work with as much detail as possible!
+
+# Advanced data manipulation, part 1: reshaping and merging
+
+# Let's get set up
+
+## A new dataset
+
+California energy data
+
+- file names: `ca_energy_generation.csv` and `ca_energy_imports.csv`
+- Read these two files into your working environment
+    - They are in the "data" folder
+
+## Reading in the data
+
+```{r importing}
+library(here)
+library(readr)
+generation <- read.csv(here::here("data/ca_energy_generation.csv"), stringsAsFactors=F)
+imports <- read.csv(here::here("data/ca_energy_imports.csv"), stringsAsFactors=F)
+```
+
+## Exploring the data
+
+```{r explore data}
+str(generation)
+```
+
+## Dealing with dates and times
+
+- Notice that the first variable in both dataset is the called "datetime"
+- What class are these variables?
+
+```{r}
+class(generation$datetime)
+class(imports$datetime)
+```
+
+## Dealing with dates/times with `lubridate`
+
+- The best way to deal with date-time data is to use the `lubridate` package
+- You can convert character variables into datetime format using the `as_datetime` function
+    - One advantage of `readr::read_csv` is that it will often detect and convert datetime variables when importing
+
+```{r datetime}
+library(lubridate)
+generation$datetime <- as_datetime(generation$datetime)
+class(generation$datetime)
+head(generation$datetime)
+```
+
+## Dealing with dates/times with `lubridate`
+```{r}
+imports$datetime <- as_datetime(imports$datetime)
+class(imports$datetime)
+head(imports$datetime)
+```
+
+# Reshaping data
+
+## Wide versus long data
+
+- Principles of "tidy data" (_R for Data Science_ - Wickham & Grolemund)
+  1. Each variable must have its own column.
+  2. Each observation must have its own row.
+  3. Each value must have its own cell.
+- Often, we want to make wide data long (or tidy) for analysis
+
+![Wide vs long data; image from RStudio Data Wrangling cheat sheet](figures/widevslong.jpg)
+
+## Wide versus long data
+
+```{r wide data}
+head(generation)
+```
+
+
+## Using `reshape2`
+
+- `melt` --> make data long
+- `dcast` --> make data wide
+- `recast`--> melt then cast data
+
+## Reshaping CA energy data
+
+- Right now, the `generation` dataframe has several observations per row
+
+```{r untidy data}
+head(generation)
+```
+
+## `melt` the generation data
+
+`melt(df, id.vars = "id")`
+
+- Specify the variable that _doesn't_ melt with `id.vars`
+
+```{r melting}
+library(reshape2)
+long_gen <- melt(generation, id.vars = "datetime",
+                             variable.name = "source",
+                             value.name = "usage")
+head(long_gen)
+```
+
+## `melt` the generation data
+
+```{r reordering}
+head(long_gen[order(long_gen$datetime), ])
+```
+
+
+# Merging data
+
+## Merging CA energy data
+
+- Sometimes you have data from two (or more) sources that you want to analyze 
+- Need to merge these dataframes together
+- To merge, need to chose the columns that have common values between the dataframes
+  - Usually a variable with ids or years, or both
+  
+## Merging the `merge`
+
+`merge(x, y, by = c("id", "year"))`
+
+- Key arguments: 
+  - `x`: first dataframe
+  - `y`: second dataframe
+  - `by`: variables to match (must have common name)
+
+## More `merge` arguments
+
+```{r, eval = F}
+merge(x, y, by.x = "id", by.y = "cd", all.x = T, all.y = T)
+```
+
+- Advanced arguments:
+  - Use `by.x` and `by.y` if the dataframes have different variable names
+  - Use `all.x = T` if you want to keep all the observation in the first dataframe (unmatched observations in `y` are dropped!)
+  - Use `all.y = T` if you want to keep all observations in the second dataframe (umatched observations in `x` are dropped!)
+  - Use both (or, simply `all = T`) to keep all observations!
+  - By **default** R will drop unmatched observations from **both** dataframes!
+
+## Merge by `datetime`
+
+- Use `merge` to join the `generation` and `imports` dataframes, using the `datetime` variable to match
+
+## Merge by `datetime`
+
+- Always check your merge!
+
+```{r merge}
+merged_energy <- merge(generation, imports, by = "datetime")
+dim(merged_energy)
+head(merged_energy)
+```
+
+## Try reshaping the merged data!
+
+- Our merged dataframe is still wide and untidy
+  - Create a long version called `long_merged_energy`
+  - Take a peek to make sure the long version looks correct
+
+## Try reshaping the merged data!
+
+```{r melt exercise}
+long_merged_energy <- melt(merged_energy, id.vars = "datetime",
+                           variable.name = "source",
+                           value.name = "usage")
+head(long_merged_energy)
+```

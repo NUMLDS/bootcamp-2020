@@ -1,0 +1,295 @@
+---
+title: 'Day 2: Data Manipulation and Simple Visualization in R'
+author: "Kumar Ramanathan"
+date: "`r Sys.Date()`"
+output: 
+  revealjs::revealjs_presentation:
+    fig_height: 4
+    self_contained: false
+    reveal_plugins: ["notes"]
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+notes<-params$notes
+```
+
+# Data manipulation
+
+## Exploring data frames
+
+> - Remember: you can view data frames in RStudio with `View()` and examine other characteristics with `str()`, `dim()`, `names()`, `nrow()`, and more.
+> - When run on a data frame, `summary()` returns summary statistics for all variables.
+> - `mean()`, `median()`, `var()`, `sd()`, and `quantile()` operate as expected.
+> - Frequency tables are a simple and useful way to explore discrete/categorical variables in data frames
+>     - `table()` creates a frequency table of one or more variables
+>     - `prop.table()` can turn a frequency table into a proportion table
+
+<aside class="notes">
+Notice that any data frames which have been read in or created, like all other objects, can be seen in the environment
+</aside>
+
+## Exploring data frames: exercise
+
+- Reload the gapminder data from Day 1
+- Run `summary()` on the gapminder data
+- Find the mean of the variable `pop`
+- Create a frequency table of the variable, using `table()`
+- Create a proportion table of the variable `continent`, using `prop.table()` <br><small>(Hint: the input for `prop.table()` is the output of `table()`)</small>
+
+## Exploring data frames: exercise
+
+```{r read_csv, message=TRUE}
+library(readr)
+gapminder <- read_csv("data/gapminder5.csv")
+```
+
+```{r exploring data frames pt1}
+summary(gapminder)
+```
+
+## Exploring data frames: exercise
+
+```{r exploring data frames pt2}
+mean(gapminder$pop)
+table(gapminder$continent)
+prop.table(table(gapminder$continent))
+```
+
+## Subsetting
+
+> - One of the benefits of R is that we can work with multiple data frames at the same time
+> - We will often want to *subset* a data frame, i.e. work with a portion of the data frame
+> - There are two common ways to subset a data frame in base R
+>     - Index the data frame: `gapminder[gapminder$continent=="Asia",]`
+>     - Use the `subset()` function: `subset(gapminder, subset=continent=="Asia")`
+
+<aside class="notes">
+The most obvious use case of subsetting is to create and store smaller data frame, which we will do shortly. But think also about how useful it is to quickly subset a data frame: we can use subsets as inputs for statistical models, for example.
+</aside>
+
+## Sorting
+
+> - The `sort()` function reorders elements, in ascending order by default. 
+>     - You can flip the order by using the `decreasing = TRUE` argument.
+> - The `order()` function gives you the index positions in sorted order.
+> - `sort()` is useful for quickly viewing vectors; `order()` is useful for arranging data frames.
+
+## Subsetting and Sorting: exercise
+
+- Create a new data frame called `gapminder07` containing only those rows in the gapminder data where `year` is 2007
+- Created a sorted frequency table of the variable `continent` in `gapminder07` <br><small>(Hint: use `table()` and `sort()`)</small>
+- Print out the population of Mexico in 2007
+- Try the bonus question if you have time
+
+## Subsetting and Sorting: exercise
+
+```{r subsetting and sorting}
+gapminder07 <- subset(gapminder, subset = year==2007)
+sort(table(gapminder07$continent))
+gapminder07$pop[gapminder07$country=="Mexico"]
+head(gapminder07[order(gapminder07$pop, decreasing=TRUE),])
+```
+
+<aside class="notes">
+Don't worry too much about the bonus question if you find it confusing. The package `dplyr`, which we will cover on Thursday, will offer other ways to do this kind of task which some of you may find more intuitive.
+</aside>
+
+## Adding and removing columns
+
+When cleaning or wrangling datasets in RStudio, we will often want to create new variables. 
+
+Two ways to add a vector as a new variable in R:
+
+```{r adding columns, eval=F}
+gapminder$newvar <- newvar
+
+gapminder <- cbind(gapminder, newvar)
+```
+
+Removing columns is easy too:
+
+```{r removing columns, eval=F}
+gapminder$newvar <- NULL
+
+gapminder <- gapminder[-"newvar"]
+```
+
+## Recoding variables
+
+> - A common task when cleaning/wrangling data is recoding variables.
+> - Think about what the recoded variable should look like & then decide on an approach.
+>     - Sometimes, a single function can accomplish the recoding task needed. The new vector can then be assigned to a new column in the data frame.
+>     - If no single function comes to mind, we can initialize a new variable in the data frame, and assign values using indexes and conditional statements.
+>     - More complex recoding tasks can be accomplished with other packages like `dplyr`, which you can preview in the lecture notes.
+    
+## Recoding variables: exercise
+
+Use the data frame `gapminder07` throughout this exercise.
+
+- Round the values of the variable `lifeExp` using `round()`, and store this as a new variable `lifeExp_round`
+- Print out the new variable to see what it looks like
+- Read through the code that creates the new variable `lifeExp_over70` and try to understand what it does.
+- Try to create a new variable `lifeExp_highlow` that has the value "High" when life expectancy is over the mean and the value "Low" when it is below the mean.
+
+## Recoding variables: exercise
+
+```{r recoding variables}
+gapminder07$lifeExp_round <- round(gapminder07$lifeExp)
+head(gapminder07$lifeExp_round)
+gapminder07$lifeExp_highlow <- NA
+gapminder07$lifeExp_highlow[gapminder07$lifeExp>mean(gapminder07$lifeExp)] <- "High"
+gapminder07$lifeExp_highlow[gapminder07$lifeExp<mean(gapminder07$lifeExp)] <- "Low"
+table(gapminder07$lifeExp_highlow)
+```
+
+## Aggregating
+
+> - Notice that the observations (i.e. rows) in our data frame are grouped; specifically, each country is grouped into a continent.
+> - We are often interested in summary statistics by groups.
+> - The `aggregate()` function accomplishes this: `aggregate(y ~ x, FUN = mean)` gives the mean of vector `y` for each unique group in `x`. 
+>     - `mean` can be replaced by other functions here, such as `median`.
+> - **Try it**! In the exercise file, find the mean of life expectancy in 2007 for each continent.
+
+## Aggregating: exercise
+
+```{r aggregating pt 1}
+aggregate(gapminder07$lifeExp ~ gapminder07$continent, FUN = mean)
+```
+
+```{r aggregating pt 2}
+aggregate(lifeExp ~ continent, data = gapminder07, FUN = mean)
+```
+
+## Statistics
+
+> - Here are some easy statistical analyses to conduct in R
+>     - Correlations: `cor()`; Covariance: `cov()`
+>     - T-tests: `t.test(var1 ~ var2)`, where `var2` is the grouping variable
+>     - Linear regression: `lm(y ~ x1 + x2, data = df)`
+> - You can store the results of these functions in objects, which is especially useful for statistical models with many components.
+
+## Statistics: exercise
+
+Use `gapminder07` for all the below exercises. 
+
+<small>You're using some new functions, so refer to help files whenever you get stuck.</small>
+
+- Calculate the correlation between `lifeExp` and `gdpPercap`.
+- Use a t-test to evaluate the difference between `gdpPercap` in "high" and "low" life expectancy countries. Store the results as `t1`, and then print out `t1`.
+
+## Statistics: exercise
+
+```{r statistics pt 1}
+cor(gapminder07$lifeExp, gapminder07$gdpPercap)
+t1 <- t.test(gapminder07$gdpPercap~gapminder07$lifeExp_highlow)
+t1 <- t.test(gdpPercap~lifeExp_highlow, data=gapminder07)
+t1
+```
+
+<small>Note that `t1` is stored as a list. You can now call up the components of the t-test when you need them.</small>
+
+## Statistics: exercise
+
+- Conduct a linear regression using `lm()` which predicts `lifeExp` as a function of `gdpPercap` and `pop`. Store the results as `reg1`.
+    - You can define all the variables using the `df$var` syntax, or you can just use variable names and identify the data frame in the `data = ` argument.
+    - Examples are shown at the bottom of the help file for `lm()`
+- Print out `reg1`.
+- Run `summary()` on `reg1`.
+
+## Statistics: exercise
+
+```{r statistics pt 2}
+reg1 <- lm(lifeExp ~ gdpPercap + pop, data = gapminder07)
+reg1
+summary(reg1)
+```
+
+# Writing files
+
+## Writing a data file
+
+> - We will often want to save the data frames as data files after cleaning/wrangling/etc.
+> - You can use `write.csv()` from base R or `write_csv()` from `readr` to do this.
+> - **Try it!** Save the data frame `gapminder07` to the "data" subfolder in your working directory using the `write.csv` function. Set the argument `row.names = FALSE`.
+
+## Writing a data file: exercise
+
+```{r writing files, eval=F}
+write.csv(gapminder07, file = "data/gapminder07.csv", row.names = FALSE)
+```
+
+## Save R objects
+
+> - You can save all objects in your workspace using `save.image()` or by clicking the "Save" icon in the Environment tab. 
+>     - You can load all objects back in using `load.image()` or opening the `.RData` file that is created.
+>     - You can save specific objects in an `.RData` file with the `save()` function.
+> - If your script file is well-written, you should be able to retrieve all your objects just by running your code again.
+> - If you have a project with code that takes a long time to run, I would recommend using project files.
+
+# Data visualization
+
+## Base R vs. ggplot2
+
+> - We will only cover visualization briefly today, using some functions included in base R. Data scientists generally use other packages for data visualization, especially `ggplot2`, which we will cover on Day 7.
+> - So why learn data visualization in base R?
+>     - Some of the simple functions are useful ways to explore data while doing analysis.
+>     - The syntax of visualization in base R is often adopted by other packages.
+
+## Histograms
+
+> - Histograms are a useful way to examine the distribution of a single variable. The base R function for histograms is simple: `hist()`.
+> - **Try it!** Create a histogram of the variable `lifeExp` in `gapminder07`. 
+>     - When you're done, look at the help file and try to re-create the histogram, this time with a title and axis labels.
+>     - Bonus: Change the `breaks = ` argument from its default setting and see what happens.
+    
+## Histograms: exercise
+
+```{r histograms}
+hist(gapminder07$lifeExp, 
+     main="Distribution of life expectancy across countries in 2007", 
+     xlab="Life expectancy", ylab="Frequency")
+```
+
+## Scatterplots
+
+> - You can create a scatterplot by providing a formula containing two variables (i.e. `y ~ x`) to the `plot()` function in R. 
+> - Titles and axis labels can be added in `plot()` similarly to `hist()`.
+> - The function `abline()` can "layer" straight lines on top of a `plot()` output.
+
+## Scatterplots: exercise
+
+- Create a scatterplot with `lifeExp` on the y-axis and `gdpPercap` on the x-axis.
+- Add a title and axis labels.
+- Bonus: Add a horizontal line indicating the mean of `lifeExp` onto the plot using `abline()`.
+
+## Scatterplots: exercise
+
+```{r scatterplot 1}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap)
+```
+
+## Scatterplots: exercise
+
+```{r scatterplot 2}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
+     main="Relationship between life expectancy and GDP per capita in 2007", 
+     ylab="Life expectancy", xlab="GDP per capita")
+```
+
+## Scatterplots: exercise
+
+```{r scatterplot 3}
+plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
+     main="Relationship between life expectancy and GDP per capita in 2007", 
+     ylab="Life expectancy", xlab="GDP per capita")
+abline(h = mean(gapminder07$lifeExp))
+```
+
+# The End!
