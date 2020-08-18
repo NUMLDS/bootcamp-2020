@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
 
 <meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Richard Paquin Morel" />
 
-<meta name="date" content="2020-08-17" />
+<meta name="date" content="2020-08-18" />
 
 <title>Day 5: Avdanced data manipulation 2 - dplyr</title>
 
@@ -1405,7 +1406,6 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
-  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1434,12 +1434,6 @@ summary {
 }
 }
 
-@media print {
-.toc-content {
-  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
-  float: right;
-}
-}
 
 .toc-content {
   padding-left: 30px;
@@ -1512,16 +1506,13 @@ div.tocify {
 
 <h1 class="title toc-ignore">Day 5: Avdanced data manipulation 2 - dplyr</h1>
 <h4 class="author">Richard Paquin Morel</h4>
-<h4 class="date">2020-08-17</h4>
+<h4 class="date">2020-08-18</h4>
 
 </div>
 
 
-<div id="r-day-3---advanced-manipulation-and-dplyr" class="section level1">
-<h1>R Day 3 - Advanced manipulation and dplyr</h1>
-</div>
-<div id="dplyr" class="section level1">
-<h1>dplyr!</h1>
+<div id="test" class="section level1">
+<h1>test</h1>
 <div id="dplyr---an-idiosyncratic-approach-to-data-manipulation" class="section level2">
 <h2>dplyr - an idiosyncratic approach to data manipulation</h2>
 <ul>
@@ -1721,9 +1712,7 @@ long_merged_energy %&gt;%
   select(-datetime) %&gt;% 
   mutate(total_usage = rowSums(merged_energy, na.rm = T)) %&gt;% 
   summarize(total_usage = sum(total_usage, na.rm = T))</code></pre>
-<pre><code>## Error: Problem with `mutate()` input `total_usage`.
-## x &#39;x&#39; must be numeric
-## i Input `total_usage` is `rowSums(merged_energy, na.rm = T)`.</code></pre>
+<pre><code>## Error in rowSums(merged_energy, na.rm = T): 'x' must be numeric</code></pre>
 </div>
 <div id="try-piping" class="section level2">
 <h2>Try piping</h2>
@@ -1912,7 +1901,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
