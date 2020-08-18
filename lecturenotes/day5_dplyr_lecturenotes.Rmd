@@ -19,6 +19,8 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75, message 
 notes<-params$notes
 ```
 
+# test
+
 ## dplyr - an idiosyncratic approach to data manipulation
 
 - `dplyr` is an R package for data manipulation developed by Hadley Wickham with help from lots of other R developers
