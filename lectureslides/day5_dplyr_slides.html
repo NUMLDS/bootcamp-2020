@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
-  <meta name="author" content="Richard Paquin Morel, adapted by Kumar Ramanathan" />
-  <meta name="dcterms.date" content="2020-08-17" />
-  <title>Day 5: Avdanced data manipulation 2 - dplyr</title>
+  <meta name="author" content="Richard Paquin Morel, adapted by Kumar Ramanathan and Emilio Lehoucq" />
+  <meta name="dcterms.date" content="2020-08-18" />
+  <title>Day 5: Avdanced data manipulation 1 - dplyr</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -1102,7 +1102,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(title);
+  { content: attr(data-line-number);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -1831,46 +1831,26 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <div class="slides">
 
 <section>
-    <h1 class="title">Day 5: Avdanced data manipulation 2 - dplyr</h1>
-    <h2 class="author">Richard Paquin Morel, adapted by Kumar Ramanathan</h2>
-    <h3 class="date">2020-08-17</h3>
+    <h1 class="title">Day 5: Avdanced data manipulation 1 - dplyr</h1>
+    <h2 class="author">Richard Paquin Morel, adapted by Kumar Ramanathan and Emilio Lehoucq</h2>
+    <h3 class="date">2020-08-18</h3>
 </section>
 
-<section><section id="data-manipulation" class="title-slide slide level1"><h1>Data manipulation</h1></section><section id="two-approaches-to-data-manipulation" class="slide level2">
-<h2>Two approaches to data manipulation</h2>
-<ul>
-<li><span style="color:orange"><code>dplyr</code></span>, and <span style="color:blue"><code>data.table</code></span>, are two packages used to process data in tabular form</li>
-<li>it is useful to be familiar with both because:
-<ul>
-<li>answers to questions on stack overflow will often be presented in a <span style="color:orange"><code>dplyr</code></span> version and a <span style="color:blue"><code>data.table</code></span> version</li>
-<li>each is built around a different philosophy, so you can choose which suits you most
-<ul>
-<li><span style="color:orange"><code>dplyr</code></span>: chain together a few, simple functions</li>
-<li><span style="color:blue"><code>data.table</code></span>: compact, syntax-based commands</li>
-</ul></li>
-<li><span style="color:blue"><code>data.table</code></span> is much faster on large data (<span style="color:orange"><code>dplyr</code></span> is explicitly meant for small-to-medium data)</li>
-</ul></li>
-</ul>
-</section></section>
-<section><section id="dplyr" class="title-slide slide level1"><h1>dplyr!</h1></section><section id="dplyr---an-idiosyncratic-approach-to-data-manipulation" class="slide level2">
-<h2>dplyr - an idiosyncratic approach to data manipulation</h2>
-<ul>
-<li><code>dplyr</code> is an R package for data manipulation developed by Hadley Wickham with help from lots of other R developers</li>
-<li>See <a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a> for more guidance</li>
-<li>Principles: consistent syntax, meaningful naming conventions, fewer arguments/more functions</li>
-</ul>
-</section><section id="load-tidyverse" class="slide level2">
+<section id="load-tidyverse" class="slide level2">
 <h2>Load <code>tidyverse</code></h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
-</section><section id="dplyr-verbs" class="slide level2">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
+</section>
+<section id="dplyr-verbs" class="slide level2">
 <h2><code>dplyr</code> verbs</h2>
 <ul>
 <li><code>select</code> –&gt; subset variables</li>
 <li><code>filter</code> –&gt; subset observations based on conditions</li>
 <li><code>mutate</code> –&gt; add new variables</li>
+<li><code>transmute</code> –&gt; add new variables and drop existing ones</li>
 <li><code>summarize</code> –&gt; reduce multiple observations to a single value (e.g., find the mean)</li>
 </ul>
-</section><section id="trying-out-dplyr-verbs---select" class="slide level2">
+</section>
+<section id="trying-out-dplyr-verbs---select" class="slide level2">
 <h2>Trying out <code>dplyr</code> verbs - <code>select</code></h2>
 <ul>
 <li>select by name:
@@ -1890,32 +1870,37 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li><code>select(df, -gdpPercap)</code></li>
 </ul></li>
 </ul>
-</section><section id="reload-data-from-day-4---i-just-copied---may-want-this-in-an-rdata-or-csv-file-instead" class="slide level2">
+</section>
+<section id="reload-data-from-day-4---i-just-copied---may-want-this-in-an-rdata-or-csv-file-instead" class="slide level2">
 <h2>Reload data from Day 4 - I just copied - may want this in an RData or csv file instead</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(here)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(readr)</a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="kw">library</span>(reshape2)</a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="kw">library</span>(lubridate)</a>
-<a class="sourceLine" id="cb2-5" title="5"></a>
-<a class="sourceLine" id="cb2-6" title="6">generation &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/ca_energy_generation.csv&quot;</span>), <span class="dt">stringsAsFactors=</span>F)</a>
-<a class="sourceLine" id="cb2-7" title="7">imports &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/ca_energy_imports.csv&quot;</span>), <span class="dt">stringsAsFactors=</span>F)</a>
-<a class="sourceLine" id="cb2-8" title="8">generation<span class="op">$</span>datetime &lt;-<span class="st"> </span><span class="kw">as_datetime</span>(generation<span class="op">$</span>datetime)</a>
-<a class="sourceLine" id="cb2-9" title="9">imports<span class="op">$</span>datetime &lt;-<span class="st"> </span><span class="kw">as_datetime</span>(imports<span class="op">$</span>datetime)</a>
-<a class="sourceLine" id="cb2-10" title="10"></a>
-<a class="sourceLine" id="cb2-11" title="11">merged_energy &lt;-<span class="st"> </span><span class="kw">merge</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>)</a>
-<a class="sourceLine" id="cb2-12" title="12">long_merged_energy &lt;-<span class="st"> </span><span class="kw">melt</span>(merged_energy, <span class="dt">id.vars =</span> <span class="st">&quot;datetime&quot;</span>,</a>
-<a class="sourceLine" id="cb2-13" title="13">                           <span class="dt">variable.name =</span> <span class="st">&quot;source&quot;</span>,</a>
-<a class="sourceLine" id="cb2-14" title="14">                           <span class="dt">value.name =</span> <span class="st">&quot;usage&quot;</span>)</a></code></pre></div>
-</section><section id="trying-out-dplyr-verbs---select-1" class="slide level2">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(here)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">library</span>(readr)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">library</span>(reshape2)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">library</span>(lubridate)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">generation &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/ca_energy_generation.csv&quot;</span>), </a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">                       <span class="dt">stringsAsFactors=</span>F)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">imports &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/ca_energy_imports.csv&quot;</span>), </a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">                    <span class="dt">stringsAsFactors=</span>F)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">generation<span class="op">$</span>datetime &lt;-<span class="st"> </span><span class="kw">as_datetime</span>(generation<span class="op">$</span>datetime)</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">imports<span class="op">$</span>datetime &lt;-<span class="st"> </span><span class="kw">as_datetime</span>(imports<span class="op">$</span>datetime)</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">merged_energy &lt;-<span class="st"> </span><span class="kw">merge</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>)</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">long_merged_energy &lt;-<span class="st"> </span><span class="kw">melt</span>(merged_energy, <span class="dt">id.vars =</span> <span class="st">&quot;datetime&quot;</span>,</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">                           <span class="dt">variable.name =</span> <span class="st">&quot;source&quot;</span>,</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">                           <span class="dt">value.name =</span> <span class="st">&quot;usage&quot;</span>)</a></code></pre></div>
+</section>
+<section id="trying-out-dplyr-verbs---select-1" class="slide level2">
 <h2>Trying out <code>dplyr</code> verbs - <code>select</code></h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, biogas, biomass, geothermal, solar)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, biogas, biomass, geothermal, solar)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] &quot;biogas&quot;     &quot;biomass&quot;    &quot;geothermal&quot; &quot;solar&quot;</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, <span class="op">-</span>biogas, <span class="op">-</span>biomass, <span class="op">-</span>geothermal, <span class="op">-</span>solar)</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, <span class="op">-</span>biogas, <span class="op">-</span>biomass, <span class="op">-</span>geothermal, <span class="op">-</span>solar)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] &quot;datetime&quot;    &quot;coal&quot;        &quot;large_hydro&quot; &quot;natural_gas&quot; &quot;nuclear&quot;    
 ## [6] &quot;other&quot;       &quot;small_hydro&quot; &quot;wind&quot;        &quot;imports&quot;</code></pre>
-</section><section id="select-helpers" class="slide level2">
+</section>
+<section id="select-helpers" class="slide level2">
 <h2>select helpers</h2>
 <ul>
 <li>There are several “select helpers” that make subsetting variables very easy
@@ -1923,15 +1908,16 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li><code>one_of()</code>, <code>contains()</code>, <code>starts_with()</code>, <code>ends_with()</code>, <code>matches()</code></li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, <span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;bio&quot;</span>))</a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">select</span>(merged_energy, <span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;bio&quot;</span>))</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">names</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] &quot;large_hydro&quot; &quot;small_hydro&quot; &quot;biogas&quot;      &quot;biomass&quot;</code></pre>
-</section><section id="filter" class="slide level2">
+</section>
+<section id="filter" class="slide level2">
 <h2><code>filter</code></h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">filter</span>(merged_energy, imports <span class="op">&gt;</span><span class="st"> </span><span class="dv">7000</span>)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw">nrow</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">filter</span>(merged_energy, imports <span class="op">&gt;</span><span class="st"> </span><span class="dv">7000</span>)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">nrow</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] 78</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">head</span>(tmp)</a></code></pre></div>
 <pre><code>##              datetime   biogas  biomass      coal geothermal large_hydro
 ## 1 2019-09-03 00:00:00 238.9167 407.0833  9.000000   967.2500    3152.500
 ## 2 2019-09-03 02:00:00 239.0000 406.8333  9.000000   973.1667    2630.000
@@ -1946,12 +1932,13 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 4    7744.333 2242.833     0    382.0833  0.00000 2397.417 7421.667
 ## 5    8624.583 2242.833     0    395.9167  0.00000 2327.000 7511.667
 ## 6    9544.583 2244.833     0    407.5000 77.16667 2048.833 8172.667</code></pre>
-</section><section id="multiple-conditions-in-filter" class="slide level2">
+</section>
+<section id="multiple-conditions-in-filter" class="slide level2">
 <h2>multiple conditions in <code>filter</code></h2>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">filter</span>(merged_energy, imports <span class="op">&gt;</span><span class="st"> </span><span class="dv">7000</span>, natural_gas <span class="op">&lt;</span><span class="st"> </span><span class="dv">7000</span>)</a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="kw">nrow</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">filter</span>(merged_energy, imports <span class="op">&gt;</span><span class="st"> </span><span class="dv">7000</span>, natural_gas <span class="op">&lt;</span><span class="st"> </span><span class="dv">7000</span>)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">nrow</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] 20</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">head</span>(tmp)</a></code></pre></div>
 <pre><code>##              datetime   biogas  biomass     coal geothermal large_hydro
 ## 1 2019-09-07 03:00:00 240.1667 358.9167 9.166667   964.7500    2413.833
 ## 2 2019-09-07 06:00:00 238.8333 371.3333 8.500000   971.7500    2649.417
@@ -1966,13 +1953,14 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 4    5037.917 2254.000     0    403.3333  0.00000 3118.083 8658.583
 ## 5    4530.750 2255.583     0    385.0833  0.00000 2928.083 8806.583
 ## 6    4079.500 2257.500     0    377.5000  0.00000 2726.583 8887.167</code></pre>
-</section><section id="mutate" class="slide level2">
+</section>
+<section id="mutate" class="slide level2">
 <h2><code>mutate</code></h2>
 <ul>
 <li><code>mutate</code> creates new variables</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">mutate</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage))</a>
-<a class="sourceLine" id="cb17-2" title="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">mutate</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage))</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
 <pre><code>##              datetime source    usage log_usage
 ## 1 2019-09-03 00:00:00 biogas 238.9167  5.476115
 ## 2 2019-09-03 01:00:00 biogas 239.0000  5.476464
@@ -1980,10 +1968,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 4 2019-09-03 03:00:00 biogas 238.9167  5.476115
 ## 5 2019-09-03 04:00:00 biogas 237.9167  5.471920
 ## 6 2019-09-03 05:00:00 biogas 237.1667  5.468763</code></pre>
-</section><section id="mutate-1" class="slide level2">
+</section>
+<section id="mutate-1" class="slide level2">
 <h2><code>mutate</code></h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">mutate</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage), <span class="dt">usage2 =</span> usage<span class="op">^</span><span class="dv">2</span>, <span class="dt">usage3 =</span> usage<span class="op">^</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">mutate</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage), <span class="dt">usage2 =</span> usage<span class="op">^</span><span class="dv">2</span>, <span class="dt">usage3 =</span> usage<span class="op">^</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
 <pre><code>##              datetime source    usage log_usage   usage2   usage3
 ## 1 2019-09-03 00:00:00 biogas 238.9167  5.476115 57081.17 13637644
 ## 2 2019-09-03 01:00:00 biogas 239.0000  5.476464 57121.00 13651919
@@ -1991,37 +1980,69 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 4 2019-09-03 03:00:00 biogas 238.9167  5.476115 57081.17 13637644
 ## 5 2019-09-03 04:00:00 biogas 237.9167  5.471920 56604.34 13467116
 ## 6 2019-09-03 05:00:00 biogas 237.1667  5.468763 56248.03 13340157</code></pre>
-</section><section id="summarize" class="slide level2">
+</section>
+<section id="transmute" class="slide level2">
+<h2><code>transmute</code></h2>
+<ul>
+<li><code>transmute</code> creates new variables and keeps existing ones</li>
+</ul>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">transmute</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage))</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<pre><code>##   log_usage
+## 1  5.476115
+## 2  5.476464
+## 3  5.476464
+## 4  5.476115
+## 5  5.471920
+## 6  5.468763</code></pre>
+</section>
+<section id="transmute-1" class="slide level2">
+<h2><code>transmute</code></h2>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">transmute</span>(long_merged_energy, <span class="dt">log_usage =</span> <span class="kw">log</span>(usage), <span class="dt">usage2 =</span> usage<span class="op">^</span><span class="dv">2</span>, <span class="dt">usage3 =</span> usage<span class="op">^</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="kw">head</span>(tmp)</a></code></pre></div>
+<pre><code>##   log_usage   usage2   usage3
+## 1  5.476115 57081.17 13637644
+## 2  5.476464 57121.00 13651919
+## 3  5.476464 57121.00 13651919
+## 4  5.476115 57081.17 13637644
+## 5  5.471920 56604.34 13467116
+## 6  5.468763 56248.03 13340157</code></pre>
+</section>
+<section id="summarize" class="slide level2">
 <h2><code>summarize</code></h2>
 <p><code>summarize</code> reduces observations to a single value based on functions - <code>mean</code>, <code>sum</code>, <code>sd</code>, <code>min</code>, <code>max</code>, etc.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># total energy consumption</span></a>
-<a class="sourceLine" id="cb21-2" title="2"><span class="kw">summarize</span>(long_merged_energy, <span class="dt">total =</span> <span class="kw">sum</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co"># total energy consumption</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="kw">summarize</span>(long_merged_energy, <span class="dt">total =</span> <span class="kw">sum</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##     total
 ## 1 5223392</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co"># mean energy consumption</span></a>
-<a class="sourceLine" id="cb23-2" title="2"><span class="kw">summarize</span>(long_merged_energy, <span class="dt">mean_cons =</span> <span class="kw">mean</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="co"># mean energy consumption</span></a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">summarize</span>(long_merged_energy, <span class="dt">mean_cons =</span> <span class="kw">mean</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##   mean_cons
 ## 1  2590.968</code></pre>
-</section><section id="a-new-operator-the-pipe" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
 <ul>
 <li>The powerful <code>%&gt;%</code> operator lets you chain together functions</li>
 <li>It sends the result of one function to another function</li>
 <li>Read <code>%&gt;%</code> as “then”</li>
+<li><code>%&gt;%</code> increases the readability of your code</li>
+<li>Don’t chain more than ~10 lines of code</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="co"># take df then filter it then select these variables</span></a>
-<a class="sourceLine" id="cb25-2" title="2"><span class="co"># you do not need to repeat the name of the dataframe!</span></a>
-<a class="sourceLine" id="cb25-3" title="3">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-4" title="4"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-5" title="5"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb25-7" title="7"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_log_usage =</span> <span class="kw">mean</span>(log_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># take df then filter it then select these variables</span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="co"># you do not need to repeat the name of the dataframe!</span></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-6" data-line-number="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-7" data-line-number="7"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_log_usage =</span> <span class="kw">mean</span>(log_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##   mean_log_usage
 ## 1       6.872053</code></pre>
-</section><section id="a-new-operator-the-pipe-1" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe-1" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>)</a></code></pre></div>
 <pre><code>##                datetime     source    usage
 ## 1   2019-09-03 00:00:00 geothermal 967.2500
 ## 2   2019-09-03 01:00:00 geothermal 970.3333
@@ -2191,11 +2212,12 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 166 2019-09-09 21:00:00 geothermal 980.5833
 ## 167 2019-09-09 22:00:00 geothermal 980.5833
 ## 168 2019-09-09 23:00:00 geothermal 980.3333</code></pre>
-</section><section id="a-new-operator-the-pipe-2" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe-2" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb29-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb29-3" title="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime)</a></code></pre></div>
 <pre><code>##         source    usage
 ## 1   geothermal 967.2500
 ## 2   geothermal 970.3333
@@ -2365,12 +2387,13 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 166 geothermal 980.5833
 ## 167 geothermal 980.5833
 ## 168 geothermal 980.3333</code></pre>
-</section><section id="a-new-operator-the-pipe-3" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe-3" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb31-3" title="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb31-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage))</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb35-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage))</a></code></pre></div>
 <pre><code>##         source    usage log_usage
 ## 1   geothermal 967.2500  6.874457
 ## 2   geothermal 970.3333  6.877640
@@ -2540,42 +2563,32 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 166 geothermal 980.5833  6.888148
 ## 167 geothermal 980.5833  6.888148
 ## 168 geothermal 980.3333  6.887893</code></pre>
-</section><section id="a-new-operator-the-pipe-4" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe-4" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-2" title="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-3" title="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-5" title="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_log_usage =</span> <span class="kw">mean</span>(log_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(source <span class="op">==</span><span class="st"> &quot;geothermal&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">log_usage =</span> <span class="kw">log</span>(usage)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb37-5" data-line-number="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_log_usage =</span> <span class="kw">mean</span>(log_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##   mean_log_usage
 ## 1       6.872053</code></pre>
-</section><section id="a-new-operator-the-pipe-5" class="slide level2">
+</section>
+<section id="a-new-operator-the-pipe-5" class="slide level2">
 <h2>A new operator: the pipe <code>%&gt;%</code></h2>
 <ul>
 <li>While piping, the piped dataframe <em>is not changed</em>!</li>
 <li>To refer to the manipulated dataframe, use <code>.</code></li>
 </ul>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-2" title="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_usage =</span> <span class="kw">rowSums</span>(., <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb35-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">total_usage =</span> <span class="kw">sum</span>(total_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_usage =</span> <span class="kw">rowSums</span>(., <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">total_usage =</span> <span class="kw">sum</span>(total_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##   total_usage
 ## 1     5223392</code></pre>
-</section><section id="a-new-operator-the-pipe-6" class="slide level2">
-<h2>A new operator: the pipe <code>%&gt;%</code></h2>
-<ul>
-<li>While piping, the piped dataframe <em>is not changed</em>!</li>
-<li>To refer to the manipulated dataframe, use <code>.</code></li>
-</ul>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-2" title="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>datetime) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_usage =</span> <span class="kw">rowSums</span>(merged_energy, <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb37-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">total_usage =</span> <span class="kw">sum</span>(total_usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
-<pre><code>## Error: Problem with `mutate()` input `total_usage`.
-## x &#39;x&#39; must be numeric
-## i Input `total_usage` is `rowSums(merged_energy, na.rm = T)`.</code></pre>
-</section><section id="try-piping" class="slide level2">
-<h2>Try piping</h2>
+</section>
+<section id="exercise-1" class="slide level2">
+<h2>Exercise 1</h2>
 <ul>
 <li>Using the (wide) merged CA energy data <code>merged_energy</code> do the following with pipes:
 <ol type="1">
@@ -2584,15 +2597,17 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>Find the mean usage for <code>total_hydro</code></li>
 </ol></li>
 </ul>
-</section><section id="try-piping-1" class="slide level2">
-<h2>Try piping</h2>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb39-2" title="2"><span class="st">  </span><span class="kw">select</span>(<span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb39-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_hydro =</span> <span class="kw">rowSums</span>(., <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb39-4" title="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_hydro =</span> <span class="kw">mean</span>(total_hydro, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+</section>
+<section id="solution-exercise-1" class="slide level2">
+<h2>Solution exercise 1</h2>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(<span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total_hydro =</span> <span class="kw">rowSums</span>(., <span class="dt">na.rm =</span> T)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb41-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_hydro =</span> <span class="kw">mean</span>(total_hydro, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>##   mean_hydro
 ## 1   3387.702</code></pre>
-</section><section id="group_by-and-summarize" class="slide level2">
+</section>
+<section id="group_by-and-summarize" class="slide level2">
 <h2><code>group_by</code> and <code>summarize</code></h2>
 <ul>
 <li><code>group_by</code> is a powerful function that allows us to perform operations by groups of observations!
@@ -2600,9 +2615,9 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>Very useful with summarize!</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb41-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb41-3" title="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sum_usage =</span> <span class="kw">sum</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">long_merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sum_usage =</span> <span class="kw">sum</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>## # A tibble: 12 x 2
 ##    source      sum_usage
 ##    &lt;fct&gt;           &lt;dbl&gt;
@@ -2618,20 +2633,22 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 10 solar         660315.
 ## 11 wind          440125.
 ## 12 imports      1122687.</code></pre>
-</section><section id="group_by-versus-for-loops" class="slide level2">
+</section>
+<section id="group_by-versus-for-loops" class="slide level2">
 <h2><code>group_by</code> versus <code>for</code> loops</h2>
 <ul>
-<li>Remember the <code>for</code> loop we wrote yesterday to find the mean life expectancy by year?</li>
+<li>Remember the <code>for</code> loop we wrote to find the mean life expectancy by year?</li>
 <li>MUCH better in <code>dplyr</code></li>
 </ul>
-</section><section id="group_by-versus-for-loops-1" class="slide level2">
+</section>
+<section id="group_by-versus-for-loops-1" class="slide level2">
 <h2><code>group_by</code> versus <code>for</code> loops</h2>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>))</a>
-<a class="sourceLine" id="cb43-2" title="2"></a>
-<a class="sourceLine" id="cb43-3" title="3">gapminder <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb43-4" title="4"><span class="st">  </span><span class="kw">group_by</span>(year) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb43-5" title="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_le =</span> <span class="kw">mean</span>(lifeExp, <span class="dt">na.rm =</span> T),</a>
-<a class="sourceLine" id="cb43-6" title="6">            <span class="dt">sd_lf =</span> <span class="kw">sd</span>(lifeExp, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb45-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb45-3" data-line-number="3">gapminder <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb45-4" data-line-number="4"><span class="st">  </span><span class="kw">group_by</span>(year) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb45-5" data-line-number="5"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_le =</span> <span class="kw">mean</span>(lifeExp, <span class="dt">na.rm =</span> T),</a>
+<a class="sourceLine" id="cb45-6" data-line-number="6">            <span class="dt">sd_lf =</span> <span class="kw">sd</span>(lifeExp, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>## # A tibble: 12 x 3
 ##     year mean_le sd_lf
 ##    &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt;
@@ -2647,21 +2664,23 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 10  1997    65.0  11.6
 ## 11  2002    65.7  12.3
 ## 12  2007    67.0  12.1</code></pre>
-</section><section id="find-the-mean-by-source" class="slide level2">
-<h2>Find the mean by source</h2>
+</section>
+<section id="exercise-2" class="slide level2">
+<h2>Exercise 2</h2>
 <ul>
 <li>Use your knowledge of <code>dplyr</code> to find the mean usage for small hydro, large hydro, biogas, and biomass</li>
 <li>Start with either the wide or long merged dataset</li>
 </ul>
-</section><section id="find-the-mean-by-source-1" class="slide level2">
-<h2>Find the mean by source</h2>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb45-2" title="2"><span class="st">  </span><span class="kw">select</span>(datetime, <span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>), <span class="kw">contains</span>(<span class="st">&quot;bio&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb45-3" title="3"><span class="st">  </span><span class="kw">melt</span>(<span class="dt">id.vars =</span> <span class="st">&quot;datetime&quot;</span>,</a>
-<a class="sourceLine" id="cb45-4" title="4">       <span class="dt">variable.name =</span> <span class="st">&quot;source&quot;</span>,</a>
-<a class="sourceLine" id="cb45-5" title="5">       <span class="dt">value.name =</span> <span class="st">&quot;usage&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb45-6" title="6"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb45-7" title="7"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_usage =</span> <span class="kw">mean</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
+</section>
+<section id="solution-to-exercise-2" class="slide level2">
+<h2>Solution to exercise 2</h2>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">merged_energy <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(datetime, <span class="kw">contains</span>(<span class="st">&quot;hydro&quot;</span>), <span class="kw">contains</span>(<span class="st">&quot;bio&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-3" data-line-number="3"><span class="st">  </span><span class="kw">melt</span>(<span class="dt">id.vars =</span> <span class="st">&quot;datetime&quot;</span>,</a>
+<a class="sourceLine" id="cb47-4" data-line-number="4">       <span class="dt">variable.name =</span> <span class="st">&quot;source&quot;</span>,</a>
+<a class="sourceLine" id="cb47-5" data-line-number="5">       <span class="dt">value.name =</span> <span class="st">&quot;usage&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-6" data-line-number="6"><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-7" data-line-number="7"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_usage =</span> <span class="kw">mean</span>(usage, <span class="dt">na.rm =</span> T))</a></code></pre></div>
 <pre><code>## # A tibble: 4 x 2
 ##   source      mean_usage
 ##   &lt;fct&gt;            &lt;dbl&gt;
@@ -2669,7 +2688,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 2 small_hydro       419.
 ## 3 biogas            235.
 ## 4 biomass           374.</code></pre>
-</section><section id="merging-in-dplyr-with-_join-functions" class="slide level2">
+</section>
+<section id="merging-in-dplyr-with-_join-functions" class="slide level2">
 <h2>Merging in <code>dplyr</code> with <code>*_join</code> functions</h2>
 <ul>
 <li><code>dplyr</code>’s philosophy is to have more functions with fewer options
@@ -2692,15 +2712,16 @@ document.getElementsByTagName('head')[0].appendChild(style);
 </ul></li>
 </ul></li>
 </ul>
-</section><section id="comparing-merge-and-inner_join" class="slide level2">
+</section>
+<section id="comparing-merge-and-inner_join" class="slide level2">
 <h2>Comparing <code>merge</code> and <code>inner_join</code></h2>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">merge</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>, <span class="dt">all =</span> F)</a>
-<a class="sourceLine" id="cb47-2" title="2"><span class="kw">dim</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">merge</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>, <span class="dt">all =</span> F)</a>
+<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="kw">dim</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] 168  13</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">tmp &lt;-<span class="st"> </span><span class="kw">inner_join</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>)</a>
-<a class="sourceLine" id="cb49-2" title="2"><span class="kw">dim</span>(tmp)</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">inner_join</span>(generation, imports, <span class="dt">by =</span> <span class="st">&quot;datetime&quot;</span>)</a>
+<a class="sourceLine" id="cb51-2" data-line-number="2"><span class="kw">dim</span>(tmp)</a></code></pre></div>
 <pre><code>## [1] 168  13</code></pre>
-</section></section>
+</section>
     </div>
   </div>
 

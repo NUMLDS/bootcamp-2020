@@ -1,6 +1,6 @@
 ---
-title: "Day 5:  Avdanced data manipulation 2 - dplyr"
-author: "Richard Paquin Morel"
+title: "Day 5:  Advanced data manipulation 1 - dplyr"
+author: "Richard Paquin Morel and Emilio Lehoucq"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -19,10 +19,6 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75, message 
 notes<-params$notes
 ```
 
-# R Day 3 - Advanced manipulation and dplyr
-
-# dplyr!
-
 ## dplyr - an idiosyncratic approach to data manipulation
 
 - `dplyr` is an R package for data manipulation developed by Hadley Wickham with help from lots of other R developers
@@ -31,9 +27,10 @@ notes<-params$notes
 
 ## `dplyr` verbs
 
-- `select` --> subset variables
-- `filter` --> subset observations based on conditions
-- `mutate` --> add new variables
+- `select` --> subset variables/columns
+- `filter` --> subset observations/rows based on conditions
+- `mutate` --> add new variables and keep existing ones
+- `transmute` --> add new variables and drop existing ones
 - `summarize` --> reduce multiple observations to a single value (e.g., find the mean)
 
 
@@ -48,7 +45,7 @@ notes<-params$notes
 - drop variables with `-`
   - `select(df, -gdpPercap)`
 
-## Reload data from Day 4 - I just copied - may want this in an RData or csv file instead
+## Reload previous data 
 
 ```{r importing}
 library(here)
@@ -105,7 +102,7 @@ head(tmp)
 
 ## `mutate`
 
-- `mutate` creates new variables
+- `mutate` creates new variables and keeps existing ones
 
 ```{r mutate}
 tmp <- mutate(long_merged_energy, log_usage = log(usage))
@@ -116,6 +113,22 @@ head(tmp)
 
 ```{r multi mutate}
 tmp <- mutate(long_merged_energy, log_usage = log(usage), usage2 = usage^2, usage3 = usage^3)
+head(tmp)
+```
+
+## `transmute`
+
+- `transmute` creates new variables and keeps existing ones
+
+```{r transmute}
+tmp <- transmute(long_merged_energy, log_usage = log(usage))
+head(tmp)
+```
+
+## `transmute`
+
+```{r multi transmute}
+tmp <- transmute(long_merged_energy, log_usage = log(usage), usage2 = usage^2, usage3 = usage^3)
 head(tmp)
 ```
 
@@ -137,6 +150,8 @@ summarize(long_merged_energy, mean_cons = mean(usage, na.rm = T))
 - The powerful `%>%` operator lets you chain together functions
 - It sends the result of one function to another function
 - Read `%>%` as "then"
+- `%>%` increases the readability of your code
+- Don't chain more than ~10 lines of code
 
 ```{r introducing the pipe}
 # take df then filter it then select these variables
@@ -161,26 +176,14 @@ merged_energy %>%
   summarize(total_usage = sum(total_usage, na.rm = T))
 ```
 
-## A new operator: the pipe `%>%`
-
-- While piping, the piped dataframe _is not changed_!
-- To refer to the manipulated dataframe, use `.`
-
-```{r oops, error = T}
-merged_energy %>% 
-  select(-datetime) %>% 
-  mutate(total_usage = rowSums(merged_energy, na.rm = T)) %>% 
-  summarize(total_usage = sum(total_usage, na.rm = T))
-```
-
-## Try piping
+## Exercise 1
 
 - Using the (wide) merged CA energy data `merged_energy` do the following with pipes:
   1. Select variables that contain the word "hydro"
   2. Create a new variable called `total_hydro` that is the sum of the retained hydro variables
   3. Find the mean usage for `total_hydro`
 
-## Try piping
+## Solution to exercise 1
 
 ```{r exercise}
 merged_energy %>% 
@@ -202,7 +205,7 @@ long_merged_energy %>%
 
 ## `group_by` versus `for` loops
 
-- Remember the `for` loop we wrote yesterday to find the mean life expectancy by year?
+- Remember the `for` loop we wrote to find the mean life expectancy by year?
 - MUCH better in `dplyr`
 
 ## `group_by` versus `for` loops
@@ -216,12 +219,12 @@ gapminder %>%
             sd_lf = sd(lifeExp, na.rm = T))
 ```
 
-## Find the mean by source
+## Exercise 2
 
 - Use your knowledge of `dplyr` to find the mean usage for small hydro, large hydro, biogas, and biomass
 - Start with either the wide or long merged dataset
 
-## Find the mean by source
+## Solution to exercise 2
 
 ```{r exercise grouping}
 merged_energy %>% 
