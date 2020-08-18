@@ -1,0 +1,97 @@
+---
+title: "Data visualization with ggplot2	 - exercises"
+author: "Emilio Lehoucq"
+date: "`r Sys.Date()`"
+output: html_document
+params:
+    answers: TRUE
+---
+
+
+```{r, echo=FALSE, eval=TRUE}
+answers<-params$answers
+```
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo=answers, eval=answers,
+                      warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+# Load the data
+
+Load the gapminder data.
+
+```{asis}
+### Answer 
+```
+
+```{r}
+gapminder <- read.csv(here::here("data/gapminder5.csv"))
+```
+
+# Bringing skills together: histogram
+
+1. Do a histogram of population
+
+```{asis}
+### Answer 
+```
+
+2. Adjust the number of bins to visualize the data more meaningfully.
+
+```{asis}
+### Answer 
+```
+
+3. Plot the proportion instead of the count on the y axis.
+
+```{asis}
+### Answer 
+```
+
+4. Change the titles for the axes, add a title for the graph, and add a caption for the source of the data
+
+```{asis}
+### Answer 
+```
+
+5. Center the title and write it in bold letter
+
+```{asis}
+### Answer 
+```
+
+6. Change the background to black and white and drop the border around the graph
+
+```{asis}
+### Answer 
+```
+
+7. Display numbers in standard form rather than scientific notation
+
+```{asis}
+### Answer 
+```
+
+# Grouped data
+
+1. Facet the histogram created in the previous histogram by continent.
+
+```{asis}
+### Answer 
+```
+
+2. Plot the evolution of the population per continent over time
+
+```{asis}
+### Answer 
+```
+
+# Challenge
+
+Reconstruct [this](https://github.com/emiliolehoucq/bootcamp-2020/blob/master/exercises/challenge_day7.png) graph.
+
+```{asis}
+### Answer 
+```

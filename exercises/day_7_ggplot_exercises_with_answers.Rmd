@@ -1,0 +1,198 @@
+---
+title: "Data visualization with ggplot2	 - exercises"
+author: "Emilio Lehoucq"
+date: "`r Sys.Date()`"
+output: html_document
+params:
+    answers: TRUE
+---
+
+
+```{r, echo=FALSE, eval=TRUE}
+answers<-params$answers
+```
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo=answers, eval=answers,
+                      warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+# Load the data
+
+Load the gapminder data.
+
+```{asis}
+### Answer 
+```
+
+```{r}
+gapminder <- read.csv(here::here("data/gapminder5.csv"))
+```
+
+# Bringing skills together: histogram
+
+1. Do a histogram of population
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder) +
+    geom_histogram(aes(pop))
+```
+
+2. Adjust the number of bins to visualize the data more meaningfully.
+
+```{asis}
+### Answer 
+```
+
+
+```{r}
+ggplot(gapminder) +
+    geom_histogram(aes(pop), bins = 15)
+```
+
+3. Plot the proportion instead of the count on the y axis.
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 20)
+```
+
+4. Change the titles for the axes, add a title for the graph, and add a caption for the source of the data
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 20) +
+      labs(title="Population of world countries", caption="Source: Gapminder", x="Population", y="Proportion of countries")
+```
+
+5. Center the title and write it in bold letter
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 20) +
+      labs(title="Population of world countries", caption="Source: Gapminder", x="Population", y="Proportion of countries") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"))
+```
+
+6. Change the background to black and white and drop the border around the graph
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 20) +
+      labs(title="Population of world countries", caption="Source: Gapminder", x="Population", y="Proportion of countries") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+7. Display numbers in standard form rather than scientific notation
+
+```{asis}
+### Answer 
+```
+
+```{r}
+library(scales)
+
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 25) +
+      labs(title="Population of world countries", caption="Source: Gapminder", x="Population", y="Proportion of countries") +
+    scale_x_continuous(labels = comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+# Grouped data
+
+1. Facet the histogram created in the previous histogram by continent.
+
+```{asis}
+### Answer 
+```
+
+```{r}
+ggplot(gapminder, aes(pop)) +
+    geom_histogram(aes(y = (..count..)/sum(..count..)), bins = 25) +
+    labs(title="Population of world countries", caption="Source: Gapminder", x="Population", y="Proportion of countries") +
+    facet_wrap(~continent) +
+    scale_x_continuous(labels = comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+2. Plot the evolution of the population per continent over time
+
+```{asis}
+### Answer 
+```
+
+```{r}
+gapminder %>% 
+    group_by(year, continent) %>% 
+    mutate(population = sum(pop)) %>% 
+    ggplot() +
+    geom_line(aes(x = year, y = population)) +
+    facet_wrap(~continent) +
+    scale_y_continuous(labels = comma) +
+    labs(title="Population of continents over time", caption="Source: Gapminder", x="Year", y="Population") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+gapminder %>% 
+    group_by(year, continent) %>% 
+    mutate(population = sum(pop)) %>% 
+    ggplot() +
+    geom_line(aes(x = year, y = population, color = continent)) +
+    scale_y_continuous(labels = comma) +
+    labs(title="Population of continents over time", caption="Source: Gapminder", x="Year", y="Population") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+# Challenge
+
+Reconstruct this graph.
+
+```{asis}
+### Answer 
+```
+
+```{r}
+gapminder %>% 
+    filter(country %in% c("China", "India", "Japan", "Hong Kong China", "Malaysia", "Taiwan", "Vietnam", "Indonesia", "Nepal")) %>% 
+    ggplot(aes(gdpPercap, lifeExp)) +
+    geom_point(size = 0.3) +
+    geom_smooth(colour="black", size=0.5) +
+    facet_wrap(~country) +
+    labs(title="Life expectancy against GDP per capita in a sample of Asian countries", caption="Source: Gapminder", y="Life expectancy",
+         x="GDP per capita") +
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5), panel.border = element_blank(), strip.background = element_rect(colour="white", fill="white"))
+```
