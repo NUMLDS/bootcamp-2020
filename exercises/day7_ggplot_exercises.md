@@ -1,6 +1,6 @@
 ## Day 7: Data visualization with ggplot - Exercises
 
-This document contains the instructions for exercises during the Day 3: ggplot session, drawn from the slides. Suggested answers are included in the [slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-ggplot_slides_kr#/).
+This document contains the instructions for exercises during the ggplot2 session, drawn from the slides. Suggested answers are included in the [slides](https://msia.github.io/bootcamp-2018/lectureslides/day3_R-ggplot_slides_kr#/).
 
 ### Exercise 1: Scatterplot
 
