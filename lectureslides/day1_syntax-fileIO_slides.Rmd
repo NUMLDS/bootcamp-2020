@@ -1,6 +1,6 @@
 ---
 title: 'Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files'
-author: "Kumar Ramanathan"
+author: "Amanda Sahar d'Urso (materials from: K. Ramanathan)"
 date: "`r Sys.Date()`"
 output: 
   revealjs::revealjs_presentation:
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, include=FALSE}
-notes<-params$notes
+notes <- params$notes
 ```
 
 # Introduction
@@ -39,7 +39,7 @@ notes<-params$notes
 <aside class="notes">
 RStudio helps you organize your workflow and keep track of your work. 
 The top-left pane is where you open, work on, and save script files. 
-The bottom-left pane includes the console, which is where your code actually "runs".
+The bottom-left pane includes the console, which is where your code actually "runs" but is not saved.
 The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
 </aside>
 
@@ -54,7 +54,7 @@ You will hear these terms often this week:
 
 ## Basics
 
-Some of you may have completed the *Introduction to R* course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, please help your classmates who did not have a chance to complete the course.
+Some of you may have completed the *Introduction to R* course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, you can work on exercises as we try to keep pace with those who may not have completed the course. 
 
 The DataCamp course covered the following material:
 
@@ -74,6 +74,29 @@ We will be working on some exercises and using data files in the next few hours.
 Let's walk through how to *fork* the repo to your GitHub account, and then *clone* it locally on your computer using the Git workflow within RStudio.
 
 # Basics and data types 
+
+## Best coding practices 
+
+> - *always* use \`<-\` as your assignment mechanism, *not* \`=\`
+> - *always* use spaces between operators
+> - *never* have R save your environment upon exit (via global options)
+> - *never* write code that, when shared, changes someone else's machine
+
+## Don't do this: 
+
+```{r not this example, eval = F}
+install.packages("tidyverse")
+
+y=1+1
+```
+
+## Do this:
+
+```{r do this example, eval = F}
+library(tidyverse)
+
+y <- 1 + 1
+```
 
 ## Arithmetic
 
@@ -112,24 +135,26 @@ Open up the file `day1_syntax-fileIO_exercises.R` in RStudio. <br> Do the follow
 - Subtract 4 from the above
 - Square the above
 
+
 ## Arithmetic: exercise
 
 ```{r arithmetic}
 x <- 5
 x*3
 log(x*3)
-log(x*3)-4
-(log(x*3)-4)^2
+log(x*3) - 4
+(log(x*3) - 4)^2
 ```
 
 ## Comparisons and Logical Operators 
 
-- Common logical operators: 
+> - Common logical operators: 
     - `==` (is equal)
     - `!=` (not equal)
     - `<` (greater than), `>` (less than)
     - `&` (and), `|` (or)
-- If you evaluate statements with these operators, R will tell you if the statement is `TRUE` or `FALSE`
+
+> - If you evaluate statements with these operators, R will tell you if the statement is `TRUE` or `FALSE`
 
 ## Comparisons and Logical Operators: exercise
 
@@ -145,8 +170,8 @@ log(x*3)-4
 1 > 2
 (1 + 1) == 2
 "eat" != 'drink'
-(1==1) & (1==2)
-(1==1) | (1==2)
+(1 == 1) & (1 == 2)
+(1 == 1) | (1 == 2)
 ```
 
 ## Packages
@@ -182,7 +207,7 @@ install.packages("tidyverse")
 ## Vectors
 
 > - Vectors store multiple values of a single data type
-> - Create a vector using the `c()` function
+> - Create a vector using the \`c()\` function
 > - Vectors are *homogenous*: each vector can only contain one data type
 > - Arithmetic operators and many functions can apply to vectors
 > - Vectors can be *indexed* by:
@@ -193,9 +218,9 @@ install.packages("tidyverse")
 ## Vectors
 
 ```{r vectors example}
-example <- c(7,8,9)
+example <- c(7, 8, 9)
 example[2]
-example[example>7]
+example[example > 7]
 ```
 
 ## Vectors: exercise
@@ -214,7 +239,7 @@ Return to the exercise file and complete the following tasks:
 ```{r vectors}
 set.seed(1234) 
 x1 <- rnorm(5)
-x2 <- rnorm(20, mean=0.5)
+x2 <- rnorm(20, mean = 0.5)
 x1[3]
 x1[x1 < 0]
 x2[x2 > 1]
@@ -229,7 +254,7 @@ Variables in datasets sometimes include missing variables. In R, missing values 
 ```{r missing values}
 vec <- c(1, 8, NA, 7, 3)
 mean(vec)
-mean(vec, na.rm=TRUE)
+mean(vec, na.rm = TRUE)
 ```
 
 ## Interlude: Missing Values
@@ -259,6 +284,7 @@ We won't spend any more time reivewing factors today. If you need a refresher, c
 > - Lists are *heterogenous*: they can store single elements, vectors, or even lists.
 > - You can keep multi-dimensional and ragged data in R using lists.
 > - You can index an element in a list using double brackets: `[[1]]`. Single brackets will return the element as a list.
+> - For more on lists, see the lecture notes or data camp.
 
 <aside class="notes">
 For more on lists, see the lecture notes or data camp.
@@ -279,10 +305,11 @@ There is an example matrix for you to practice with in the exercises file, but w
 ## Matricies
 
 ```{r matrix}
-mat <- matrix(data=c(1,2,3,4,5,6,11,12,34), ncol=3)
+mat <- matrix(data = c(1,2,3,4,5,6,11,12,34), ncol = 3)
 mat
 mat[1,]
-mat[1,3]
+mat[,3]
+mat[1, 3]
 ```
 
 ## Data frames
@@ -297,15 +324,21 @@ mat[1,3]
 ## Data frames
 
 ```{r data frames example}
-df <- data.frame(candidate=c("Biden","Warren","Sanders"), 
-                 poll=c(26,17,17), 
-                 age=c(76,70,78))
+df <- data.frame(candidate = c("Biden","Warren","Sanders"), 
+                 poll = c(26,17,17), 
+                 age = c(77,71,78))
 df
 df[1,3]
 df$age
-df$age[df$candidate=="Biden"]
-df$poll_max <- df$poll+3
-df
+```
+
+## Data frames examples cont. 
+
+```{r data frames examples cont}
+df$candidate == "Biden"
+df$age[df$candidate == "Biden"]
+df$candidate[df$age == 76]
+df$poll_max <- df$poll + 3
 ```
 
 ## Data frames: exercise
@@ -383,13 +416,13 @@ The above code is what you will usually see and use. The below code breaks down 
 ## Reading files: exercise
 
 - Run the `read.csv()` code provided and see what happens in the Environment tab.
-- Load the `readr` package. 
+- Load the `tidyverse` package, which includes `readr`.
 - Use `read_csv()` to load the gapminder data. Read the message generated in the console.
 
 ## Reading files: exercise
 
-```{r read_csv, message=TRUE}
-library(readr)
+```{r read_csv, message=F, warning = F}
+library(tidyverse)
 gapminder <- read_csv("data/gapminder5.csv")
 ```
 

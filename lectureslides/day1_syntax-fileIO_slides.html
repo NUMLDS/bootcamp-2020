@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
-  <meta name="author" content="Kumar Ramanathan" />
-  <meta name="dcterms.date" content="2020-08-17" />
+  <meta name="author" content="Amanda Sahar d’Urso (materials from: K. Ramanathan)" />
+  <meta name="dcterms.date" content="2020-08-18" />
   <title>Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,67 +13,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 <link rel="stylesheet" href="day1_syntax-fileIO_slides_files/reveal.js-3.3.0.1/css/theme/simple.css" id="theme">
@@ -514,11 +488,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
 
 <section>
     <h1 class="title">Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files</h1>
-    <h2 class="author">Kumar Ramanathan</h2>
-    <h3 class="date">2020-08-17</h3>
+    <h2 class="author">Amanda Sahar d’Urso (materials from: K. Ramanathan)</h2>
+    <h3 class="date">2020-08-18</h3>
 </section>
 
-<section><section id="introduction" class="title-slide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
+<section><section id="introduction" class="titleslide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
 <h2>Why R?</h2>
 <ul>
 <li class="fragment">R is flexible</li>
@@ -535,7 +509,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li class="fragment">We will be using RStudio today</li>
 </ul>
 <aside class="notes">
-RStudio helps you organize your workflow and keep track of your work. The top-left pane is where you open, work on, and save script files. The bottom-left pane includes the console, which is where your code actually “runs”. The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
+RStudio helps you organize your workflow and keep track of your work. The top-left pane is where you open, work on, and save script files. The bottom-left pane includes the console, which is where your code actually “runs” but is not saved. The right-hand side panes include tools for manging your environment, workspace, and packages; for plotting and graphics; for accessing help files; and more.
 </aside>
 </section><section id="some-key-concepts" class="slide level2">
 <h2>Some key concepts</h2>
@@ -548,7 +522,7 @@ RStudio helps you organize your workflow and keep track of your work. The top-le
 </ul>
 </section><section id="basics" class="slide level2">
 <h2>Basics</h2>
-<p>Some of you may have completed the <em>Introduction to R</em> course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, please help your classmates who did not have a chance to complete the course.</p>
+<p>Some of you may have completed the <em>Introduction to R</em> course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, you can work on exercises as we try to keep pace with those who may not have completed the course.</p>
 <p>The DataCamp course covered the following material:</p>
 <ul>
 <li class="fragment">Arithmetic with R</li>
@@ -564,7 +538,25 @@ Today, we will briefly review the above topics, and then turn to new material on
 <p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2020 github repository.</p>
 <p>Let’s walk through how to <em>fork</em> the repo to your GitHub account, and then <em>clone</em> it locally on your computer using the Git workflow within RStudio.</p>
 </section></section>
-<section><section id="basics-and-data-types" class="title-slide slide level1"><h1>Basics and data types</h1></section><section id="arithmetic" class="slide level2">
+<section><section id="basics-and-data-types" class="titleslide slide level1"><h1>Basics and data types</h1></section><section id="best-coding-practices" class="slide level2">
+<h2>Best coding practices</h2>
+<ul>
+<li class="fragment"><em>always</em> use `&lt;-` as your assignment mechanism, <em>not</em> `=`</li>
+<li class="fragment"><em>always</em> use spaces between operators</li>
+<li class="fragment"><em>never</em> have R save your environment upon exit (via global options)</li>
+<li class="fragment"><em>never</em> write code that, when shared, changes someone else’s machine</li>
+</ul>
+</section><section id="dont-do-this" class="slide level2">
+<h2>Don’t do this:</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)
+
+y=<span class="dv">1</span><span class="op">+</span><span class="dv">1</span></code></pre></div>
+</section><section id="do-this" class="slide level2">
+<h2>Do this:</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+
+y &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span></code></pre></div>
+</section><section id="arithmetic" class="slide level2">
 <h2>Arithmetic</h2>
 <ul>
 <li><code>&lt;-</code> is the assignment operator</li>
@@ -573,23 +565,23 @@ Today, we will briefly review the above topics, and then turn to new material on
 </ul>
 </section><section id="arithmetic-1" class="slide level2">
 <h2>Arithmetic</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">y &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb1-2" title="2">y</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="dv">5</span>
+y</code></pre></div>
 <pre><code>## [1] 5</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">y <span class="op">+</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y <span class="op">+</span><span class="st"> </span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 7</code></pre>
 </section><section id="functions" class="slide level2">
 <h2>Functions</h2>
 <ul>
-<li>Functions take inputs and return outputs, e.g. <code>log(10)</code> results in <code>2.302585</code></li>
-<li>Functions can also take arguments, e.g. <code>log(10, base=10)</code></li>
-<li>All functions have a help file that you can call up, e.g. <code>?log</code></li>
+<li>Functions take inputs and return outputs, e.g. <code>log(10)</code> results in <code>2.302585</code></li>
+<li>Functions can also take arguments, e.g. <code>log(10, base=10)</code></li>
+<li>All functions have a help file that you can call up, e.g. <code>?log</code></li>
 </ul>
 </section><section id="functions-1" class="slide level2">
 <h2>Functions</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">log</span>(<span class="dv">10</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 2.302585</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">log</span>(<span class="dv">10</span>, <span class="dt">base=</span><span class="dv">10</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(<span class="dv">10</span>, <span class="dt">base=</span><span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 1</code></pre>
 </section><section id="arithmetic-exercise" class="slide level2">
 <h2>Arithmetic: exercise</h2>
@@ -603,26 +595,26 @@ Today, we will briefly review the above topics, and then turn to new material on
 </ul>
 </section><section id="arithmetic-exercise-1" class="slide level2">
 <h2>Arithmetic: exercise</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">x &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb9-2" title="2">x<span class="op">*</span><span class="dv">3</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="dv">5</span>
+x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 <pre><code>## [1] 15</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>)</code></pre></div>
 <pre><code>## [1] 2.70805</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>)<span class="op">-</span><span class="dv">4</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>) <span class="op">-</span><span class="st"> </span><span class="dv">4</span></code></pre></div>
 <pre><code>## [1] -1.29195</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">(<span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>)<span class="op">-</span><span class="dv">4</span>)<span class="op">^</span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="kw">log</span>(x<span class="op">*</span><span class="dv">3</span>) <span class="op">-</span><span class="st"> </span><span class="dv">4</span>)<span class="op">^</span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 1.669134</code></pre>
 </section><section id="comparisons-and-logical-operators" class="slide level2">
 <h2>Comparisons and Logical Operators</h2>
 <ul>
-<li>Common logical operators:
+<li class="fragment">Common logical operators:</li>
+<li class="fragment"><code>==</code> (is equal)</li>
+<li class="fragment"><code>!=</code> (not equal)</li>
+<li class="fragment"><code>&lt;</code> (greater than), <code>&gt;</code> (less than)</li>
+<li class="fragment"><code>&amp;</code> (and), <code>|</code> (or)</li>
+</ul>
 <ul>
-<li><code>==</code> (is equal)</li>
-<li><code>!=</code> (not equal)</li>
-<li><code>&lt;</code> (greater than), <code>&gt;</code> (less than)</li>
-<li><code>&amp;</code> (and), <code>|</code> (or)</li>
-</ul></li>
-<li>If you evaluate statements with these operators, R will tell you if the statement is <code>TRUE</code> or <code>FALSE</code></li>
+<li class="fragment">If you evaluate statements with these operators, R will tell you if the statement is <code>TRUE</code> or <code>FALSE</code></li>
 </ul>
 </section><section id="comparisons-and-logical-operators-exercise" class="slide level2">
 <h2>Comparisons and Logical Operators: exercise</h2>
@@ -635,29 +627,29 @@ Today, we will briefly review the above topics, and then turn to new material on
 </ul>
 </section><section id="comparisons-and-logical-operators-exercise-1" class="slide level2">
 <h2>Comparisons and Logical Operators: exercise</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">==</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">==</span><span class="st"> </span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="st">&quot;eat&quot;</span> <span class="op">!=</span><span class="st"> &#39;drink&#39;</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">&quot;eat&quot;</span> <span class="op">!=</span><span class="st"> &#39;drink&#39;</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">(<span class="dv">1</span><span class="op">==</span><span class="dv">1</span>) <span class="op">&amp;</span><span class="st"> </span>(<span class="dv">1</span><span class="op">==</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">1</span> <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">&amp;</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">(<span class="dv">1</span><span class="op">==</span><span class="dv">1</span>) <span class="op">|</span><span class="st"> </span>(<span class="dv">1</span><span class="op">==</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">1</span> <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">|</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </section><section id="packages" class="slide level2">
 <h2>Packages</h2>
 <ul>
-<li>Load the package <code>tidyverse</code> using the function <code>library()</code> <br><small>You may need to install it using <code>install.packages("tidyverse")</code> if you have not done so already</small></li>
+<li>Load the package <code>tidyverse</code> using the function <code>library()</code> <br><small>You may need to install it using <code>install.packages(&quot;tidyverse&quot;)</code> if you have not done so already</small></li>
 <li>Open the help file for the function <code>recode</code> <br><small>(Hint: remember what <code>?</code> does)</small></li>
 </ul>
 </section><section id="packages-1" class="slide level2">
 <h2>Packages</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">library</span>(tidyverse)</a>
-<a class="sourceLine" id="cb27-2" title="2"></a>
-<a class="sourceLine" id="cb27-3" title="3">?recode</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+
+?recode</code></pre></div>
 <p>Remember, if you need to install a package:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</code></pre></div>
 </section><section id="data-types" class="slide level2">
 <h2>Data types</h2>
 <ul>
@@ -665,15 +657,15 @@ Today, we will briefly review the above topics, and then turn to new material on
 <li class="fragment"><strong>integer</strong>: a specific type; most numbers are numeric instead</li>
 <li class="fragment"><strong>numeric</strong>: real or decimal</li>
 <li class="fragment"><strong>complex</strong>: ex: <code>2+5i</code></li>
-<li class="fragment"><strong>character</strong>: <code>"text data"</code>, denoted with quotes <br><small>(<code>'single quotes'</code> and <code>"double quotes"</code> both work)</small></li>
+<li class="fragment"><strong>character</strong>: <code>&quot;text data&quot;</code>, denoted with quotes <br><small>(<code>'single quotes'</code> and <code>&quot;double quotes&quot;</code> both work)</small></li>
 <li class="fragment">Use <code>typeof()</code> on an object to check its type</li>
 </ul>
 </section></section>
-<section><section id="review-data-structures" class="title-slide slide level1"><h1>Review: Data structures</h1></section><section id="vectors" class="slide level2">
+<section><section id="review-data-structures" class="titleslide slide level1"><h1>Review: Data structures</h1></section><section id="vectors" class="slide level2">
 <h2>Vectors</h2>
 <ul>
 <li class="fragment">Vectors store multiple values of a single data type</li>
-<li class="fragment">Create a vector using the <code>c()</code> function</li>
+<li class="fragment">Create a vector using the `c()` function</li>
 <li class="fragment">Vectors are <em>homogenous</em>: each vector can only contain one data type</li>
 <li class="fragment">Arithmetic operators and many functions can apply to vectors</li>
 <li class="fragment">Vectors can be <em>indexed</em> by:
@@ -685,10 +677,10 @@ Today, we will briefly review the above topics, and then turn to new material on
 </ul>
 </section><section id="vectors-1" class="slide level2">
 <h2>Vectors</h2>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">example &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>)</a>
-<a class="sourceLine" id="cb29-2" title="2">example[<span class="dv">2</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>)
+example[<span class="dv">2</span>]</code></pre></div>
 <pre><code>## [1] 8</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">example[example<span class="op">&gt;</span><span class="dv">7</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example[example <span class="op">&gt;</span><span class="st"> </span><span class="dv">7</span>]</code></pre></div>
 <pre><code>## [1] 8 9</code></pre>
 </section><section id="vectors-exercise" class="slide level2">
 <h2>Vectors: exercise</h2>
@@ -703,34 +695,34 @@ Today, we will briefly review the above topics, and then turn to new material on
 </ul>
 </section><section id="vectors-exercise-1" class="slide level2">
 <h2>Vectors: exercise</h2>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>) </a>
-<a class="sourceLine" id="cb33-2" title="2">x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb33-3" title="3">x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">20</span>, <span class="dt">mean=</span><span class="fl">0.5</span>)</a>
-<a class="sourceLine" id="cb33-4" title="4">x1[<span class="dv">3</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) 
+x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)
+x2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">20</span>, <span class="dt">mean =</span> <span class="fl">0.5</span>)
+x1[<span class="dv">3</span>]</code></pre></div>
 <pre><code>## [1] 1.084441</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">x1[x1 <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x1[x1 <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>]</code></pre></div>
 <pre><code>## [1] -1.207066 -2.345698</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">x2[x2 <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x2[x2 <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>]</code></pre></div>
 <pre><code>## [1] 1.006056 1.459494 2.915835</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">x3 &lt;-<span class="st"> </span>x2[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a>
-<a class="sourceLine" id="cb39-2" title="2">x1[<span class="op">-</span><span class="dv">3</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x3 &lt;-<span class="st"> </span>x2[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]
+x1[<span class="op">-</span><span class="dv">3</span>]</code></pre></div>
 <pre><code>## [1] -1.2070657  0.2774292 -2.3456977  0.4291247</code></pre>
 </section><section id="interlude-missing-values" class="slide level2">
 <h2>Interlude: Missing Values</h2>
 <p>Variables in datasets sometimes include missing variables. In R, missing values are stored as <code>NA</code>. Vectors containing any data type can contain missing values. Functions deal with missing values differently, and sometimes require arguments to specify how to deal with missing values.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb41-2" title="2"><span class="kw">mean</span>(vec)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="dv">3</span>)
+<span class="kw">mean</span>(vec)</code></pre></div>
 <pre><code>## [1] NA</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1"><span class="kw">mean</span>(vec, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(vec, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>## [1] 4.75</code></pre>
 </section><section id="interlude-missing-values-1" class="slide level2">
 <h2>Interlude: Missing Values</h2>
 <p>You can check if a vector contains missing values by the function <code>is.na()</code>. Since this returns a logical vector, you can use <code>sum()</code> or <code>mean()</code> on the result to count the number or proportion of <code>TRUE</code> values.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">is.na</span>(vec)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">is.na</span>(vec)</code></pre></div>
 <pre><code>## [1] FALSE FALSE  TRUE FALSE FALSE</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">sum</span>(<span class="kw">is.na</span>(vec))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">is.na</span>(vec))</code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1"><span class="kw">mean</span>(<span class="kw">is.na</span>(vec))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">is.na</span>(vec))</code></pre></div>
 <pre><code>## [1] 0.2</code></pre>
 </section><section id="factors" class="slide level2">
 <h2>Factors</h2>
@@ -750,6 +742,7 @@ We won’t spend any more time reivewing factors today. If you need a refresher,
 <li class="fragment">Lists are <em>heterogenous</em>: they can store single elements, vectors, or even lists.</li>
 <li class="fragment">You can keep multi-dimensional and ragged data in R using lists.</li>
 <li class="fragment">You can index an element in a list using double brackets: <code>[[1]]</code>. Single brackets will return the element as a list.</li>
+<li class="fragment">For more on lists, see the lecture notes or data camp.</li>
 </ul>
 <aside class="notes">
 For more on lists, see the lecture notes or data camp.
@@ -768,15 +761,17 @@ There is an example matrix for you to practice with in the exercises file, but w
 </aside>
 </section><section id="matricies-1" class="slide level2">
 <h2>Matricies</h2>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">mat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">data=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">34</span>), <span class="dt">ncol=</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb51-2" title="2">mat</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">data =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">34</span>), <span class="dt">ncol =</span> <span class="dv">3</span>)
+mat</code></pre></div>
 <pre><code>##      [,1] [,2] [,3]
 ## [1,]    1    4   11
 ## [2,]    2    5   12
 ## [3,]    3    6   34</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1">mat[<span class="dv">1</span>,]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat[<span class="dv">1</span>,]</code></pre></div>
 <pre><code>## [1]  1  4 11</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1">mat[<span class="dv">1</span>,<span class="dv">3</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat[,<span class="dv">3</span>]</code></pre></div>
+<pre><code>## [1] 11 12 34</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mat[<span class="dv">1</span>, <span class="dv">3</span>]</code></pre></div>
 <pre><code>## [1] 11</code></pre>
 </section><section id="data-frames" class="slide level2">
 <h2>Data frames</h2>
@@ -786,30 +781,32 @@ There is an example matrix for you to practice with in the exercises file, but w
 <li class="fragment">Columns are typically variables and rows are observations.</li>
 <li class="fragment">You can make make data frames with <code>data.frame()</code>, or by combining vectors with <code>cbind()</code> or <code>rbind()</code>.</li>
 <li class="fragment">Data frames can be indexed in the same way as matricies: <code>df[row no, col no]</code>.</li>
-<li class="fragment">Data frames can also be indexed by using variable/column names: <code>df$var</code> or <code>df["var"]</code>.</li>
+<li class="fragment">Data frames can also be indexed by using variable/column names: <code>df$var</code> or <code>df[&quot;var&quot;]</code>.</li>
 </ul>
 </section><section id="data-frames-1" class="slide level2">
 <h2>Data frames</h2>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">candidate=</span><span class="kw">c</span>(<span class="st">&quot;Biden&quot;</span>,<span class="st">&quot;Warren&quot;</span>,<span class="st">&quot;Sanders&quot;</span>), </a>
-<a class="sourceLine" id="cb57-2" title="2">                 <span class="dt">poll=</span><span class="kw">c</span>(<span class="dv">26</span>,<span class="dv">17</span>,<span class="dv">17</span>), </a>
-<a class="sourceLine" id="cb57-3" title="3">                 <span class="dt">age=</span><span class="kw">c</span>(<span class="dv">76</span>,<span class="dv">70</span>,<span class="dv">78</span>))</a>
-<a class="sourceLine" id="cb57-4" title="4">df</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">candidate =</span> <span class="kw">c</span>(<span class="st">&quot;Biden&quot;</span>,<span class="st">&quot;Warren&quot;</span>,<span class="st">&quot;Sanders&quot;</span>), 
+                 <span class="dt">poll =</span> <span class="kw">c</span>(<span class="dv">26</span>,<span class="dv">17</span>,<span class="dv">17</span>), 
+                 <span class="dt">age =</span> <span class="kw">c</span>(<span class="dv">77</span>,<span class="dv">71</span>,<span class="dv">78</span>))
+df</code></pre></div>
 <pre><code>##   candidate poll age
-## 1     Biden   26  76
-## 2    Warren   17  70
+## 1     Biden   26  77
+## 2    Warren   17  71
 ## 3   Sanders   17  78</code></pre>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1">df[<span class="dv">1</span>,<span class="dv">3</span>]</a></code></pre></div>
-<pre><code>## [1] 76</code></pre>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1">df<span class="op">$</span>age</a></code></pre></div>
-<pre><code>## [1] 76 70 78</code></pre>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1">df<span class="op">$</span>age[df<span class="op">$</span>candidate<span class="op">==</span><span class="st">&quot;Biden&quot;</span>]</a></code></pre></div>
-<pre><code>## [1] 76</code></pre>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">df<span class="op">$</span>poll_max &lt;-<span class="st"> </span>df<span class="op">$</span>poll<span class="op">+</span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb65-2" title="2">df</a></code></pre></div>
-<pre><code>##   candidate poll age poll_max
-## 1     Biden   26  76       29
-## 2    Warren   17  70       20
-## 3   Sanders   17  78       20</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df[<span class="dv">1</span>,<span class="dv">3</span>]</code></pre></div>
+<pre><code>## [1] 77</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>age</code></pre></div>
+<pre><code>## [1] 77 71 78</code></pre>
+</section><section id="data-frames-examples-cont." class="slide level2">
+<h2>Data frames examples cont.</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>candidate <span class="op">==</span><span class="st"> &quot;Biden&quot;</span></code></pre></div>
+<pre><code>## [1]  TRUE FALSE FALSE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>age[df<span class="op">$</span>candidate <span class="op">==</span><span class="st"> &quot;Biden&quot;</span>]</code></pre></div>
+<pre><code>## [1] 77</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>candidate[df<span class="op">$</span>age <span class="op">==</span><span class="st"> </span><span class="dv">76</span>]</code></pre></div>
+<pre><code>## factor(0)
+## Levels: Biden Sanders Warren</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df<span class="op">$</span>poll_max &lt;-<span class="st"> </span>df<span class="op">$</span>poll <span class="op">+</span><span class="st"> </span><span class="dv">3</span></code></pre></div>
 </section><section id="data-frames-exercise" class="slide level2">
 <h2>Data frames: exercise</h2>
 <ul>
@@ -822,19 +819,19 @@ There is an example matrix for you to practice with in the exercises file, but w
 </ul>
 </section><section id="data-frames-exercise-1" class="slide level2">
 <h2>Data frames: exercise</h2>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1"><span class="kw">dim</span>(mtcars) <span class="co"># str(mtcars) also okay here</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(mtcars) <span class="co"># str(mtcars) also okay here</span></code></pre></div>
 <pre><code>## [1] 32 11</code></pre>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1"><span class="kw">names</span>(mtcars)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(mtcars)</code></pre></div>
 <pre><code>##  [1] &quot;mpg&quot;  &quot;cyl&quot;  &quot;disp&quot; &quot;hp&quot;   &quot;drat&quot; &quot;wt&quot;   &quot;qsec&quot; &quot;vs&quot;   &quot;am&quot;   &quot;gear&quot;
 ## [11] &quot;carb&quot;</code></pre>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">mtcars<span class="op">$</span>mpg</a></code></pre></div>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1">mtcars[<span class="dv">4</span>,]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>mpg</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars[<span class="dv">4</span>,]</code></pre></div>
 <pre><code>##                 mpg cyl disp  hp drat    wt  qsec vs am gear carb
 ## Hornet 4 Drive 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</code></pre>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1">mtcars<span class="op">$</span>cylsq &lt;-<span class="st"> </span>(mtcars<span class="op">$</span>cyl)<span class="op">^</span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>cylsq &lt;-<span class="st"> </span>(mtcars<span class="op">$</span>cyl)<span class="op">^</span><span class="dv">2</span></code></pre></div>
 </section></section>
-<section id="break" class="title-slide slide level1"><h1>Break!</h1></section>
-<section><section id="roadmap" class="title-slide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
+<section><section id="break" class="titleslide slide level1"><h1>Break!</h1></section></section>
+<section><section id="roadmap" class="titleslide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
 <h2>Roadmap for the rest of the R sessions</h2>
 <ul>
 <li>Today we will learn how to do basic <strong>data manipulation</strong> and <strong>data visualization</strong> in base R</li>
@@ -847,18 +844,18 @@ There is an example matrix for you to practice with in the exercises file, but w
 </ul></li>
 </ul>
 </section></section>
-<section><section id="reading-files" class="title-slide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
+<section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
 <h2>Working directories</h2>
 <p>The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio’s projects feature, your working directory is set already. Check where it is as follows:</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" title="1"><span class="kw">getwd</span>()</a></code></pre></div>
-<pre><code>## [1] &quot;C:/Users/ali/Documents/northwestern/extra/msia_bootcamp/bootcamp-2020&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
+<pre><code>## [1] &quot;C:/Users/Amanda/Google Drive/Work/Teaching/MSiA Bootcamp&quot;</code></pre>
 <p>If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> function.</p>
 </section><section id="reading-files-read.csv" class="slide level2">
 <h2>Reading files: read.csv()</h2>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" title="1">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" title="1">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,</a>
-<a class="sourceLine" id="cb78-2" title="2">                       <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,</a>
-<a class="sourceLine" id="cb78-3" title="3">                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
+                       <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
+                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <aside class="notes">
 The above code is what you will usually see and use. The below code breaks down what is going on inside.
 </aside>
@@ -866,22 +863,13 @@ The above code is what you will usually see and use. The below code breaks down 
 <h2>Reading files: exercise</h2>
 <ul>
 <li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
-<li>Load the <code>readr</code> package.</li>
+<li>Load the <code>tidyverse</code> package, which includes <code>readr</code>.</li>
 <li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
 </ul>
 </section><section id="reading-files-exercise-1" class="slide level2">
 <h2>Reading files: exercise</h2>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1"><span class="kw">library</span>(readr)</a>
-<a class="sourceLine" id="cb79-2" title="2">gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</a></code></pre></div>
-<pre><code>## Parsed with column specification:
-## cols(
-##   country = col_character(),
-##   year = col_double(),
-##   pop = col_double(),
-##   continent = col_character(),
-##   lifeExp = col_double(),
-##   gdpPercap = col_double()
-## )</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
 </section><section id="reading-files-1" class="slide level2">
 <h2>Reading files</h2>
 <ul>
@@ -890,7 +878,7 @@ The above code is what you will usually see and use. The below code breaks down 
 <li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
 </ul>
 </section></section>
-<section id="the-end" class="title-slide slide level1"><h1>The End!</h1></section>
+<section><section id="the-end" class="titleslide slide level1"><h1>The End!</h1></section></section>
     </div>
   </div>
 
