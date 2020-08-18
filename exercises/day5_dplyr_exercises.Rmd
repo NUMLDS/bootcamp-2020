@@ -1,5 +1,5 @@
 ---
-title: "Day 5:  Advanced data manipulation 2 - dplyr"
+title: "Day 5:  Advanced data manipulation 1 - dplyr"
 author: "Richard Paquin Morel and Ali Ehlen, adapted from exercises by Christina Maimone"
 date: "`r Sys.Date()`"
 output: html_document
