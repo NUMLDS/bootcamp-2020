@@ -1,13 +1,12 @@
 ---
-title: 'Day 7: Data visualization with ggplot'
-subtitle: 'Data visualization with ggplot2'
+title: 'Day 7: Data visualization with ggplot2'
 author: |
   | Richard Paquin Morel
-  | (slides created by Kumar Ramanathan)
+  | (slides created by Kumar Ramanathan and adapted by Emilio Lehoucq)
 date: "`r Sys.Date()`"
 output: 
   revealjs::revealjs_presentation:
-    fig_height: 4
+    fig_height: 3.7
     self_contained: false
     reveal_plugins: ["notes"]
 params:
@@ -23,43 +22,28 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
 notes<-params$notes
 ```
 
-# Introduction to ggplot
+## ggplot2
 
 Part of the `tidyverse`, `ggplot2` is an R package that implements the "grammar of graphics" in R.
 
-In ggplot, graphics are built by supplying *data* and *mapping* of data values to aesthetics, and then adding *layers* that build geometric objects, scales, labels, and more.
+Highly recommend videos of Hadley Wickham talking about it.
 
-## Why ggplot?
-
-> - Highly customizable and extensible.
-> - Designed to work with `dplyr` and other `tidyverse` packages.
-> - In use for over 10 years, meaning that help is widely available.
-> - Wide variety of avilable [extensions](http://www.ggplot2-exts.org/gallery/)
-
-## Useful resources
-
-- The [ggplot cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
-- The [ggplot reference guide](https://ggplot2.tidyverse.org/reference/index.html)
-- The [Data Visualization chapter](http://r4ds.had.co.nz/data-visualisation.html) in the "R for Data Science" book
-- And, of course, the help files that come with the package itself.
+Definitely check out the lecture notes. They include many more things than the slides.
 
 ## Let's make sure we have the necessary data frames for our examples
 
-1. If you still have `imports`, `generation`, `merged_energy`, `long_gen` and `long_merged_energy` in your Enrivorment, read in `gapminder` and recreate `gapminder07`.
-2. Alternatively, or if you are missing any of those objects from your workspace, run the following line of code:
+Run the following code to have `imports`, `generation`, `merged_energy`, `long_gen`, `long_merged_energy`, `gapminder`, and `gapminder07` :
 
 ```{r, warning=FALSE, message=FALSE}
 source(here::here("data/day3_objects.R"))
 ```
 
-# Basics: grammar of graphics
-
 ## Components of a basic plot
 
-> - **data**: a data frame, provided to the `ggplot()` function
-> - **geometric objects**: the objects/shapes that you want to plot, indicated through one of the many available `geom` functions, such as `geom_point()` or `geom_hist()`
-> - **aesthetic mapping**: the mapping from the data to the geometric objects, provided in an `aes()` function nested within the chosen `geom` function
-> - connected with the `+` operator
+- **data**: a data frame, provided to the `ggplot()` function
+- **geometric objects**: the objects/shapes that you want to plot, indicated through one of the many available `geom` functions, such as `geom_point()` or `geom_hist()`
+- **aesthetic mapping**: the mapping from the data to the geometric objects, provided in an `aes()` function nested within the chosen `geom` function
+- connected with the `+` operator
 
 ```{r ggplot structure, eval=F}
 ggplot(data = <DATA FRAME>) + 
@@ -70,24 +54,24 @@ ggplot(data = <DATA FRAME>) +
 Write this on the board, without data= and mapping= specified.
 </aside>
 
-## Example: Scatterplot from Day 1
+## Example: Scatterplot from previous session
 
 Task:<br>Create scatterplot of `lifeExp` against `gdpPercap` from `gapminder07` data.
 
 Steps:
 
-> 1. Supply `gapminder07` data frame as input to `ggplot()` function
-> 2. Choose a `geom`; in this case we choose `geom_point()` to generate points
-> 3. Supply aesthetic mapping, i.e. specify `x` and `y` values, to `geom_point()`.
+1. Supply `gapminder07` data frame as input to `ggplot()` function
+2. Choose a `geom`; in this case we choose `geom_point()` to generate points
+3. Supply aesthetic mapping, i.e. specify `x` and `y` values, to `geom_point()`.
 
-## Example: Scatterplot from Day 1
+## Example: Scatterplot from previous session
 
 ```{r scatterplot 1}
 ggplot(data = gapminder07) + 
   geom_point(mapping = aes(x = gdpPercap, y = lifeExp))
 ```
 
-## Example: Scatterplot from Day 1
+## Example: Scatterplot from previous session
 
 ```{r scatterplot 2}
 ggplot(gapminder07) + 
@@ -100,8 +84,6 @@ ggplot(gapminder07) +
 
 Using the `gapminder07` data, create a scatterplot of the natural log of `gdpPercap` as a function of the natural log of `pop`. Give it a title and axis labels.
 
-Remember, you will need three functions: `ggplot()`, `geom_point()`, and `labs()`. 
-
 <aside class="notes">
 You can create a new script file for your exercises in this session, or you can continue to use script files from earlier in the day. In either case, make sure to give the file a sensible filename and to demarcate sections with meaningful comments.
 </aside>
@@ -111,15 +93,16 @@ You can create a new script file for your exercises in this session, or you can 
 ```{r scatterplot exercise}
 ggplot(gapminder07) + 
   geom_point(aes(x = log(pop), y = log(gdpPercap))) + 
-  labs(title = "Relationship between GDP per capita and population in 2007", x = "Logged GDP per capita", y = "Logged life expectancy")
+  labs(title = "Relationship between GDP per capita and population in 
+       2007", x = "Logged GDP per capita", y = "Logged life expectancy")
 ```
 
-# Preparing your data
+## Preparing your data
 
-> - Recall the role of pipes (`%>%`) in `dplyr` this morning. 
-> - `dplyr` and `ggplot2` are designed to work well together. 
-> - You can use a series of pipes to prepare your data before plotting.
-> - To see examples, let's turn to the California energy data.
+- Recall the role of pipes (`%>%`) in `dplyr` 
+- `dplyr` and `ggplot2` are designed to work well together. 
+- You can use a series of pipes to prepare your data before plotting.
+- To see examples, let's turn to the California energy data.
 
 ## Example: Energy generated over time
 
@@ -127,10 +110,10 @@ Task:<br>Plot a *column chart* of *total* energy generated over time.
 
 Steps: 
 
-> 1. Choose long-format generation data, i.e. `long_gen`.
-> 2. Manipulate data frame to calculate total output per date-time.
-> 3. Pipe manipulated data frame into plot.
-> 4. Select `geom_col()` and map appropriate `x` and `y` variables.
+1. Choose long-format generation data, i.e. `long_gen`.
+2. Manipulate data frame to calculate total output per date-time.
+3. Pipe manipulated data frame into plot.
+4. Select `geom_col()` and map appropriate `x` and `y` variables.
 
 ## Example: Energy generated over time
 
@@ -171,14 +154,14 @@ generation %>%
   labs(title="Total hydro power generated, by hour", x="Hour", y="Output (MW)")
 ```
 
-# Geometric objects
+## Geometric objects
 
 We have already seen examples of two kinds of plots:
 
 - Scatterplots, generated with `geom_point()`
 - Column charts, generated with `geom_col()`
 
-Let's see a few more.
+We'll see a few more, but there are *many* more! Your imagination is the limit!
 
 ## Line plots: `geom_line()`
 
@@ -191,10 +174,10 @@ imports %>%
 
 ## Interlude: changing geom characteristics
 
-> - In the geom functions, we have only been supplying aesthetic mapping (in `aes()`).
-> - Geom functions can also control characteristics of the geom object, *outside* the `aes()` function.
-> - In most geoms, we can modulate `size=` and `col=`.
-> - Let's try it with the line plot we just made. 
+- In the geom functions, we have only been supplying aesthetic mapping (in `aes()`).
+- Geom functions can also control characteristics of the geom object, *outside* the `aes()` function.
+- In most geoms, we can modulate `size=` and `col=`.
+- Let's try it with the line plot we just made. 
 
 ## Interlude: changing geom characteristics
 
@@ -220,7 +203,8 @@ generation %>%
 long_gen %>% 
   ggplot() + 
   geom_boxplot(aes(x=source, y=output)) + 
-  labs(title="Amount of energy generated by each source, Sept 3-9", x="Source type", y="Output (MW)")
+  labs(title="Amount of energy generated by each source, Sept 3-9", 
+       x="Source type", y="Output (MW)")
 ```
 
 ## Multiple geoms in one plot
@@ -229,10 +213,9 @@ Task:<br>Plot a *line* of large hydro generation over time, and a *smoothed line
 
 Steps: 
 
-> 1. Supply the `generation` data to `ggplot()`.
-> 2. Create a line with `geom_line()` with appropriate `x` and `y` aesthetics. Make it turquoise for fun.
-> 3. Create a smoothed line with `geom_smooth()` with the same `x` and `y` aesthetics.
->     1. `geom_smooth()` plots smoothed conditional means (estimated using a loess regression)
+1. Supply the `generation` data to `ggplot()`.
+2. Create a line with `geom_line()` with appropriate `x` and `y` aesthetics. Make it turquoise for fun.
+3. Create a smoothed line with `geom_smooth()` with the same `x` and `y` aesthetics.
 
 ## Multiple geoms in one plot
 
@@ -241,7 +224,8 @@ generation %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=large_hydro), col="turquoise3") + 
   geom_smooth(aes(x=datetime, y=large_hydro)) + 
-  labs(title="Hydroelectric (large) generation per hour, Sept 3-9", x="Hour", y="Output (MW)")
+  labs(title="Hydroelectric (large) generation per hour, Sept 3-9", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Exercise 3: Total output per source
@@ -261,15 +245,9 @@ long_merged_energy %>%
   ggplot() + 
   geom_col(aes(x=source, y=output), fill="darkred") + 
   geom_hline(aes(yintercept=mean(output))) + 
-  labs(title="Total output per energy source over Sept 3-9", y="Output (MW)", x="Source")
+  labs(title="Total output per energy source over Sept 3-9", 
+       y="Output (MW)", x="Source")
 ```
-
-# Additional layers
-
-## Labels
-
-> - We have already seen that the `labs()` layer can add titles (`title=`) and axis labels (`x=` and `y=`) to a plot.
-> - It can also add subtitles (`subtitle=`) and captions (`caption=`).
 
 ## Labels
 
@@ -277,8 +255,10 @@ long_merged_energy %>%
 imports %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=imports), col="red") + 
-  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018",
-       caption="Source: California Energy Commission", x="Hour", y="Amount imported (MW)")
+  labs(title="Energy imports over time in California", 
+       subtitle="Hourly data from September 3-9, 2018",
+       caption="Source: California Energy Commission", 
+       x="Hour", y="Amount imported (MW)")
 ```
 
 <aside class="notes">
@@ -287,13 +267,12 @@ No exercise this time, but we will practice this later.
 
 ## Scales
 
-> - Scales allow you to manipulate the relationship between data values and aesthetics beyond aesthetic mapping.
->     - AKA: scales "control the details of how data values are translated to visual properties" (quote from [reference guide](https://ggplot2.tidyverse.org/reference/index.html#section-aesthetics)).
-> - For example:
->     - `scale_alpha`: control transparency settings
->     - `scale_color` and `scale_fill`: control color palettes and other aspects of data mapped to colors
->     - `scale_x` and `scale_y`: control the position of axis markers
-> - The cheatsheet is your friend!
+- Scales allow you to manipulate the relationship between data values and aesthetics beyond aesthetic mapping.
+- For example:
+     - `scale_alpha`: control transparency settings
+     - `scale_color` and `scale_fill`: control color palettes and other aspects of data mapped to colors
+     - `scale_x` and `scale_y`: control the position of axis markers
+- The cheatsheet is your friend!
 
 ## Scales
 
@@ -301,11 +280,11 @@ Task:<br>Recreate line plot of imports over time, but label x-axis with hours ra
 
 Steps:
 
-> 0. Check the cheatsheet!
-> 1. Supply `imports` data to `ggplot()`.
-> 2. Add a `geom_line()` layer and map appropriate `x` and `y` variables.
-> 3. Add a `scale_x_datetime()` layer and use `date_labels=` and `date_breaks=` arguments to modify x-axis labels and breaks.
-> 4. Add a `labs()` layer.
+0. Check the cheatsheet!
+1. Supply `imports` data to `ggplot()`.
+2. Add a `geom_line()` layer and map appropriate `x` and `y` variables.
+3. Add a `scale_x_datetime()` layer and use `date_labels=` and `date_breaks=` arguments to modify x-axis labels and breaks.
+4. Add a `labs()` layer.
 
 ## Example: Imports over time
 
@@ -314,7 +293,9 @@ imports %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=imports), col="red") + 
   scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
-  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)")
+  labs(title="Energy imports over time in California", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Amount imported (MW)")
 ```
 
 <aside class="notes">
@@ -331,41 +312,26 @@ ggplot comes with several preset themes that can be added as layers, including:
 - `theme_dark()` and `theme_light()`: change the background of the coordinate system
 - `theme_minimal()` and `theme_void()`: see reference guide for details
 
+You can also manually alter many more things. Check out the help file.
+
 ## Example: Imports over time
 
 ```{r theme preset}
 imports %>%
   ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
   scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
-  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
+  labs(title="Energy imports over time in California", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Amount imported (MW)") + 
   theme_minimal()
-```
-
-## Themes: manual
-
-The `theme()` layer lets you modulate many components of the theme, including: 
-
-> - Angle, position, and other characteristics of axis labels (e.g. `axis.labels.x = `).
-> - Angle, position, and other characteristics of legends (e.g. `legend.position = `).
-> - Characteristics of the background of the plot (e.g. `plot.background = `).
-> - For a full list of the components that can be modified, see the help file for `ggplot2::theme()`.
-
-## Example: Imports over time
-
-```{r theme manual}
-imports %>%
-  ggplot() + geom_line(aes(x=datetime, y=imports), col="red") + 
-  scale_x_datetime(date_labels="%H:%M", date_breaks="12 hours") +
-  labs(title="Energy imports over time in California", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Amount imported (MW)") + 
-  theme(axis.text.x=element_text(angle=45, hjust=1, size=12))
 ```
 
 ## Coordinate system adjustment
 
-> - `coord_flip()` is the default Cartesian coordinate system used; by explicitly calling this function, you can change the limits of the `x` and `y` axes from their defaults
-> - `coord_fixed()` sets a fixed aspect ratio between the `x` and `y` axes
-> - `coord_transform()` lets you transform the Cartesian coordinates using functions like `sqrt` or `log`
-> - `coord_polar()` changes the coordinate system to polar coordinates rather than a Cartesian system
+- `coord_flip()` is the default Cartesian coordinate system used; by explicitly calling this function, you can change the limits of the `x` and `y` axes from their defaults
+- `coord_fixed()` sets a fixed aspect ratio between the `x` and `y` axes
+- `coord_transform()` lets you transform the Cartesian coordinates using functions like `sqrt` or `log`
+- `coord_polar()` changes the coordinate system to polar coordinates rather than a Cartesian system
 
 ## Example: coord_flip()
 
@@ -388,19 +354,12 @@ long_gen %>%
   coord_flip()
 ```
 
-## Stats
+## Visualizing grouped data
 
-> - There are several `stat` functions in ggplot that enable you to conduct statistical transformations of your data prior to plotting. 
-> - `stat` and `geom` layers can be used interchangeably, as each `stat` layer has a `geom` argument and vice versa. 
-> - You may want to use stat layers or arguments to override default settings, or to use transformed versions of a variable in your plot.
-> - For more, see [Chapter 3.7 of the R for data science online textbook](http://r4ds.had.co.nz/data-visualisation.html#statistical-transformations).
-
-# Visualizing grouped data
-
-> - We often want to visualize multiple variables, or a variable that can be divided into groups, in one graphic.
-> - There are two broad principles for visualizing grouped variables in R:
->     - Identify a grouping variable in a `geom()` using the `group = ` argument, and demarcate the distinct objects created per group in some way.
->     - Use facets to generate geometric objects in separate coordinate systems for each group.
+- We often want to visualize multiple variables, or a variable that can be divided into groups, in one graphic.
+- There are two broad principles for visualizing grouped variables in R:
+     - Identify a grouping variable in a `geom()` using the `group = ` argument, and demarcate the distinct objects created per group in some way.
+     - Use facets to generate geometric objects in separate coordinate systems for each group.
 
 ## Colors and fill
 
@@ -408,10 +367,10 @@ Task:<br>Create a line plot of energy output over time, with separate lines for 
 
 Steps:
 
-> 1. Supply the data frame `long_merged_energy` to `ggplot()`.
-> 2. Add a `geom_line()` layer and specify `x=datetime` and `y=output`.
-> 3. Also specify that `group=source` and `col=source`.
-> 4. Add a `labs()` layer.
+1. Supply the data frame `long_merged_energy` to `ggplot()`.
+2. Add a `geom_line()` layer and specify `x=datetime` and `y=output`.
+3. Also specify that `group=source` and `col=source`.
+4. Add a `labs()` layer.
 
 ## Colors and fill
 
@@ -419,7 +378,9 @@ Steps:
 long_merged_energy %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=output, group=source, col=source)) + 
-  labs(title="Output by energy source over time", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  labs(title="Output by energy source over time", 
+       subtitle="Hourly data from September 3-9, 2018", x="Hour", 
+       y="Output (MW)")
 ```
 
 ## Exercise 4: Colors and fill
@@ -434,18 +395,24 @@ Task:<br>Create a line plot that compares generation of wind, solar, and geother
 long_merged_energy %>%
   filter(source=="wind"|source=="solar"|source=="geothermal") %>% 
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
-  labs(title="Wind vs. Solar vs. Geothermal generation", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  geom_line(aes(x=datetime, y=output, group=source, col=source), 
+            size=1.5) + 
+  labs(title="Wind vs. Solar vs. Geothermal generation", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Customizing with scale_color layers
 
 ```{r aes colors 2}
-long_merged_energy %>% filter(source=="wind"|source=="solar"|source=="geothermal") %>% 
+long_merged_energy %>% filter(source=="wind"|source=="solar"| source=="geothermal") %>% 
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source),
+            size=1.5) + 
   scale_color_brewer(palette="Accent", name="Energy source") + 
-  labs(title="Wind vs. Solar vs. Geothermal generation", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  labs(title="Wind vs. Solar vs. Geothermal generation", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Colors and fill
@@ -457,9 +424,9 @@ long_merged_energy %>% filter(source=="wind"|source=="solar"|source=="geothermal
 
 ## Position adjustment
 
-> - Once we introduce a grouping variable to a `geom` function, we generate multiple geometric objects on the same plot.
-> - Colors and fill help us distinguish each object from other objects.
-> - Another way to distinguish objects, often used together with color/fill, is *position adjustment*.
+ - Once we introduce a grouping variable to a `geom` function, we generate multiple geometric objects on the same plot.
+ - Colors and fill help us distinguish each object from other objects.
+ - Another way to distinguish objects, often used together with color/fill, is *position adjustment*.
 
 ## Example: Energy use by day
 
@@ -467,13 +434,11 @@ Task:<br>Create a column chart of energy use by day, grouped by source.
 
 Steps:
 
-> 1. Modify `long_merged_energy` to summarize output by date and source.
->     1. Use `mutate()` to create a `date` variable from `datetime`.
->     2. Use `group_by()` and `summarize()` to calculate total output per date per source.
-> 2. Supply modified data frame to `ggplot()`
-> 3. Add a `geom_col()` layer, supply `x` and `y` aesthetics.
-> 4. Specify `group=source` and `fill=source`.
-> 5. Add a `labs()` layer.
+1. Modify `long_merged_energy` to summarize output by date and source. Use `mutate()` to create a `date` variable from `datetime`. Use `group_by()` and `summarize()` to calculate total output per date per source.
+2. Supply modified data frame to `ggplot()`
+3. Add a `geom_col()` layer, supply `x` and `y` aesthetics.
+4. Specify `group=source` and `fill=source`.
+5. Add a `labs()` layer.
 
 ## Example: Energy use by day
 
@@ -489,11 +454,11 @@ long_merged_energy %>%
 
 ## Example: Energy use by day
 
-> - This column chart is useful if our main goal is to examine total output over time across sources.
-> - But what if our main goal is to compare trends across sources?
->     - We can use `position="dodge"` in `geom_col()` 'unstack' the columns for each source.
-> - What if our goal is to compare what portion of output per day each source comprises?
->     - We can use `position="fill"` to normalize height of stacked columns.
+- This column chart is useful if our main goal is to examine total output over time across sources.
+- But what if our main goal is to compare trends across sources?
+     - We can use `position="dodge"` in `geom_col()` 'unstack' the columns for each source.
+- What if our goal is to compare what portion of output per day each source comprises?
+     - We can use `position="fill"` to normalize height of stacked columns.
 
 ## Example: Energy use by day (pos dodge)
 
@@ -503,7 +468,8 @@ long_merged_energy %>%
   group_by(date, source) %>% 
   summarize(output=sum(output)) %>% 
   ggplot() + 
-  geom_col(aes(x=date, y=output, group=source, fill=source), position="dodge") + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), 
+           position="dodge") + 
   labs(title="Energy use by day", x="Day", y="Output (MW)")
 ```
 
@@ -515,15 +481,16 @@ long_merged_energy %>%
   group_by(date, source) %>% 
   summarize(output=sum(output)) %>% 
   ggplot() + 
-  geom_col(aes(x=date, y=output, group=source, fill=source), position="fill") + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), 
+           position="fill") + 
   labs(title="Energy use by day", x="Day", y="Output (MW)")
 ```
 
 ## Shapes and linetypes
 
-> - Colors/fill and position adjustment are the most common and intuitive way to distinguish geometric objects from each other.
-> - Shapes and linetypes are two other ways.
-> - The idea here is to modify what the object actually looks like.
+- Colors/fill and position adjustment are the most common and intuitive way to distinguish geometric objects from each other.
+- Shapes and linetypes are two other ways.
+- The idea here is to modify what the object actually looks like.
 
 ## Example: Energy source group, by day
 
@@ -531,11 +498,11 @@ Task:<br>
 
 Steps:
 
-> 1. Prepare data frame that summarizes output by date and "group" from `regroup`.
-> 2. Supply modified data frame to `ggplot()`.
-> 3. Two choices!
->     1. Add `geom_line()` and `geom_point()` with `shape=group`.
->     2. Add `geom_line()` with `linetype=group`.
+1. Prepare data frame that summarizes output by date and "group" from `regroup`.
+2. Supply modified data frame to `ggplot()`.
+3. Two choices!
+     1. Add `geom_line()` and `geom_point()` with `shape=group`.
+     2. Add `geom_line()` with `linetype=group`.
 
 ## Example: Energy source group by day
 
@@ -559,7 +526,9 @@ long_merged_energy_regroup %>%
   ggplot() + 
   geom_line(aes(x=date, y=output, group=group, col=group), size=0.8) +
   geom_point(aes(x=date, y=output, group=group, shape=group)) + 
-  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
+  labs(title="Output by source group over time", 
+       subtitle="Data collected during September 3-9, 2018", 
+       x="Date", y="Output (MW)")
 ```
 
 ## Example: Energy source group, by day
@@ -568,14 +537,16 @@ long_merged_energy_regroup %>%
 long_merged_energy_regroup %>% 
   ggplot() + 
   geom_line(aes(x=date, y=output, group=group, linetype=group), size=1) +
-  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018", x="Date", y="Output (MW)")
+  labs(title="Output by source group over time", 
+       subtitle="Data collected during September 3-9, 2018", 
+       x="Date", y="Output (MW)")
 ```
 
 ## Sizes and alpha
 
-> - `size=` and `alpha=` inside `aes()` modulate the size and transparency of geom objects based on some data value.
-> - They are particularly useful when you want to distinguish objects based on some *continuous* variable.
-> - Let's return to the Gapminder data for an example.
+- `size=` and `alpha=` inside `aes()` modulate the size and transparency of geom objects based on some data value.
+- They are particularly useful when you want to distinguish objects based on some *continuous* variable.
+- Let's return to the Gapminder data for an example.
 
 ## Example: Life expectancy over GDP
 
@@ -583,8 +554,10 @@ long_merged_energy_regroup %>%
 gapminder07 %>% 
   ggplot() + 
   geom_point(aes(x=log(gdpPercap), y=lifeExp, size=pop, col=continent)) + 
-  scale_size_continuous(name="Population") + scale_color_discrete(name="Continent") +
-  labs(title="Life expectancy as a function of GDP per capita in 2007", x="Logged GDP per capita", y="Life expectancy")
+  scale_size_continuous(name="Population") + 
+  scale_color_discrete(name="Continent") +
+  labs(title="Life expectancy as a function of GDP per capita in 2007", 
+       x="Logged GDP per capita", y="Life expectancy")
 ```
 
 ## Exercise 5: Average hourly output by source
@@ -614,6 +587,12 @@ ex5 <- long_merged_energy %>%
   theme_bw()
 ```
 
+You can save images created by ggplot in three ways:
+
+- Assign the result of your ggplot code to a named object, which can be saved like other objects in your R workspace
+- Use the "save" icon in the Plots tab of RStudio
+- Add the function `ggsave()` as a layer to your plotting code
+
 ## Exercise 5: Average hourly output by source
 
 ```{r exercise5 plot}
@@ -622,8 +601,8 @@ ex5
 
 ## Facets
 
-> - So far we have been visualizing grouped data by changing the appearance or position of the objects.
-> - A different approach is to use facets, which creates separate coordinate systems for each geometric object.
+- So far we have been visualizing grouped data by changing the appearance or position of the objects.
+- A different approach is to use facets, which creates separate coordinate systems for each geometric object.
 
 ## Example: Comparing generation patterns
 
@@ -631,9 +610,9 @@ Task:<br>Compare energy generation over time, across sources.
 
 How do we do this? Using what we've learned so far:
 
-> 1. Supply `long_gen` to `ggplot()`.
-> 2. Add a `geom_line()` layer, setting `x=datetime` and `y=output` in `aes()`.
-> 3. Let's set `group=source` and `col=source` in `aes()`.
+1. Supply `long_gen` to `ggplot()`.
+2. Add a `geom_line()` layer, setting `x=datetime` and `y=output` in `aes()`.
+3. Let's set `group=source` and `col=source` in `aes()`.
 
 ## Example: Comparing generation patterns
 
@@ -641,17 +620,18 @@ How do we do this? Using what we've learned so far:
 long_gen %>%
   ggplot() + 
   geom_line(aes(x=datetime, y=output, group=source, col=source), size=1) + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  labs(title="Generation over time, by energy source", 
+       subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
 ```
 
 ## Example: Comparing generation patterns
 
 Is this a helpful plot?
 
-> - Not if our goal is to compare the patterns of each source.
-> - It's too noisy!
-> - Instead of setting `col=` in `aes()`, let's add a `facet_wrap()` layer.
-> - Specifically, `facet_wrap(~source)`, i.e. tell ggplot to "facet by source".
+- Not if our goal is to compare the patterns of each source.
+- It's too noisy!
+- Instead of setting `col=` in `aes()`, let's add a `facet_wrap()` layer.
+- Specifically, `facet_wrap(~source)`, i.e. tell ggplot to "facet by source".
 
 ## Example: Comparing generation patterns
 
@@ -660,7 +640,9 @@ long_gen %>%
   ggplot() + 
   geom_line(aes(x = datetime, y = output)) + 
   facet_wrap(~source) + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  labs(title="Generation over time, by energy source", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Example: Comparing generation patterns
@@ -670,7 +652,9 @@ long_gen %>%
   ggplot() + 
   geom_line(aes(x = datetime, y = output)) + 
   facet_wrap(~source, scales="free") + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)")
+  labs(title="Generation over time, by energy source", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
 ```
 
 ## Exercise 6: Facets
@@ -699,42 +683,8 @@ long_gen_regroup %>% ggplot() +
   geom_line(aes(x=datetime, y=output, group=group, col=group), size=1) + 
   scale_color_brewer(palette="Set1", name="Type of energy source") +
   facet_wrap(~type, scales="free") + 
-  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", x="Hour", y="Output (MW)") + 
+  labs(title="Generation over time, by energy source", 
+       subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)") + 
   theme(legend.position = "bottom")
 ```
-
-# Final notes
-
-## Comment your code
-
-Always remember to comment your code!
-
-When writing particularly complex code in `dplyr` or `ggplot2`, this includes commenting *within* a flow of `%>%` or `+` operators. See the lecture notes for some examples of this.
-
-## Saving images
-
-Three ways to save images created by ggplot:
-
-- Assign the result of your ggplot code to a named object, which can be saved like other objects in your R workspace
-- Use the "save" icon in the Plots tab of RStudio
-- Add the function `ggsave()` as a layer to your plotting code
-
-# Break!
-
-This is the end of the R lecture sessions.
-
-After a short break, we will return for a cumulative exercise that combines the skills you have learned since Monday. 
-
-# Final Exercise
-
-The instructions are in a markdown file in the `exercises` folder. Create a new RMarkdown file (save it using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`), in which you will complete the exercise.
-
-You can work in small groups, but write up your code separately.
-
-Raise your hand if you need help!
-
-## Optional Submissions
-
-You've created several RMarkdown files over the past three days. Since you stored these in a forked repo, it is possible to create a pull request and 'submit' these changes to the base repo. This is *optional*, but gives you a chance to explore Github functionality and share your work with your classmates. 
-
-Before you submit your completed exercises, *move every new file in your repo to the* `submissions` *folder*. This ensures that we won't inadvertently make changes to the session materials. Then, create a new pull request, asking to merge changes from your fork to the base repository.
