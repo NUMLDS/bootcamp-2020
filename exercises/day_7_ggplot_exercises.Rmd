@@ -90,7 +90,7 @@ gapminder <- read.csv(here::here("data/gapminder5.csv"))
 
 # Challenge
 
-Reconstruct [this](https://github.com/emiliolehoucq/bootcamp-2020/blob/master/exercises/challenge_day7.png) graph.
+Reconstruct [this](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/challenge_day7.png) graph.
 
 ```{asis}
 ### Answer 
