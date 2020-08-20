@@ -1,6 +1,6 @@
 ---
 title: "Day 4: Rmarkdown, Advanced Data Manipulation 1"
-author: "Richard Paquin Morel"
+author: "Amanda Sahar d'Urso (materials from: R.P. Morel"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
 params:
