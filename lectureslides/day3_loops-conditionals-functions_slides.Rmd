@@ -14,14 +14,6 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
 ```{r, include=FALSE}
 notes<-params$notes
 ```
-
-## Remember our data from Day 2...
-
-```{r revisiting the data}
-gapminder <- read.csv(here::here("data", "gapminder5.csv"))
-head(gapminder)
-```
-
 ## Sidebar: the `here` package
 
 The `here()` function gets your current working directory and appends any strings enclosed in the function.
@@ -33,15 +25,15 @@ here::here()
 here::here("data", "gapminder.csv")
 ```
 
-## Remember our data this morning...
 
-```{r revisiting the data 2}
-gapminder <- read.csv(here::here("data", "gapminder5.csv"))
+## Remember the gapminder dataset...
+
+```{r revisiting the data}
+gapminder <- read.csv(here::here("/Desktop/", "gapminder5.csv"))
 head(gapminder)
 ```
 
-
-## `gapminder` dataset
+## Let's inspect `gapminder` 
 
 ```{r str gapminder}
 str(gapminder)
