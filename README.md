@@ -1,5 +1,7 @@
 # 2020 Poli Sci Math Camp (materials from 2020 MSiA boot camp)
 
+TESTING TESTING THIS IS A PAIN BUT BETTER THAN ANYTHING ELSE SO FAR
+
 This Github repository contains materials for the R sessions of the 2020 Political Science Department Math Camp. These materials are heavily derived and adjusted from the Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources. 
 
 ## Workshop materials
