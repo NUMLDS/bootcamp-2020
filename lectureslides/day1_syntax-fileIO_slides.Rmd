@@ -1,6 +1,6 @@
 ---
 title: 'Day 1: Intro to R Syntax and Data Structures'
-author: "Amanda Sahar d'Urso (materials from: K. Ramanathan)"
+author: "Amanda Sahar d'Urso and Pilar Manzi (materials from: K. Ramanathan)"
 date: "`r Sys.Date()`"
 output: 
   revealjs::revealjs_presentation:
