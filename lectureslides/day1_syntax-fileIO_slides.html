@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Amanda Sahar d’Urso (materials from: K. Ramanathan)" />
-  <meta name="dcterms.date" content="2020-08-18" />
-  <title>Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files</title>
+  <meta name="dcterms.date" content="2020-08-20" />
+  <title>Day 1: Intro to R Syntax and Data Structures</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -487,9 +487,9 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <div class="slides">
 
 <section>
-    <h1 class="title">Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files</h1>
+    <h1 class="title">Day 1: Intro to R Syntax and Data Structures</h1>
     <h2 class="author">Amanda Sahar d’Urso (materials from: K. Ramanathan)</h2>
-    <h3 class="date">2020-08-18</h3>
+    <h3 class="date">2020-08-20</h3>
 </section>
 
 <section><section id="introduction" class="titleslide slide level1"><h1>Introduction</h1></section><section id="why-r" class="slide level2">
@@ -513,33 +513,16 @@ RStudio helps you organize your workflow and keep track of your work. The top-le
 </aside>
 </section><section id="some-key-concepts" class="slide level2">
 <h2>Some key concepts</h2>
-<p>You will hear these terms often this week:</p>
+<p>You will hear these terms:</p>
 <ul>
 <li class="fragment">Objects</li>
 <li class="fragment">Packages</li>
 <li class="fragment">Functions</li>
 <li class="fragment">Help files</li>
 </ul>
-</section><section id="basics" class="slide level2">
-<h2>Basics</h2>
-<p>Some of you may have completed the <em>Introduction to R</em> course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, you can work on exercises as we try to keep pace with those who may not have completed the course.</p>
-<p>The DataCamp course covered the following material:</p>
-<ul>
-<li class="fragment">Arithmetic with R</li>
-<li class="fragment">Objects and variable assignment</li>
-<li class="fragment">Data types, incl.: character, numeric, logical, factors</li>
-<li class="fragment">Data structures, incl.: vectors, matricies, data frames, lists</li>
-</ul>
-<aside class="notes">
-Today, we will briefly review the above topics, and then turn to new material on reading and writing files, data manipulation, and data visualization.
-</aside>
-</section><section id="copy-relevant-folders" class="slide level2">
-<h2>Copy relevant folders</h2>
-<p>We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2020 github repository.</p>
-<p>Let’s walk through how to <em>fork</em> the repo to your GitHub account, and then <em>clone</em> it locally on your computer using the Git workflow within RStudio.</p>
 </section></section>
-<section><section id="basics-and-data-types" class="titleslide slide level1"><h1>Basics and data types</h1></section><section id="best-coding-practices" class="slide level2">
-<h2>Best coding practices</h2>
+<section><section id="basics" class="titleslide slide level1"><h1>Basics</h1></section><section id="first-best-coding-practices" class="slide level2">
+<h2>First, best coding practices</h2>
 <ul>
 <li class="fragment"><em>always</em> use `&lt;-` as your assignment mechanism, <em>not</em> `=`</li>
 <li class="fragment"><em>always</em> use spaces between operators</li>
@@ -556,15 +539,15 @@ y=<span class="dv">1</span><span class="op">+</span><span class="dv">1</span></c
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 
 y &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span></code></pre></div>
-</section><section id="arithmetic" class="slide level2">
-<h2>Arithmetic</h2>
+</section><section id="arithmetic-r-as-a-caluclator" class="slide level2">
+<h2>Arithmetic (R as a caluclator)</h2>
 <ul>
 <li><code>&lt;-</code> is the assignment operator</li>
 <li>Standard arithmetic operators work: <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>^</code></li>
 <li>To run an operation, you can hit Ctrl+Return (Windows) or Cmd+Return (Mac)</li>
 </ul>
-</section><section id="arithmetic-1" class="slide level2">
-<h2>Arithmetic</h2>
+</section><section id="arithmetic-r-as-a-calculator" class="slide level2">
+<h2>Arithmetic (R as a calculator)</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="dv">5</span>
 y</code></pre></div>
 <pre><code>## [1] 5</code></pre>
@@ -640,8 +623,10 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 </section><section id="packages" class="slide level2">
 <h2>Packages</h2>
 <ul>
-<li>Load the package <code>tidyverse</code> using the function <code>library()</code> <br><small>You may need to install it using <code>install.packages(&quot;tidyverse&quot;)</code> if you have not done so already</small></li>
-<li>Open the help file for the function <code>recode</code> <br><small>(Hint: remember what <code>?</code> does)</small></li>
+<li class="fragment">So far we have only used “base R”. That is, the capabilities built into R.</li>
+<li class="fragment">What if you want to do other things in R? What about all the fancy things you’ve seen people do? Those require <strong>packages</strong></li>
+<li class="fragment">Load the package <code>tidyverse</code> using the function <code>library()</code> <br><small>You may need to install it using <code>install.packages(&quot;tidyverse&quot;)</code> if you have not done so already</small></li>
+<li class="fragment">Open the help file for the function <code>recode</code> <br><small>(Hint: remember what <code>?</code> does)</small></li>
 </ul>
 </section><section id="packages-1" class="slide level2">
 <h2>Packages</h2>
@@ -661,7 +646,7 @@ x<span class="op">*</span><span class="dv">3</span></code></pre></div>
 <li class="fragment">Use <code>typeof()</code> on an object to check its type</li>
 </ul>
 </section></section>
-<section><section id="review-data-structures" class="titleslide slide level1"><h1>Review: Data structures</h1></section><section id="vectors" class="slide level2">
+<section><section id="data-structures" class="titleslide slide level1"><h1>Data structures</h1></section><section id="vectors" class="slide level2">
 <h2>Vectors</h2>
 <ul>
 <li class="fragment">Vectors store multiple values of a single data type</li>
@@ -829,54 +814,6 @@ df</code></pre></div>
 <pre><code>##                 mpg cyl disp  hp drat    wt  qsec vs am gear carb
 ## Hornet 4 Drive 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars<span class="op">$</span>cylsq &lt;-<span class="st"> </span>(mtcars<span class="op">$</span>cyl)<span class="op">^</span><span class="dv">2</span></code></pre></div>
-</section></section>
-<section><section id="break" class="titleslide slide level1"><h1>Break!</h1></section></section>
-<section><section id="roadmap" class="titleslide slide level1"><h1>Roadmap</h1></section><section id="roadmap-for-the-rest-of-the-r-sessions" class="slide level2">
-<h2>Roadmap for the rest of the R sessions</h2>
-<ul>
-<li>Today we will learn how to do basic <strong>data manipulation</strong> and <strong>data visualization</strong> in base R</li>
-<li>Most commonly, you will do these tasks using specialized packages such as <code>tidyverse</code> or <code>data.table</code></li>
-<li>So why teach these skills in base R?
-<ul>
-<li>This helps you understand how R works</li>
-<li>Many packages rely on how these tasks work in base R</li>
-<li>Useful for simple tasks in workflows that otherwise don’t involve much manipulation or visualization</li>
-</ul></li>
-</ul>
-</section></section>
-<section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
-<h2>Working directories</h2>
-<p>The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio’s projects feature, your working directory is set already. Check where it is as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
-<pre><code>## [1] &quot;C:/Users/Amanda/Google Drive/Work/Teaching/MSiA Bootcamp&quot;</code></pre>
-<p>If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> function.</p>
-</section><section id="reading-files-read.csv" class="slide level2">
-<h2>Reading files: read.csv()</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
-                       <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
-                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<aside class="notes">
-The above code is what you will usually see and use. The below code breaks down what is going on inside.
-</aside>
-</section><section id="reading-files-exercise" class="slide level2">
-<h2>Reading files: exercise</h2>
-<ul>
-<li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
-<li>Load the <code>tidyverse</code> package, which includes <code>readr</code>.</li>
-<li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
-</ul>
-</section><section id="reading-files-exercise-1" class="slide level2">
-<h2>Reading files: exercise</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
-gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
-</section><section id="reading-files-1" class="slide level2">
-<h2>Reading files</h2>
-<ul>
-<li class="fragment">You can also read files from the full local path or from URLs</li>
-<li class="fragment">You can read files using RStudio’s interface through the “Files” tab</li>
-<li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
-</ul>
 </section></section>
 <section><section id="the-end" class="titleslide slide level1"><h1>The End!</h1></section></section>
     </div>

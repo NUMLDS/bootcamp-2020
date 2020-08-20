@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Amanda Sahar d’Urso (materials from: K. Ramanathan)" />
-  <meta name="dcterms.date" content="2020-08-18" />
+  <meta name="dcterms.date" content="2020-08-20" />
   <title>Day 2: Data Manipulation and Simple Visualization in R</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -489,9 +489,43 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Day 2: Data Manipulation and Simple Visualization in R</h1>
     <h2 class="author">Amanda Sahar d’Urso (materials from: K. Ramanathan)</h2>
-    <h3 class="date">2020-08-18</h3>
+    <h3 class="date">2020-08-20</h3>
 </section>
 
+<section><section id="reading-files" class="titleslide slide level1"><h1>Reading files</h1></section><section id="working-directories" class="slide level2">
+<h2>Working directories</h2>
+<p>The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio’s projects feature, your working directory is set already. Check where it is as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>()</code></pre></div>
+<pre><code>## [1] &quot;C:/Users/Amanda/Google Drive/Work/Teaching/Math Camp 2020&quot;</code></pre>
+<p>If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the “More” menu. Or you can use the <code>setwd()</code> function.</p>
+</section><section id="reading-files-read.csv" class="slide level2">
+<h2>Reading files: read.csv()</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;data/gapminder5.csv&quot;</span>,
+                       <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,
+                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<aside class="notes">
+The above code is what you will usually see and use. The below code breaks down what is going on inside.
+</aside>
+</section><section id="reading-files-exercise" class="slide level2">
+<h2>Reading files: exercise</h2>
+<ul>
+<li>Run the <code>read.csv()</code> code provided and see what happens in the Environment tab.</li>
+<li>Load the <code>tidyverse</code> package, which includes <code>readr</code>.</li>
+<li>Use <code>read_csv()</code> to load the gapminder data. Read the message generated in the console.</li>
+</ul>
+</section><section id="reading-files-exercise-1" class="slide level2">
+<h2>Reading files: exercise</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+gapminder &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/gapminder5.csv&quot;</span>)</code></pre></div>
+</section><section id="reading-files-1" class="slide level2">
+<h2>Reading files</h2>
+<ul>
+<li class="fragment">You can also read files from the full local path or from URLs</li>
+<li class="fragment">You can read files using RStudio’s interface through the “Files” tab</li>
+<li class="fragment">For other file types, use the packages <code>haven</code> (Stata, SAS, SPSS) or <code>readxl</code> (Excel)</li>
+</ul>
+</section></section>
 <section><section id="data-manipulation" class="titleslide slide level1"><h1>Data manipulation</h1></section><section id="exploring-data-frames" class="slide level2">
 <h2>Exploring data frames</h2>
 <ul>
@@ -510,7 +544,7 @@ Notice that any data frames which have been read in or created, like all other o
 </section><section id="exploring-data-frames-exercise" class="slide level2">
 <h2>Exploring data frames: exercise</h2>
 <ul>
-<li>Reload the gapminder data from Day 1</li>
+<li>Makesure gapminder is loaded</li>
 <li>Run <code>summary()</code> on the gapminder data</li>
 <li>Find the mean of the variable <code>pop</code></li>
 <li>Create a frequency table of the variable, using <code>table()</code></li>
@@ -590,14 +624,14 @@ The most obvious use case of subsetting is to create and store smaller data fram
 </ul>
 </section><section id="subsetting-and-sorting-exercise-1" class="slide level2">
 <h2>Subsetting and Sorting: exercise</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07 &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, <span class="dt">subset =</span> year<span class="op">==</span><span class="dv">2007</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07 &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, <span class="dt">subset =</span> year <span class="op">==</span><span class="st"> </span><span class="dv">2007</span>)
 <span class="kw">sort</span>(<span class="kw">table</span>(gapminder07<span class="op">$</span>continent))</code></pre></div>
 <pre><code>## 
 ##  Oceania Americas   Europe     Asia   Africa 
 ##        2       25       30       33       52</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07<span class="op">$</span>pop[gapminder07<span class="op">$</span>country<span class="op">==</span><span class="st">&quot;Mexico&quot;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gapminder07<span class="op">$</span>pop[gapminder07<span class="op">$</span>country <span class="op">==</span><span class="st"> &quot;Mexico&quot;</span>]</code></pre></div>
 <pre><code>## [1] 108700891</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(gapminder07[<span class="kw">order</span>(gapminder07<span class="op">$</span>pop, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>),])</code></pre></div>
 <pre><code>## # A tibble: 6 x 6
 ##   country        year        pop continent lifeExp gdpPercap
 ##   &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
@@ -609,7 +643,7 @@ The most obvious use case of subsetting is to create and store smaller data fram
 ## 6 Pakistan       2007  169270617 Asia         65.5     2606.</code></pre>
 </section><section id="aside" class="slide level2">
 <h2>Aside:</h2>
-<p>Don’t worry too much about the bonus question if you find it confusing. The package <code>dplyr</code> within <code>tidyverse</code>, which I will cover in R4, will offer other ways to do this kind of task which some of you may find more intuitive.</p>
+<p>Don’t worry too much about the bonus question if you find it confusing. The package <code>dplyr</code> within <code>tidyverse</code>, which we will cover tomorrow, will offer other ways to do this kind of task which some of you may find more intuitive.</p>
 </section><section id="adding-and-removing-columns" class="slide level2">
 <h2>Adding and removing columns</h2>
 <p>When cleaning or wrangling datasets in RStudio, we will often want to create new variables.</p>
@@ -830,14 +864,14 @@ reg1</code></pre></div>
 </section><section id="scatterplots-exercise-2" class="slide level2">
 <h2>Scatterplots: exercise</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,
-     <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, 
-     <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)</code></pre></div>
+     <span class="dt">main =</span> <span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)</code></pre></div>
 <p><img src="day2_dataintro_slides_files/figure-revealjs/scatterplot%202-1.png" width="768" /></p>
 </section><section id="scatterplots-exercise-3" class="slide level2">
 <h2>Scatterplots: exercise</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(gapminder07<span class="op">$</span>lifeExp <span class="op">~</span><span class="st"> </span>gapminder07<span class="op">$</span>gdpPercap,
-     <span class="dt">main=</span><span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, 
-     <span class="dt">ylab=</span><span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)
+     <span class="dt">main =</span> <span class="st">&quot;Relationship between life expectancy and GDP per capita in 2007&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Life expectancy&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;GDP per capita&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">mean</span>(gapminder07<span class="op">$</span>lifeExp))</code></pre></div>
 <p><img src="day2_dataintro_slides_files/figure-revealjs/scatterplot%203-1.png" width="768" /></p>
 </section></section>

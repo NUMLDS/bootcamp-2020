@@ -1,0 +1,275 @@
+---
+title: "Day 3: Introduction to Tidyverse"
+author: "Richard Paquin Morel, adapted by Kumar Ramanathan, Emilio Lehoucq, and Amanda Sahar d'Urso"
+date: "`r Sys.Date()`"
+output: revealjs::revealjs_presentation
+params:
+  notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75, message = FALSE, warning = FALSE)
+```
+
+```{r, include=FALSE}
+notes <- params$notes
+```
+
+# The Tidyverse
+
+>- “System of packages for data manipulation, exploration, and visualization that share a common design philosophy” - Rickert
+>- Mainly developed by Hadley Wickham 
+>- These packages work together using consistent language structures—once you learn it, these packages will feel as one
+
+## Tidyverse packages 
+
+![packages included in the tidyverse, always adding new packages](figures/tidyverse universe.png)
+
+## What is Tidy Data?
+
+>- "Happy families are all alike; every unhappy family is unhappy in its own way" - Leo Tolstoy 
+>- "Tidy datasets are all alike, but every messy dataset is messy in its own way" - Hadley Wickham
+>- Basically, tidy data are the way your data should be organized 
+
+## Three rules for tidy data:
+
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell. 
+
+## 1. Each variable must have its own column 
+
+![variables to column](figures/variables to column.png)
+
+## 2. Each observation must have its own row
+
+![observations to row](figures/observations to row.png)
+
+## 3. Each value must have its own cell. 
+
+![values to cell](figures/values to cell.png)
+
+## Load `tidyverse`
+
+```{r load tidyverse}
+library(tidyverse)
+```
+
+## `dplyr` verbs
+
+- `select` --> subset variables
+- `filter` --> subset observations based on conditions
+- `mutate` --> add new variables
+- `transmute` --> add new variables and drop existing ones
+- `summarize` --> reduce multiple observations to a single value (e.g., find the mean)
+
+## Trying out `dplyr` verbs - `select`
+
+- select by name: 
+  - `select(gapminder, continent, pop)`
+- select by position: 
+  - `select(df, c(1, 3, 10))`
+- select by range:
+  - `select(df, country:pop)` or `select(df, 1:3)`
+- drop variables with `-`
+  - `select(df, -gdpPercap)`
+
+## Load generator data
+
+```{r importing}
+#library(readr)
+#library(lubridate)
+
+gapminder <- read_csv("../data/gapminder5.csv")
+
+```
+
+## Trying out `dplyr` verbs - `select`
+```{r select}
+select(gapminder, country, year, lifeExp)
+```
+
+## select helpers
+
+- There are several "select helpers" that make subsetting variables very easy
+  - `one_of()`, `contains()`, `starts_with()`, `ends_with()`, `matches()`
+
+```{r}
+select(gapminder, ends_with("p"), contains("ear"))
+```
+
+## `filter`
+
+```{r filter}
+filter(gapminder, lifeExp > 80)
+```
+
+## multiple conditions in `filter`
+
+```{r, eval = F}
+filter(gapminder, lifeExp < 35 | continent != "Asia")
+```
+
+
+```{r multi filter, echo = F}
+filter(gapminder, lifeExp < 35 | continent != "Asia") %>% slice(1:5)
+```
+
+```{r, eval = F}
+filter(gapminder, lifeExp < 35 & continent != "Asia") 
+```
+
+```{r, echo = F}
+filter(gapminder, lifeExp < 35 & continent != "Asia") %>% slice(1:5)
+```
+
+## `mutate`
+
+- `mutate` creates new variables
+
+```{r mutate}
+tmp <- mutate(gapminder, log_pop = log(pop))
+head(tmp)
+```
+
+## `mutate`
+
+```{r multi mutate}
+tmp <- mutate(gapminder, 
+              log_pop = log(pop),
+              gdp_total = pop * gdpPercap)
+head(tmp)
+```
+
+## `summarize`
+
+`summarize` reduces observations to a single value based on functions
+  - `mean`, `sum`, `sd`, `min`, `max`, etc.
+
+```{r summarize}
+# mean energy consumption
+summarize(gapminder, mean_le = mean(lifeExp, na.rm = T))
+
+```
+## `group_by`
+
+```{r, eval = F}
+group_by(gapminder, country)
+```
+
+```{r, echo = F}
+group_by(gapminder, country) %>% slice(1:3)
+```
+
+```{r, eval = F}
+gapgroup <- group_by(gapminder, country)
+temp <- summarize(gapgroup, mean_le = mean(lifeExp, na.rm = T))
+head(temp)
+```
+
+```{r, echo = F}
+gapminder %>% 
+  group_by(country) %>% 
+  summarize(mean_le = mean(lifeExp, na.rm = T))
+```
+
+## A new operator: the pipe `%>%`
+
+- The powerful `%>%` operator lets you chain together functions
+- It sends the result of one function to another function
+- Read `%>%` as "then"
+- `%>%` increases the readability of your code
+- Don't chain more than ~10 lines of code
+
+## A new operator: the pipe `%>%`
+
+It looks like this!
+
+```{r introducing the pipe}
+# take df then filter it then select these variables
+# you do not need to repeat the name of the dataframe!
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop) %>% 
+  mutate(log_gdp = log(gdpPercap)) %>% 
+  group_by(country) %>% 
+  summarize(mean_le = mean(lifeExp, na.rm = T))
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 1}
+gapminder %>% 
+  filter(continent == "Asia")
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 2}
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop)
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 3}
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop) %>% 
+  mutate(log_gdp = log(gdpPercap))
+```
+
+## A new operator: the pipe `%>%`
+
+```{r introducing the pipe step 4}
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop) %>% 
+  mutate(log_gdp = log(gdpPercap)) %>% 
+  group_by(country) 
+```
+
+## A new operator: the pipe `%>%`
+
+```{r}
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop) %>% 
+  mutate(log_gdp = log(gdpPercap)) %>% 
+  group_by(country) %>% 
+  summarize(mean_le = mean(lifeExp, na.rm = T))
+```
+
+## A new operator: the pipe `%>%`
+
+- While piping, the piped dataframe _is not changed_!
+- You can also use pipes within a pipe
+
+```{r dot}
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  select(-pop) %>% 
+  mutate(pre_2000 = ifelse(year < 2000, "yes", "no") %>% 
+           as.factor() %>% 
+           factor(levels = c("yes", "no"))) 
+```
+
+## Exercise 1
+
+- Using the gapminder data `do the following with pipes:
+  1. Select variables that contain the begin with the letter "c"
+  2. Find the average gdpPercap (hint: what might be the most useful way to do this?) (hint 2: use `group_by` and `summarize`)
+
+## Solution exercise 1
+
+```{r exercise}
+gapminder %>% 
+  select(contains("c")) %>% slice(1:5)
+
+gapminder %>% 
+  group_by(country) %>%
+  summarize(mean_gdp = mean(gdpPercap, na.rm = T)) %>% slice(1:5)
+```
+
+

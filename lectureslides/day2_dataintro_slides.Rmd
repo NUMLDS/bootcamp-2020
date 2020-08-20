@@ -20,6 +20,53 @@ knitr::opts_chunk$set(echo = TRUE)
 notes <- params$notes
 ```
 
+# Reading files
+
+## Working directories
+
+The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio's projects feature, your working directory is set already. Check where it is as follows:
+
+```{r}
+getwd()
+```
+
+If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the "More" menu. Or you can use the `setwd()` function.
+
+## Reading files: read.csv()
+
+```{r read.csv intro, eval=F}
+gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
+```
+
+```{r read.csv breakdown, eval=F}
+gapminder <- read.csv(file = "data/gapminder5.csv",
+                       sep = ",",
+                       stringsAsFactors = FALSE)
+```
+
+<aside class="notes">
+The above code is what you will usually see and use. The below code breaks down what is going on inside.
+</aside>
+
+## Reading files: exercise
+
+- Run the `read.csv()` code provided and see what happens in the Environment tab.
+- Load the `tidyverse` package, which includes `readr`.
+- Use `read_csv()` to load the gapminder data. Read the message generated in the console.
+
+## Reading files: exercise
+
+```{r read_csv, message=F, warning = F}
+library(tidyverse)
+gapminder <- read_csv("data/gapminder5.csv")
+```
+
+## Reading files
+
+> - You can also read files from the full local path or from URLs
+> - You can read files using RStudio's interface through the "Files" tab
+> - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
+
 # Data manipulation
 
 ## Exploring data frames
@@ -37,7 +84,7 @@ Notice that any data frames which have been read in or created, like all other o
 
 ## Exploring data frames: exercise
 
-- Reload the gapminder data from Day 1
+- Makesure gapminder is loaded
 - Run `summary()` on the gapminder data
 - Find the mean of the variable `pop`
 - Create a frequency table of the variable, using `table()`
@@ -45,7 +92,7 @@ Notice that any data frames which have been read in or created, like all other o
 
 ## Exploring data frames: exercise
 
-```{r read_csv, message=TRUE}
+```{r read_csv exercise, message=TRUE}
 library(readr)
 gapminder <- read_csv("data/gapminder5.csv")
 ```
@@ -91,15 +138,15 @@ The most obvious use case of subsetting is to create and store smaller data fram
 ## Subsetting and Sorting: exercise
 
 ```{r subsetting and sorting}
-gapminder07 <- subset(gapminder, subset = year==2007)
+gapminder07 <- subset(gapminder, subset = year == 2007)
 sort(table(gapminder07$continent))
-gapminder07$pop[gapminder07$country=="Mexico"]
-head(gapminder07[order(gapminder07$pop, decreasing=TRUE),])
+gapminder07$pop[gapminder07$country == "Mexico"]
+head(gapminder07[order(gapminder07$pop, decreasing = TRUE),])
 ```
 
 ## Aside: 
 
-Don't worry too much about the bonus question if you find it confusing. The package `dplyr` within `tidyverse`, which I will cover in R4, will offer other ways to do this kind of task which some of you may find more intuitive.
+Don't worry too much about the bonus question if you find it confusing. The package `dplyr` within `tidyverse`, which we will cover tomorrow, will offer other ways to do this kind of task which some of you may find more intuitive.
 
 ## Adding and removing columns
 
@@ -279,16 +326,16 @@ plot(gapminder07$lifeExp ~ gapminder07$gdpPercap)
 
 ```{r scatterplot 2}
 plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
-     main="Relationship between life expectancy and GDP per capita in 2007", 
-     ylab="Life expectancy", xlab="GDP per capita")
+     main = "Relationship between life expectancy and GDP per capita in 2007", 
+     ylab = "Life expectancy", xlab="GDP per capita")
 ```
 
 ## Scatterplots: exercise
 
 ```{r scatterplot 3}
 plot(gapminder07$lifeExp ~ gapminder07$gdpPercap,
-     main="Relationship between life expectancy and GDP per capita in 2007", 
-     ylab="Life expectancy", xlab="GDP per capita")
+     main = "Relationship between life expectancy and GDP per capita in 2007", 
+     ylab = "Life expectancy", xlab="GDP per capita")
 abline(h = mean(gapminder07$lifeExp))
 ```
 

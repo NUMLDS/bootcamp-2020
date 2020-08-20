@@ -1,5 +1,5 @@
 ---
-title: 'Day 1: Intro to R Syntax, Data Structures, and Reading/Writing Files'
+title: 'Day 1: Intro to R Syntax and Data Structures'
 author: "Amanda Sahar d'Urso (materials from: K. Ramanathan)"
 date: "`r Sys.Date()`"
 output: 
@@ -45,37 +45,16 @@ The right-hand side panes include tools for manging your environment, workspace,
 
 ## Some key concepts
 
-You will hear these terms often this week:
+You will hear these terms:
 
 > - Objects
 > - Packages
 > - Functions
 > - Help files
 
-## Basics
+# Basics
 
-Some of you may have completed the *Introduction to R* course on DataCamp that was recommended. Congratulations! You already know quite a lot about how R works. As we continue, you can work on exercises as we try to keep pace with those who may not have completed the course. 
-
-The DataCamp course covered the following material:
-
-> - Arithmetic with R
-> - Objects and variable assignment
-> - Data types, incl.: character, numeric, logical, factors
-> - Data structures, incl.: vectors, matricies, data frames, lists
-
-<aside class="notes">
-Today, we will briefly review the above topics, and then turn to new material on reading and writing files, data manipulation, and data visualization.
-</aside>
-
-## Copy relevant folders
-
-We will be working on some exercises and using data files in the next few hours. To do this, you will need to fork and clone the bootcamp-2020 github repository.
-
-Let's walk through how to *fork* the repo to your GitHub account, and then *clone* it locally on your computer using the Git workflow within RStudio.
-
-# Basics and data types 
-
-## Best coding practices 
+## First, best coding practices 
 
 > - *always* use \`<-\` as your assignment mechanism, *not* \`=\`
 > - *always* use spaces between operators
@@ -98,13 +77,13 @@ library(tidyverse)
 y <- 1 + 1
 ```
 
-## Arithmetic
+## Arithmetic (R as a caluclator)
 
 - `<-` is the assignment operator
 - Standard arithmetic operators work: `+`, `-`, `/`, `*`, `^`
 - To run an operation, you can hit Ctrl+Return (Windows) or Cmd+Return (Mac)
 
-## Arithmetic 
+## Arithmetic (R as a calculator)
 
 ```{r arith 1}
 y <- 5
@@ -176,8 +155,10 @@ log(x*3) - 4
 
 ## Packages
 
-- Load the package `tidyverse` using the function `library()` <br><small>You may need to install it using `install.packages("tidyverse")` if you have not done so already</small>
-- Open the help file for the function `recode` <br><small>(Hint: remember what `?` does)</small>
+>- So far we have only used "base R". That is, the capabilities built into R.
+>- What if you want to do other things in R? What about all the fancy things you've seen people do? Those require **packages** 
+>- Load the package `tidyverse` using the function `library()` <br><small>You may need to install it using `install.packages("tidyverse")` if you have not done so already</small>
+>- Open the help file for the function `recode` <br><small>(Hint: remember what `?` does)</small>
 
 ## Packages
 
@@ -202,7 +183,7 @@ install.packages("tidyverse")
 > - **character**: `"text data"`, denoted with quotes <br><small>(`'single quotes'` and `"double quotes"` both work)</small>
 > - Use `typeof()` on an object to check its type
 
-# Review: Data structures
+# Data structures
 
 ## Vectors
 
@@ -369,67 +350,5 @@ mtcars$mpg
 mtcars[4,]
 mtcars$cylsq <- (mtcars$cyl)^2
 ```
-
-# Break!
-
-Let's take a break and return to learn two new skills: **reading files** and basic **data manipulation**.
-
-# Roadmap
-
-## Roadmap for the rest of the R sessions
-
-- Today we will learn how to do basic **data manipulation** and **data visualization** in base R
-- Most commonly, you will do these tasks using specialized packages such as `tidyverse` or `data.table`
-- So why teach these skills in base R?
-    - This helps you understand how R works
-    - Many packages rely on how these tasks work in base R
-    - Useful for simple tasks in workflows that otherwise don't involve much manipulation or visualization
-
-# Reading files
-
-## Working directories
-
-The working directory is the folder where R scripts and projects look for files by default. Since we are using RStudio's projects feature, your working directory is set already. Check where it is as follows:
-
-```{r}
-getwd()
-```
-
-If you need to change your working directory, e.g. when you are not working within an RStudio Project, you can go to the Files tab in the bottom right window in RStudio and find the directory you want. Then you can set it as a working directory with an option in the "More" menu. Or you can use the `setwd()` function.
-
-## Reading files: read.csv()
-
-```{r read.csv intro, eval=F}
-gapminder <- read.csv("data/gapminder5.csv", stringsAsFactors=FALSE)
-```
-
-```{r read.csv breakdown, eval=F}
-gapminder <- read.csv(file = "data/gapminder5.csv",
-                       sep = ",",
-                       stringsAsFactors = FALSE)
-```
-
-<aside class="notes">
-The above code is what you will usually see and use. The below code breaks down what is going on inside.
-</aside>
-
-## Reading files: exercise
-
-- Run the `read.csv()` code provided and see what happens in the Environment tab.
-- Load the `tidyverse` package, which includes `readr`.
-- Use `read_csv()` to load the gapminder data. Read the message generated in the console.
-
-## Reading files: exercise
-
-```{r read_csv, message=F, warning = F}
-library(tidyverse)
-gapminder <- read_csv("data/gapminder5.csv")
-```
-
-## Reading files
-
-> - You can also read files from the full local path or from URLs
-> - You can read files using RStudio's interface through the "Files" tab
-> - For other file types, use the packages `haven` (Stata, SAS, SPSS) or `readxl` (Excel)
 
 # The End!
