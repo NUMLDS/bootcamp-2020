@@ -1,6 +1,6 @@
 ---
 title: "Day 3: Loops, Conditionals, Functions"
-author: "Richard Paquin Morel"
+author: "Richard Paquin Morel and Sarah Moore"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
 params:
