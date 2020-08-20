@@ -1,6 +1,6 @@
-# 2020 MSiA boot camp
+# 2020 Poli Sci Math Camp (materials from 2020 MSiA boot camp)
 
-This Github repository contains materials for the R sessions of the 2020 Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources as you continue to develop your skills. 
+This Github repository contains materials for the R sessions of the 2020 Political Science Department Math Camp. These materials are heavily derived and adjusted from the Masters of Science in Analytics program boot camp, including lecture notes, slides, exercises, and recommended resources. 
 
 ## Workshop materials
 
@@ -8,9 +8,8 @@ This Github repository contains materials for the R sessions of the 2020 Masters
 |-------|-------|-------------|------|---------|
 |Day 1<br />Wed, 8/26|Basic syntax and data structures; reading and writing files|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day1_syntax-fileIO_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day1_syntax-fileIO_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day1_syntax-fileIO_exercises.R) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day1_syntax-fileIO_exercises_with_answers.R)|
 |Day 2<br />Thur, 8/27|Data manipulation and simple visualization in base R|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day2_dataintro_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day2_dataintro_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day2_dataintro_exercises.R) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day2_dataintro_exercises_with_answers.R)|
-|Day 3<br />Thur, 9/3|Git workflow in Rstudio/R Markdown; Reshaping and merging|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day4_Rmd-datamanip1_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day4_Rmd-datamanip1_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day4_Rmd-datamanip1_exercises.Rmd) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day4_Rmd-datamanip1_exercises_with_answers.Rmd)|
-|Day 4<br />Tue, 9/8|Advanced data manipulation in dplyr|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day5_dplyr_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day5_dplyr_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day5_dplyr_exercises.Rmd) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day5_dplyr_exercises_with_answers.Rmd)|
-|Day 5<br />Thur, 9/10|Data visualization with ggplot2|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day7_ggplot_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day7_ggplot_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day_7_ggplot_exercises.Rmd) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day_7_ggplot_exercises_with_answers.Rmd) |
+|Day 3<br />Tue, 9/8|Advanced data manipulation in dplyr|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day5_dplyr_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day5_dplyr_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day5_dplyr_exercises.Rmd) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day5_dplyr_exercises_with_answers.Rmd)|
+|Day 4<br />Thur, 9/10|Data visualization with ggplot2|[Lecture notes](https://msia.github.io/bootcamp-2020/lecturenotes/day7_ggplot_lecturenotes)|[Slides](https://msia.github.io/bootcamp-2020/lectureslides/day7_ggplot_slides.html)|[Exercises](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day_7_ggplot_exercises.Rmd) and [Answers](https://github.com/MSIA/bootcamp-2020/blob/master/exercises/day_7_ggplot_exercises_with_answers.Rmd) |
 
 ## Resources
 
@@ -37,7 +36,7 @@ Michael Hartl also wrote [Learn Enough Git to be Dangerous](https://www.learneno
 
 NUIT also has a [Git resource list](https://github.com/nuitrcs/gitworkshop).
 
-
+updat
 ## Authorship
 
 The R materials used on 8/26 - 9/8 and 9/10 are based on the [Intro to R workshop](https://github.com/nuitrcs/r_intro_june2018) from NUIT Research Computing Services, created by Christina Maimone. They have been expanded and modified by Kumar Ramanathan and Richard Morel. The materials on data.table used on 9/18 were originally developed by Ali Ehlen. The materials on ggplot2 used on 9/10 were originally developed by Kumar Ramanathan. Richard Morel, Ali Ehlen, and Kumar Ramanathan all jointly developed the overarching sequence of the sessions as well as the synthetic final exercise on 9/15. 
