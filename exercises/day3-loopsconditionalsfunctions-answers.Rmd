@@ -114,7 +114,8 @@ while (i <= 2002) {
 
 ## Conditional Statements 
 
-Then create an `if/else` command that prints "Mean gdp per capita is less than 900" if the mean gdp per capita is less than 900 over all observed years. Else, print the statement "Mean GDP per capita is greater than 900." 
+Then create an `if/else` command that prints "Mean gdp per capita is less than 900" if the mean gdp per capita is less than 900 over all observed years. 
+Else, print the statement "Mean GDP per capita is greater than 900." 
 
 ```{r}
 if(mean(gapminder$gdpPercap) < 900) {
@@ -125,7 +126,9 @@ if(mean(gapminder$gdpPercap) < 900) {
 ```
 
 Create a `for` loop with an if/else conditional: 
-Write a `for` loop that calculates the mean gdp per capita for each country over the observed years in the dataset. If a given country's mean gdp per capita is greater than the median for all country-year observations, then print the country and its mean gdp per capita. `Else`, print the country name and the statement "Sorry, this country does not meet the median threshold." 
+Write a `for` loop that calculates the mean gdp per capita for each country over the observed years in the dataset. 
+If a given country's mean gdp per capita is greater than the median for all country-year observations, then print the country and its mean gdp per capita. 
+`Else`, print the country name and the statement "Sorry, this country does not meet the median threshold." 
 
 ```{r} 
 for(i in unique(gapminder$country)) {
