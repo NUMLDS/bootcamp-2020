@@ -21,7 +21,6 @@ The `here()` function gets your current working directory and appends any string
 ```{r here}
 # install.packages("here")
 here::here()
-
 here::here("data", "gapminder.csv")
 ```
 
@@ -29,7 +28,7 @@ here::here("data", "gapminder.csv")
 ## Remember the gapminder dataset...
 
 ```{r revisiting the data}
-gapminder <- read.csv(here::here("/Desktop/", "gapminder5.csv"))
+gapminder <- read.csv(here::here("data/", "gapminder5.csv"))
 head(gapminder)
 ```
 
