@@ -1,6 +1,6 @@
 ---
-title: "Day 4: Rmarkdown, Advanced Data Manipulation 1"
-author: "Richard Paquin Morel"
+title: "Day 4: Rmarkdown, RStudio Git, RMD, and Advanced Data Manipulation 1"
+author: "Amanda Sahar d'Urso (materials from: R.P. Morel"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
 params:
@@ -33,7 +33,7 @@ notes<-params$notes
 
 # Advanced data manipulation, part 1: reshaping and merging
 
-# Let's get set up
+Let's get set up!
 
 ## A new dataset
 
@@ -45,18 +45,99 @@ California energy data
 
 ## Reading in the data
 
-```{r importing}
-library(here)
-library(readr)
-generation <- read.csv(here::here("data/ca_energy_generation.csv"), stringsAsFactors=F)
-imports <- read.csv(here::here("data/ca_energy_imports.csv"), stringsAsFactors=F)
+```{r importing, warning=F, message = F}
+library(tidyverse)
+generation <- read_csv("../data/ca_energy_generation.csv")
+imports <- read_csv("../data/ca_energy_imports.csv")
 ```
 
-## Exploring the data
+## Tidy data: What the heck is the `tidyverse`?
 
-```{r explore data}
-str(generation)
+>- “System of packages for data manipulation, exploration, and visualization that share a common design philosophy” - Rickert
+>- Mainly developed by Hadley Wickham 
+>- These packages work together using consistent language structures—once you learn it, these packages will feel as one
+
+## Tidy data: Tidyverse packages 
+
+![packages included in the tidyverse, always adding new packages](figures/tidyverse universe.png)
+
+## What is Tidy Data?
+
+>- "Happy families are all alike; every unhappy family is unhappy in its own way" - Leo Tolstoy 
+>- "Tidy datasets are all alike, but every messy dataset is messy in its own way" - Hadley Wickham
+>- Basically, tidy data are the way your data should be organized 
+
+## Three rules for tidy data:
+
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell. 
+
+## 1. Each variable must have its own column 
+
+![variables to column](figures/variables to column.png)
+
+## 2. Each observation must have its own row
+
+![observations to row](figures/observations to row.png)
+
+## 3. Each value must have its own cell. 
+
+![values to cell](figures/values to cell.png)
+
+## Long to wide 
+
+![long to wide](figures/long to wide.png)
+
+## Wide versus long data
+
+- Often, we want to make wide data long (or tidy) for analysis
+
+![Wide to long](figures/wide to long.png)
+
+## Wide versus long data
+
+```{r wide data}
+head(generation)
 ```
+
+
+## Using `reshape2`
+
+- `gather` --> make data long
+- `spread` --> make data wide
+
+## Reshaping CA energy data
+
+- Right now, the `generation` dataframe has several observations per row
+
+```{r untidy data}
+head(generation)
+```
+
+## `gather` the generation data
+
+`gather(df, key = new column name for key variable, value = new column name for data)`
+
+- Specify the variable that _doesn't_ gather through `-variable` (or specify the ones you want to gather)
+
+```{r gather}
+long_gen <- gather(generation, key = source, value = usage, -datetime)
+head(long_gen)
+```
+
+## reordering the `gather` the generation data by time
+
+```{r reordering}
+head(long_gen[order(long_gen$datetime), ])
+```
+
+```{r}
+spread(long_gen, key = source, value = usage) %>% slice(1:5)
+```
+
+# Dealing with dates/time
+How the heck am I supposed to work with "2019-09-03 00:00:00"?
 
 ## Dealing with dates and times
 
@@ -68,79 +149,30 @@ class(generation$datetime)
 class(imports$datetime)
 ```
 
-## Dealing with dates/times with `lubridate`
+
+
+
+## Dealing with dates/times: `lubridate`
 
 - The best way to deal with date-time data is to use the `lubridate` package
 - You can convert character variables into datetime format using the `as_datetime` function
     - One advantage of `readr::read_csv` is that it will often detect and convert datetime variables when importing
 
-```{r datetime}
+```{r, warning=F, message=F}
 library(lubridate)
-generation$datetime <- as_datetime(generation$datetime)
-class(generation$datetime)
-head(generation$datetime)
 ```
 
 ## Dealing with dates/times with `lubridate`
+```{r datetime}
+generation$datetime <- as_datetime(generation$datetime)
+head(generation$datetime)
+```
+
+
 ```{r}
 imports$datetime <- as_datetime(imports$datetime)
-class(imports$datetime)
 head(imports$datetime)
 ```
-
-# Reshaping data
-
-## Wide versus long data
-
-- Principles of "tidy data" (_R for Data Science_ - Wickham & Grolemund)
-  1. Each variable must have its own column.
-  2. Each observation must have its own row.
-  3. Each value must have its own cell.
-- Often, we want to make wide data long (or tidy) for analysis
-
-![Wide vs long data; image from RStudio Data Wrangling cheat sheet](figures/widevslong.jpg)
-
-## Wide versus long data
-
-```{r wide data}
-head(generation)
-```
-
-
-## Using `reshape2`
-
-- `melt` --> make data long
-- `dcast` --> make data wide
-- `recast`--> melt then cast data
-
-## Reshaping CA energy data
-
-- Right now, the `generation` dataframe has several observations per row
-
-```{r untidy data}
-head(generation)
-```
-
-## `melt` the generation data
-
-`melt(df, id.vars = "id")`
-
-- Specify the variable that _doesn't_ melt with `id.vars`
-
-```{r melting}
-library(reshape2)
-long_gen <- melt(generation, id.vars = "datetime",
-                             variable.name = "source",
-                             value.name = "usage")
-head(long_gen)
-```
-
-## `melt` the generation data
-
-```{r reordering}
-head(long_gen[order(long_gen$datetime), ])
-```
-
 
 # Merging data
 
@@ -195,9 +227,7 @@ head(merged_energy)
 
 ## Try reshaping the merged data!
 
-```{r melt exercise}
-long_merged_energy <- melt(merged_energy, id.vars = "datetime",
-                           variable.name = "source",
-                           value.name = "usage")
+```{r gather exercise}
+long_merged_energy <- gather(merged_energy, key = source, value = usage, -datetime)
 head(long_merged_energy)
 ```

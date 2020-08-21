@@ -1,5 +1,5 @@
 ---
-title: "Day 5:  Avdanced data manipulation 1 - dplyr"
+title: "Day 5:  Advanced data manipulation 1 - dplyr"
 author: "Richard Paquin Morel, adapted by Kumar Ramanathan and Emilio Lehoucq"
 date: "`r Sys.Date()`"
 output: revealjs::revealjs_presentation
