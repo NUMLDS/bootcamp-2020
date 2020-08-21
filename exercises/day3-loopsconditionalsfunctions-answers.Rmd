@@ -62,7 +62,7 @@ gapminder$log_lifeExp_months_2<-log(gapminder$lifeExpmonths_2)
 all(gapminder$lifeExp_months== gapminder$lifeExpmonths_2)
 all(gapminder$log_lifeExp_months== gapminder$log_lifeExpmonths_2)
 ```
-Using a method of your choosing, use the gdpPercap variable and pop variable to calculate the GDP per year per country. Call this variable "gdp". 
+Using a method of your choosing, use the gdpPercap variable and pop variable to calculate the GDP per year per country. Call this variable `gdp`. 
 ```{r}
 for (i in obs) {
   gapminder[i, "gdp"]<- gapminder[i, "pop"]*gapminder[i, "gdpPercap"]
@@ -73,7 +73,8 @@ for (i in obs) {
 gapminder$gdp<-gapminder$pop*gapminder$gdpPercap
 ```
 
-Now account for each of the unique country names that are in the dataset, and create a variable with them called "countries" 
+Now account for each of the unique country names that are in the dataset, and create a variable with them called `countries`.
+
 ```{r}
 countries<-unique(gapminder$country)
 ``` 
@@ -164,9 +165,9 @@ report_min_max(gapminder, "gdp", "Europe")
 ## Putting things all together. 
 
 Change the following function to conform to the following:
-#1) Change the color to green (hint: the specification for color is `col`)
-#2) Instead of a log x variable, use a squared x variable. 
-#3) Run the function as we did in the exercise from the lecture, but with the above new specifications for the year 1987. 
+1) Change the color to green (hint: the specification for color is `col`)
+2) Instead of a log x variable, use a squared x variable. 
+3) Run the function as we did in the exercise from the lecture, but with the above new specifications for the year 1987. 
 ```{r}
 viz_lm <-
   function(df, dv, iv, year) {
