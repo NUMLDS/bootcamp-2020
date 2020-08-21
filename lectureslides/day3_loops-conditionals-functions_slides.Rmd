@@ -544,12 +544,5 @@ viz_lm(gapminder, "lifeExp", "gdpPercap", 1977)
 ```
 
 
-## Loop it!
-
-```{r}
-for (i in years) {
-  viz_lm(gapminder, "lifeExp", "gdpPercap", i)
-}
-```
 
 
