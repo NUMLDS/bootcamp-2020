@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Intro to Tidyverse</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Amanda and Pilar" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Intro to Tidyverse
+### Amanda and Pilar
+### 22 August, 2020
+
+---
+
+
+
+ 
+# Intro to Tidyverse 
+
+A combination of packages that are useful for: importing, cleaning and transforming, processing and analyzing, visualizing. 
+
+Most common packages: dplyr, ggplot, haven 
+
+When you install (and load) tidyverse, you're installing (and loading) all of these packages. You can, instead, load the individual packages you'll use. 
+
+---
+# Tidy Data
+
+.med[There are three interrelated rules which make a dataset tidy:]
+
+--
+
+.med[1) Each variable must have its own column] 
+
+.center[
+&lt;img src="figures/vars.png" width="50%" height="40%" /&gt;
+]
+
+---
+# Tidy Data
+
+.med[There are three interrelated rules which make a dataset tidy:]
+
+--
+
+.med[2) Each observation must have its own row.] 
+
+.center[
+&lt;img src="figures/rows.png" width="50%" height="40%" /&gt;
+]
+
+---
+# Tidy Data
+
+.med[There are three interrelated rules which make a dataset tidy:]
+
+--
+
+.med[3) Each value must have its own cell.] 
+
+.center[
+&lt;img src="figures/cells.png" width="50%" height="40%" /&gt;
+]
+
+---
+# Dplyr 
+
+.med[Dplyr is a package for *data manipulation*.] 
+
+--
+
+.med[It's intuitive. Check out it's basic commands and guess what each does:] 
+
+--
+.med[.pull-left[
+1) mutate 
+
+2) select
+
+3) filter
+
+4) summarize/summarise
+
+5) group_by
+
+6) rename
+]]
+
+.pull-right[
+&lt;img src="figures/dplyr.png" width="60%" height="60%" /&gt;
+]
+
+---
+# Dplyr In Practice: exploring dataset
+
+.med[Let's use the data on Chicago neighborhoods.]
+
+
+```r
+chicago &lt;- read.csv("data/Census Data_selected_2008-2012.csv")
+```
+
+.large[Check out the 'glimpse' command. How does it compare to the Base R commands we learned last time? (dim(), head(), and names() ?]
+
+---
+# Dplyr in Practice: renaming
+
+.med[Notice the variable names are quite messy. Let's fix this with 'rename'.]
+
+
+```r
+rename(chicago, neighborhood=COMMUNITY.AREA.NAME)
+```
+--
+
+.med[Let's check if this worked:]
+
+
+```r
+names(chicago)
+```
+
+```
+##  [1] "Community.Area.Number"                       
+##  [2] "COMMUNITY.AREA.NAME"                         
+##  [3] "PERCENT.OF.HOUSING.CROWDED"                  
+##  [4] "PERCENT.HOUSEHOLDS.BELOW.POVERTY"            
+##  [5] "PERCENT.AGED.16..UNEMPLOYED"                 
+##  [6] "PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA"
+##  [7] "PERCENT.AGED.UNDER.18.OR.OVER.64"            
+##  [8] "PER.CAPITA.INCOME"                           
+##  [9] "HARDSHIP.INDEX"                              
+## [10] "ZONE"
+```
+--
+
+.med[How come?]
+
+---
+# PRACTICE
+
+.med[Rename the following variables:] 
+
+&lt;br&gt; 
+ 
+.med[1) PERCENT.HOUSEHOLDS.BELOW.POVERTY into "poverty"]
+  
+  &lt;br&gt;
+  
+.med[2) PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA into "no_diploma".]
+
+--
+
+---
+# Dplyr in Practice: summarizing
+
+.med[`summarize` reduces observations to a single value based on functions]
+
+
+```r
+summarise(chicago, mean = mean(poverty))
+```
+
+```
+##       mean
+## 1 21.73974
+```
+--
+
+Let's add other descriptive statistics:
+
+
+```r
+summarise(chicago, mean = mean(poverty), sd = sd(poverty), max = max(poverty))
+```
+
+```
+##       mean       sd  max
+## 1 21.73974 11.45723 56.5
+```
+
+
+---
+# Dplyr in Practice: filtering
+
+Say we want to create a filter to get neighborhoods that have poverty rates above 20%. 
+
+If we run this command, it will simply show us the dataset with the filter.
+
+```r
+filter(chicago, poverty &gt; 20)
+```
+--
+
+We can save this new dataset as a new object:
+
+
+```r
+high_pov &lt;- filter(chicago, poverty &gt; 20)
+```
+--
+You can combine multiple conditions too: 
+
+
+```r
+filter(chicago, poverty &gt; 20 &amp; diploma &gt; 40 &amp; neighborhood != "Hermosa")
+```
+
+---
+# PRACTICE 
+
+.med[ 1) What are the dimensions of this new dataset? 
+
+2) Summarize 'poverty' on this new dataset]
+
+---
+# Dplyr in Practice: selecting
+
+.med[Sometimes you will be working with large dataset that have hundreds of variables. But what if you want to work with only some of these variables?]
+
+--
+
+.med[We can create a dataset that has only the variables we want:]
+
+
+```r
+small_chicago &lt;- select(chicago, poverty, diploma, neighborhood)
+```
+--
+
+
+```r
+glimpse(small_chicago)
+```
+
+```
+## Rows: 78
+## Columns: 3
+## $ poverty      &lt;dbl&gt; 23.6, 17.2, 24.0, 10.9, 7.5, 11.4, 12.3, 12.9, 3.3, 5....
+## $ diploma      &lt;dbl&gt; 18.2, 20.8, 11.8, 13.4, 4.5, 2.6, 3.6, 2.5, 7.4, 11.5,...
+## $ neighborhood &lt;chr&gt; "Rogers Park", "West Ridge", "Uptown", "Lincoln Square...
+```
+---
+# Dplyr in Practice: selecting 
+
+.med[
+- select by name: 
+  - `select(chicago, poverty, diploma)`
+- select by position: 
+  - `select(chicago, c(1, 3, 10))`
+- select by range:
+  - `select(chicago, neighborhood:poverty)` or `select(chicago, 1:3)`
+- drop variables with `-`
+  - `select(chicago, -diploma)`
+- "select helpers" that make subsetting variables very easy
+  - `one_of()`, `contains()`, `starts_with()`, `ends_with()`, `matches()`
+]
+
+---
+# Dplyr in Practice: grouping 
+
+Many times you'll want to analyze data across groups (regions, gender, age group, political party, etc.). We can use the group_by function for this. 
+
+
+```r
+grouping &lt;- group_by(chicago, ZONE)
+```
+
+And now instead of summarizing over "chicago", we summarize over the new object "grouping". 
+
+
+```r
+summarise(grouping, mean = mean(poverty))
+```
+
+```
+## # A tibble: 7 x 2
+##   ZONE         mean
+##   &lt;chr&gt;       &lt;dbl&gt;
+## 1 ""           16.1
+## 2 "Far South"  25.7
+## 3 "North"      13.5
+## 4 "Northwest"  15.0
+## 5 "South"      31.9
+## 6 "Southwest"  19.0
+## 7 "West"       31.3
+```
+
+---
+# Dplyr in Practice: Pipes %&gt;% 
+
+.med[There's a wonderful tool in dplyr called a **pipe**, which will allow us to do things much more efficiently.]
+
+--
+
+.center.med[It's symbols is %&gt;% *(tip: keyboard shortcut Ctrl+Shift+M)*]
+
+--
+
+.med[
+- It lets us perform multiple operations at once, without creating an object for each one of them.
+- It sends the result of one function to another function
+- Read `%&gt;%` as "then"
+- `%&gt;%` increases the readability of your code]
+
+
+---
+# Dplyr in Practice: Pipes %&gt;% 
+
+Let's take the example above (mean of poverty by area) and do it in one step. The first thing we do is tell it which dataset we want to run the commands in, and then we simply write the commands, without having to specify the dataset. 
+
+--
+
+
+```r
+chicago %&gt;% group_by(ZONE) %&gt;% summarise(mean = mean(poverty))
+```
+
+```
+## # A tibble: 7 x 2
+##   ZONE         mean
+##   &lt;chr&gt;       &lt;dbl&gt;
+## 1 ""           16.1
+## 2 "Far South"  25.7
+## 3 "North"      13.5
+## 4 "Northwest"  15.0
+## 5 "South"      31.9
+## 6 "Southwest"  19.0
+## 7 "West"       31.3
+```
+--
+
+This translates to: in the dataset 'chicago', group by 'zone' and give us the mean of poverty for each zone. 
+
+---
+# Dplyr in Practice: Pipes
+
+You can add as many commands as you want (but nothing in excess is good!). 
+
+--
+
+
+```r
+chicago %&gt;% select(poverty, ZONE) %&gt;% filter(poverty &gt; 30) %&gt;% 
+  group_by(ZONE) %&gt;% summarise(mean = mean(poverty))
+```
+
+```
+## # A tibble: 4 x 2
+##   ZONE       mean
+##   &lt;chr&gt;     &lt;dbl&gt;
+## 1 Far South  44.8
+## 2 South      39.2
+## 3 Southwest  40.5
+## 4 West       38.4
+```
+
+--
+
+In this case, we are first selecting only two variables from the dataset, then filtering for neighborhoods with poverty rates over 30%, then grouping by zone, then obtaining the mean poverty rate for each zone.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

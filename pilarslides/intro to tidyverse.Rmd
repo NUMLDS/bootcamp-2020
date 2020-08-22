@@ -38,7 +38,7 @@ When you install (and load) tidyverse, you're installing (and loading) all of th
 
 .center[
 ```{r  out.height="40%", out.width="50%", echo=FALSE}
-knitr::include_graphics("vars.png") 
+knitr::include_graphics("figures/vars.png") 
 ```
 ]
 
@@ -53,7 +53,7 @@ knitr::include_graphics("vars.png")
 
 .center[
 ```{r  out.height="40%", out.width="50%", echo=FALSE}
-knitr::include_graphics("rows.png") 
+knitr::include_graphics("figures/rows.png") 
 ```
 ]
 
@@ -68,7 +68,7 @@ knitr::include_graphics("rows.png")
 
 .center[
 ```{r  out.height="40%", out.width="50%", echo=FALSE}
-knitr::include_graphics("cells.png") 
+knitr::include_graphics("figures/cells.png") 
 ```
 ]
 
@@ -98,7 +98,7 @@ knitr::include_graphics("cells.png")
 
 .pull-right[
 ```{r  out.height="60%", out.width="60%", echo=FALSE}
-knitr::include_graphics("dplyr.png") 
+knitr::include_graphics("figures/dplyr.png") 
 ```
 ]
 
@@ -108,7 +108,7 @@ knitr::include_graphics("dplyr.png")
 .med[Let's use the data on Chicago neighborhoods.]
 
 ```{r}
-chicago <- read.csv("Census Data_selected_2008-2012.csv")
+chicago <- read.csv("data/Census Data_selected_2008-2012.csv")
 ```
 
 .large[Check out the 'glimpse' command. How does it compare to the Base R commands we learned last time? (dim(), head(), and names() ?]
@@ -121,12 +121,14 @@ chicago <- read.csv("Census Data_selected_2008-2012.csv")
 ```{r echo=T, results="hide"}
 rename(chicago, neighborhood=COMMUNITY.AREA.NAME)
 ```
+--
 
 .med[Let's check if this worked:]
 
 ```{r}
 names(chicago)
 ```
+--
 
 .med[How come?]
 
@@ -136,11 +138,12 @@ names(chicago)
 .med[Rename the following variables:] 
 
 <br> 
-
-.med[ 
-  - PERCENT.HOUSEHOLDS.BELOW.POVERTY into "poverty"
+ 
+.med[1) PERCENT.HOUSEHOLDS.BELOW.POVERTY into "poverty"]
+  
   <br>
-  - PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA into "no_diploma".]
+  
+.med[2) PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA into "no_diploma".]
 
 --
 ```{r echo=FALSE}
