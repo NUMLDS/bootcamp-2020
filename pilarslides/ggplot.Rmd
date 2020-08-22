@@ -1,0 +1,359 @@
+---
+title: "ggplot"
+author: "Amanda and Pilar"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  xaringan::moon_reader:
+    seal: true 
+    css: [default, custom.css, default, default-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+library(tidyverse)
+library(gapminder)
+library(flipbookr)
+```
+ 
+# Intro to ggplot 
+
+.med[Compare a simple ggplot with a base R plot.]
+
+--
+.pull-left[
+```{r echo=TRUE, fig.height = 5, fig.width = 6}
+gapminder %>% ggplot(aes(gdpPercap, lifeExp)) + geom_point()
+```
+]
+
+.pull-right[
+```{r echo=TRUE, fig.height = 5, fig.width = 6}
+plot(gapminder$gdpPercap, gapminder$lifeExp)
+```
+]
+
+---
+# Intro to Ggplot
+
+.med[Now compare it with this:]
+
+--
+
+.center[
+
+```{r echo=FALSE}
+gapminder %>% 
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+  ylab("Life Expectancy in years")+
+  theme_minimal()
+```
+]
+
+---
+# Getting started
+
+First, make sure you have the package installed and loaded. Remember that by loading 'tidyverse' you'll be including both ggplot and dplyr (and the other packages from the collection). 
+
+--
+
+Next, install and load the package "gapminder". 
+
+--
+
+Gapminder is a reduced version of the full data found at gapminder.org. Take a first look at the data with some of these commands: glimpse(), View(), names(), head(). 
+
+```{r}
+glimpse(gapminder)
+```
+
+
+---
+# The Basic Structure
+
+ggplot works by combining several functions using the `+` operator. This creates _layers_ in an additive fashion. Each function does something specific: provide a dataset, create a geometric object, add labels, add scales, change the coordinate system or layout, change the color palette, etc. 
+
+
+ggplot(name of dataset), aes (x= name variable x, y= name variable y, ...) +
+geom_something() 
+
+--
+
+- Name of dataset: just type the name of the dataset that contains the variables you are interested in graphing.
+
+--
+
+- aes(): *what* you want to plot (variables) and what you want to *see* (color, fill, shape, linetype, and size. aes stands for 'aesthetics'. 
+
+--
+
+- geom_something: *how* you want to plot it. Geometric objects are the actual marks we put on a plot. You need at leas one but can have as many as you want! Common examples: 
+  - geom_point: points for scatter plots, dot plots, etc.
+  - geom_line: lines for time series, trend lines, etc.
+  - geom_boxplot: boxplots
+
+--
+
+- other options: titles, themes, axis adjustment, legends, etc. 
+
+
+---
+# Step by Step
+
+```{r plot, echo = F, eval = F}
+gapminder %>% 
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() + 
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+  ylab("Life Expectancy in years")+
+  theme_minimal()
+```
+---
+
+`r chunk_reveal(chunk_name = "plot")`
+---
+# Step by Step
+
+The example we just saw is fleshed out at its maximum to illustrate what each step does. In practice, you can get this done in fewer lines. 
+
+--
+
+Both of these codes produce the exact same graph. Take a second to identify what's different from them: 
+
+.pull-left[
+```{r, eval=FALSE}
+gapminder %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point(aes(color = continent)) +
+  labs(
+    title = "Wealth and Health",
+    subtitle = "GDP and life expectancy",
+    caption = "Source: Gapminder",
+    x = "GDP/capita in US$",
+    y = "Life Expectancy in years"
+  ) +
+  theme_minimal()
+```
+]
+
+.pull-right[
+```{r, eval=FALSE}
+gapminder %>% 
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() + 
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+  ylab("Life Expectancy in years")+
+  theme_minimal()
+```
+]
+
+---
+# ggplot: one categorical variable 
+
+.pull-left[
+```{r fig.height = 5, fig.width = 6}
+ggplot(gapminder, aes(x=continent)) + geom_bar()
+```
+]
+
+.pull-right[
+```{r fig.height = 5, fig.width = 6}
+ggplot(gapminder, aes(x=continent,fill= continent)) + geom_bar()
+```
+]
+
+---
+# Plotting a continuous variable
+
+.pull-left[
+```{r fig.height = 5, fig.width = 6}
+ggplot(data=gapminder, aes(x=lifeExp)) + 
+    geom_histogram(binwidth = .2)
+```
+]
+
+--
+.pull-right.med[
+**PRACTICE**: Change the binwidth to different values. What does this do? 
+]
+
+---
+# Plotting a continuous variable
+
+Now let's add some color. 
+
+```{r fig.height = 5, fig.width = 6}
+ggplot(data=gapminder, aes(x=lifeExp)) + 
+    geom_histogram(binwidth = .2, color= "blue", fill="black") 
+```
+---
+# ggplot: Plotting a continuous variable
+
+.med[**PRACTICE**: What if we want a density plot instead of a histogram? Google what geom_xxx we need to get this done?]
+
+--
+
+How about one density plot per continent? 
+
+--
+```{r fig.height = 5, fig.width = 6}
+ggplot(data=gapminder, aes(x=lifeExp, fill=continent)) +
+    geom_density(alpha=0.3)
+```
+--
+
+.pull-right.med[**PRACTICE**: Change the alpha value and see what that does.]
+
+---
+# Plotting a continuous vs a categorical
+
+Boxplots are useful when we have a categorical X and a continuous Y (or viceversa)
+
+```{r fig.height = 5, fig.width = 6}
+ ggplot(data=gapminder, aes(x=continent, y=lifeExp)) +
+  geom_boxplot(outlier.size=2)
+```
+--
+
+.pull-right.med[**PRACTICE**: Give it some color (hint: see the colorful bar graph above)]
+
+---
+# Plotting two continuous 
+
+```{r lineplot, echo=FALSE, eval=FALSE}
+gapminder %>%
+  group_by(continent, year) %>%
+  summarise(lifeExp = median(lifeExp)) %>%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+  geom_line() + 
+  geom_line(size = 1, linetype="dashed") + 
+  labs(x = "Year", y = "Life Expectancy") + 
+  theme_dark() +
+  theme(legend.position = "bottom") 
+```
+---
+
+---
+# Plotting two continuous 
+
+`r chunk_reveal(chunk_name = "lineplot")`
+---
+# ggplot: Multiple Plots
+
+Sometimes we have too much on a single graph, and that makes things messy. We can use the 'facet_wrap' option:
+
+.pull-left[
+```{r, eval=FALSE}
+gapminder %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap(~continent)
+```
+]
+
+.pull-right[
+```{r, echo=FALSE, fig.height=5, fig.width=6}
+gapminder %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap(~continent)
+```
+
+]
+
+---
+# PRACTICE
+
+.med[Make the above plot nicer: 
+
+1) Fix the axis labels 
+
+2) Add some color 
+
+3) Change the axis so that it's not in scientific notation
+
+4) Add a theme 
+]
+
+---
+# Saving graphs 
+
+.med[1) Create an object with the plot]
+
+.pull-left[
+```{r, echo=TRUE}
+plot1 <- gapminder %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap( ~ continent)
+```
+]
+
+.pull-left[
+```{r, echo=TRUE, fig.height=5, fig.width=6}
+plot1 
+```
+]
+---
+# Saving graphs 
+
+.med[2) Save it from the Viewer Panel]
+
+.center[
+```{r  out.height="40%", out.width="50%", echo=FALSE}
+knitr::include_graphics("saving.png") 
+```
+]
+---
+# Saving graphs
+
+.med[3) Use the 'ggsave' function.] 
+
+
+```{r, fig.height=5, fig.width=6}
+plot1 <- gapminder %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap( ~ continent) +
+  ggsave("plot1.png")
+```
+
+--
+
+.med[**PRACTICE**: Find this plot in your files.]
+

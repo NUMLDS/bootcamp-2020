@@ -1,0 +1,260 @@
+---
+title: "Coding Tips and Exploring Data"
+author: "Amanda and Pilar"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  xaringan::moon_reader:
+    seal: true 
+    css: [default, custom.css, default, default-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# Coding: The Script
+
+.med[Recall the difference between the Console and the Script.
+
+The console is for "quick and dirty" coding, for trying out commands, etc. But most of the time you'll want to save your work. This is what the script is for.
+
+In it, we write our code, and then we send it to the console for execution.]
+
+--
+
+.med[To execute our code, we put our cursor on the line and hit ctrl + Enter]
+
+--
+
+<br>
+
+.med[**Remember: whatever you write on the console IS NOT SAVED. What you write on the script is, but there may be some things you are not interested in saving!**]
+
+---
+# Coding: Keeping it neat
+
+.med[Most important: COMMENT YOUR CODE AND KEEP IT NEAT]
+
+--
+
+.med[Comments are written with hashtags #. R will not run anything that comes after one. 
+
+Comment everything that you do. Your future self, your coauthors, and replicators will appreciate it.]
+
+--
+```{r}
+# Create a vector with birthdates
+bday <- c(1993,1991,1996,1989)
+
+# Calculate mean 
+mean(bday)
+```
+
+---
+# Coding: Keeping it neat
+
+.med[
+You can also create sections of code by using four hashtags (or dashes) after your section title. This will make it easier to find your spot on the code (they will get long!).]
+
+```{r  out.height="80%", out.width="70%", echo=FALSE}
+knitr::include_graphics("sections.png") 
+```
+
+---
+# Coding: Keeping it neat
+
+.med[ALWAYS use `<-` as your assignment mechanism, NOT `= `]
+
+--
+
+.med[ALWAYS use spaces between operators, like `=`, `<-`, `~`
+
+  - USE: mod1 <- lm(formula = weight ~ height + age + gender) 
+  
+  - NOT: mod1<-lm(formula=weight~height+age+gender)]
+  
+--
+  
+.center[*Tip: keyboard shortcut for <- includes these spaces. Option + - on a Mac, or Alt + - on Linux and Windows.*]
+
+---
+# Coding: Loading libraries
+
+.med[Always a good idea to load your libraries at the top of your code.]
+
+--
+
+```{r}
+library(tidyverse)
+library(car)
+library(janitor)
+```
+
+--
+.med[If you load a library without installing it first, you will get this error:] 
+
+```{r error= TRUE}
+library(caret)
+```
+
+
+--
+.med[If you try to run a command from a package without loading it first, you will get this error:]
+
+```{r error=TRUE}
+glimpse(gapmider)
+```
+
+---
+# Coding: What to save
+
+.med[Always save your script. NEVER save your environment upon exit. It's usually a good idea to start each session from scratch.]
+
+--
+.pull-left[
+```{r  out.height="90%", out.width="80%", echo=FALSE}
+knitr::include_graphics("saving.png") 
+```
+]
+--
+.pull-right[.med[
+Each time you open R you're environment will be empty. This means that the objects you created in your previous session will not be saved (but you can always re-create them from the script).]] 
+
+---
+# Coding: Other good practices
+
+.med[NEVER write code that, when shared, changes someone else’s machine
+
+  - USE: #install tidyverse
+  
+  - NOT: install.packages("tidyverse")]
+
+--- 
+# Coding: Working Directory
+
+.med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+
+--
+
+.med[We want all of this to be in the same folder, so we'll tell R where this folder is. You will then be able to see these files under the "Files" pane, or with dir().]
+
+--
+
+.med[We do this by using the command setwd(""). You will copy-paste your folder's path in these quotations.]
+
+```{r eval= FALSE}
+setwd("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2")
+```
+
+--
+.med[*Windows users: you will have to change the backslash \ for the forward slash /*]
+
+---
+# Reading in Data: The easy way 
+
+```{r  out.height="80%", out.width="70%", echo=FALSE}
+knitr::include_graphics("importing.png") 
+```
+
+---
+# Reading in Data: Most efficient way
+
+.med[Once you are comfortable with setwd() and how to type paths, this is the most efficient option. You can run a script that has a line to import the datasets.] 
+
+--
+
+.med[There are several commands to read files from outside R. The command you use depends on the type of data file. Below, one of the most common ones:] 
+
+--
+
+```{r}
+chicago <- read.csv("Census Data_selected_2008-2012.csv")
+```
+
+--
+
+If I had not set my working directory, I would write the whole path to the file:
+
+```{r}
+chicago <- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/Census Data_selected_2008-2012.csv")
+```
+
+---
+# Reading in Data 
+
+.med[Besides the Base R commands for importing data, many packages offer alternatives. See "readr" and "haven", both part of the Tidyverse collection.]
+
+--
+
+.med[Haven is useful for importing Stata files, which you will often encounter]
+
+
+```{r, eval=FALSE}
+install.packages("haven")
+library(haven)
+
+chicago_stat <- read_dta("Census Data_selected_2008-2012.dta")
+
+```
+
+---
+# Exploring data 
+
+.med[There are several initial steps you can do to get a sense of what the dataset looks like, what variables it contains, how it's structured, etc.]
+
+--
+
+1) The first easy way is to use the command View(), which opens up the dataset in a new window.
+
+```{r}
+View(chicago)
+```
+
+--
+Alternatively, you can click the "play" button next to the name of the dataset in the Environment window. 
+
+```{r  out.height="50%", out.width="50%", echo=FALSE}
+knitr::include_graphics("view.png") 
+```
+
+---
+# Exploring data 
+
+
+2) Look at the dimensions of the dataset:
+
+```{r}
+dim(chicago)
+```
+--
+
+3) Look at the names of the variables:
+
+```{r}
+names(chicago)
+```
+
+---
+# Exploring the Data
+
+4) Look at the firs rows of the dataset. (Figure out how to look at the last rows too). 
+
+```{r}
+head(chicago)
+```
+---
+# Exploring Data
+
+4) Summarize the variables 
+
+```{r}
+summary(chicago)
+```
+
+

@@ -1,0 +1,20 @@
+.large {
+font-size: 30px;
+padding 1em 4em 1em 4em;
+}
+
+.med {
+font-size: 27px;
+padding 1em 4em 1em 4em;
+}
+
+.tiny{
+font-size: 7px;
+padding 1em 4em 1em 4em;
+}
+
+.bold{font-weight: bold}
+
+.space1{line-height: 2}
+
+.space1{line-height: 1.5}

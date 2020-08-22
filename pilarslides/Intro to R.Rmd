@@ -1,0 +1,298 @@
+---
+title: "Intro to R"
+author: "Amanda and Pilar"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  xaringan::moon_reader:
+    seal: true 
+    css: [default, custom.css, default, default-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# R and R studio
+
+```{r  out.height="100%", out.width="100%", echo=FALSE}
+knitr::include_graphics("rpic.png") 
+```
+
+Source: Modern Drive
+
+---
+# R Studio Interface
+```{r  out.height="80%", out.width="80%", echo=FALSE}
+knitr::include_graphics("rladies.png") 
+```
+Source: R Ladies
+
+---
+# Customizing R Studio 
+.center[
+```{r  out.height="40%", out.width="50%", echo=FALSE}
+  knitr::include_graphics("mactheme.png")
+```
+]
+
+Tools --> Global Options --> Appearance
+
+---
+# R as a calculator
+
+```{r}
+2+2
+2/3
+log(10)
+abs(-1)
+sqrt(9)
+```
+
+---
+# Logical statements
+
+.med[Common logical operators: 
+
+  - == (is equal)
+  - != (not equal)
+  - < (greater than), > (less than)
+  - & (and), | (or)
+]
+
+---
+# Logical statements
+
+```{r}
+1 < 2
+
+2 >= 1
+
+1 == 2
+
+2 != 2
+
+1 > 0 & 2 > 0
+
+1 < 0 | 2 <= 3
+```
+
+---
+# PRACTICE 
+.large[
+1) Calculate square root of 109090
+
+<br>
+
+2) What number is larger: The log of 2000 or the square root of 51? (Try to do this in one line only)
+
+<br>
+
+3) What is the maximum number between: the square root of 200, seven times 2, and log of 3000 (Try to do this in one line only)
+]
+
+---
+# Objects
+
+.large[
+- R is based on objects: variables, functions, dataframes, etc.
+
+<br>
+- Objects can be of different types (or "class"). The types of operations you can perform will depend on the class. 
+
+<br>
+
+- Most common class of objects: numeric, character, logical, matrix, data.frame, list, function.
+]
+
+---
+# Objects
+
+We usually want to store objects so we can work with them later. We do this by attributing a name to that object. 
+
+```{r}
+year <- 2020
+```
+
+What type of object is "year"?
+
+```{r}
+class(year)
+```
+
+```{r}
+prof_name <- "Jean"
+prof_name
+class(prof_name)
+```
+
+---
+# Vectors (combining objects)
+
+A vector is a combination of more than one object (of the same class). We can create vectors with c() which stands for "combine". 
+
+```{r}
+names <- c("Jean", "Amanda", "Pilar")
+names
+class(names)
+```
+--
+
+```{r}
+grad_year <- c(2016, 2021, 2023)
+grad_year
+class(grad_year)
+```
+--
+
+```{r}
+area <- c("Methods", "American Politics", "Comparative Politics")
+```
+
+---
+# PRACTICE 
+.large[
+1) Create an object with your first name and a second object with your last name.
+
+<br>
+
+2) Create a vector that contains your first and last name. (Try the function "paste" too)
+]
+
+---
+# Functions to describe numeric vectors
+
+.large[
+summary()
+
+mean()
+
+median()
+
+sd()
+
+var()
+]
+
+---
+# Dataframes 
+
+.large[
+  - Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.
+  - Data frames are *heterogenous*: the vectors in a data frames can each be of a different data type.
+  - Columns are typically variables and rows are observations.
+  - You can make make data frames with `data.frame()`, or by combining vectors with `cbind()` or `rbind()`.
+  ]
+---
+# Dataframes (combining vectors)
+
+```{r}
+dataset <- cbind(names, grad_year, area)
+dataset 
+```
+
+```{r}
+dataset <- data.frame(names = c("Jean","Amanda","Pilar"), 
+                 grad_year = c(2016, 2021, 2023), 
+                 area = c("Methods", "American Politics", "Comparative Politics"))
+dataset
+```
+---
+# Dataframes
+
+Data frames can be indexed by using variable/column names: `df$var` or `df["var"]`.
+
+```{r}
+dataset$names
+
+dataset$grad_year[dataset$names == "Jean"]
+
+dataset$new_grad_year <- dataset$grad_year - 2
+
+dataset$new_grad_year
+```
+
+---
+# Packages
+
+```{r  out.height="80%", out.width="80%", echo=FALSE}
+knitr::include_graphics("packages.png") 
+```
+
+--
+
+
+| On phone     | On R                 |
+|--------------|----------------------|
+| Download app | install.packages("") |
+| Open app     | library()            |
+
+
+---
+# Basics of R: Errors and Warnings
+
+.med[Error: If you get an error, the command will not be executed. This can be due to many things (including silly spelling mistakes, missing parentheses, etc.)]
+
+```{r error= TRUE}
+names <- "Jean", "Amanda", "Pilar"
+```
+
+--
+
+.med[In some occasions, R will warn you about this even before executing the code.]
+
+```{r  out.height="90%", out.width="90%", echo=FALSE}
+knitr::include_graphics("error.png") 
+```
+
+---
+# Basics of R: Errors and Warnings
+
+.med[If you get a warning, the command will still be executed, but with some tweaking.]
+
+--
+
+```{r warning=TRUE}
+x <- as.numeric(c("1", "2", "X"))
+```
+<br>
+--
+
+.med[Make sure that "tweaking" still gets you the result you want.]
+
+```{r}
+x
+```
+---
+# Where to find help 
+
+.med[
+1) In R:
+ - type ?mean 
+ - In "Help" window on lower-right pane
+
+
+2) Google
+
+
+3) StackExchange, StackOverflow
+
+
+4) Package documentation, Package vignettes
+]
+
+---
+# PRACTICE
+
+.large[
+1) Install the package "tidyverse" 
+
+<br>
+
+2) Download and save the documentation for the package 
+]
