@@ -181,7 +181,7 @@ chicago <- read.csv("Census Data_selected_2008-2012.csv")
 
 If I had not set my working directory, I would write the whole path to the file:
 
-```{r}
+```{r, eval=FALSE}
 chicago <- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/Census Data_selected_2008-2012.csv")
 ```
 
