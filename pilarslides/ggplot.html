@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ggplot</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Amanda and Pilar" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ggplot
+### Amanda and Pilar
+### 22 August, 2020
+
+---
+
+
+
+ 
+# Intro to ggplot 
+
+.med[Compare a simple ggplot with a base R plot.]
+
+--
+.pull-left[
+
+```r
+gapminder %&gt;% ggplot(aes(gdpPercap, lifeExp)) + geom_point()
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+plot(gapminder$gdpPercap, gapminder$lifeExp)
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+]
+
+---
+# Intro to Ggplot
+
+.med[Now compare it with this:]
+
+--
+
+.center[
+
+![](ggplot_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+]
+
+---
+# Getting started
+
+First, make sure you have the package installed and loaded. Remember that by loading 'tidyverse' you'll be including both ggplot and dplyr (and the other packages from the collection). 
+
+--
+
+Next, install and load the package "gapminder". 
+
+--
+
+Gapminder is a reduced version of the full data found at gapminder.org. Take a first look at the data with some of these commands: glimpse(), View(), names(), head(). 
+
+
+```r
+glimpse(gapminder)
+```
+
+```
+## Rows: 1,704
+## Columns: 6
+## $ country   &lt;fct&gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan, Afgha...
+## $ continent &lt;fct&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asi...
+## $ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 199...
+## $ lifeExp   &lt;dbl&gt; 28.801, 30.332, 31.997, 34.020, 36.088, 38.438, 39.854, 4...
+## $ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 14880372,...
+## $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 786.113...
+```
+
+
+---
+# The Basic Structure
+
+ggplot works by combining several functions using the `+` operator. This creates _layers_ in an additive fashion. Each function does something specific: provide a dataset, create a geometric object, add labels, add scales, change the coordinate system or layout, change the color palette, etc. 
+
+
+ggplot(name of dataset), aes (x= name variable x, y= name variable y, ...) +
+geom_something() 
+
+--
+
+- Name of dataset: just type the name of the dataset that contains the variables you are interested in graphing.
+
+--
+
+- aes(): *what* you want to plot (variables) and what you want to *see* (color, fill, shape, linetype, and size. aes stands for 'aesthetics'. 
+
+--
+
+- geom_something: *how* you want to plot it. Geometric objects are the actual marks we put on a plot. You need at leas one but can have as many as you want! Common examples: 
+  - geom_point: points for scatter plots, dot plots, etc.
+  - geom_line: lines for time series, trend lines, etc.
+  - geom_boxplot: boxplots
+
+--
+
+- other options: titles, themes, axis adjustment, legends, etc. 
+
+
+---
+# Step by Step
+
+
+---
+
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-plot-auto[
+
+```
+## # A tibble: 1,704 x 6
+##    country     continent  year lifeExp      pop gdpPercap
+##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia       1952    28.8  8425333      779.
+##  2 Afghanistan Asia       1957    30.3  9240934      821.
+##  3 Afghanistan Asia       1962    32.0 10267083      853.
+##  4 Afghanistan Asia       1967    34.0 11537966      836.
+##  5 Afghanistan Asia       1972    36.1 13079460      740.
+##  6 Afghanistan Asia       1977    38.4 14880372      786.
+##  7 Afghanistan Asia       1982    39.9 12881816      978.
+##  8 Afghanistan Asia       1987    40.8 13867957      852.
+##  9 Afghanistan Asia       1992    41.7 16317921      649.
+## 10 Afghanistan Asia       1997    41.8 22227415      635.
+## # ... with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+* ggplot()
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+* aes(x=gdpPercap)
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+* aes(y=lifeExp)
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+* scale_x_log10()
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+* geom_point()
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_06_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+* geom_point(aes(color=continent))
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_07_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+* labs(title="Wealth and Health")
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_08_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+* labs(subtitle = "GDP and life expectancy")
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_09_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+* labs(caption="Source: Gapminder")
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_10_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+* xlab("GDP/capita in US$")
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_11_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+* ylab("Life Expectancy in years")
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_12_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-plot-auto[
+
+```r
+gapminder %&gt;%
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() +
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+  ylab("Life Expectancy in years")+
+* theme_minimal()
+```
+]
+ 
+.panel2-plot-auto[
+![](ggplot_files/figure-html/plot_auto_13_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-plot-auto {
+  color: black;
+  width: 38.6060606060606%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-plot-auto {
+  color: black;
+  width: 59.3939393939394%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-plot-auto {
+  color: black;
+  width: NA%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+---
+# Step by Step
+
+The example we just saw is fleshed out at its maximum to illustrate what each step does. In practice, you can get this done in fewer lines. 
+
+--
+
+Both of these codes produce the exact same graph. Take a second to identify what's different from them: 
+
+.pull-left[
+
+```r
+gapminder %&gt;%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point(aes(color = continent)) +
+  labs(
+    title = "Wealth and Health",
+    subtitle = "GDP and life expectancy",
+    caption = "Source: Gapminder",
+    x = "GDP/capita in US$",
+    y = "Life Expectancy in years"
+  ) +
+  theme_minimal()
+```
+]
+
+.pull-right[
+
+```r
+gapminder %&gt;% 
+  ggplot() +
+  aes(x=gdpPercap) +
+  aes(y=lifeExp)+
+  scale_x_log10() +
+  geom_point() + 
+  geom_point(aes(color=continent)) +
+  labs(title="Wealth and Health") +
+  labs(subtitle = "GDP and life expectancy") +
+  labs(caption="Source: Gapminder") +
+  xlab("GDP/capita in US$")+
+  ylab("Life Expectancy in years")+
+  theme_minimal()
+```
+]
+
+---
+# ggplot: one categorical variable 
+
+.pull-left[
+
+```r
+ggplot(gapminder, aes(x=continent)) + geom_bar()
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+ggplot(gapminder, aes(x=continent,fill= continent)) + geom_bar()
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+]
+
+---
+# Plotting a continuous variable
+
+.pull-left[
+
+```r
+ggplot(data=gapminder, aes(x=lifeExp)) + 
+    geom_histogram(binwidth = .2)
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+--
+.pull-right.med[
+**PRACTICE**: Change the binwidth to different values. What does this do? 
+]
+
+---
+# Plotting a continuous variable
+
+Now let's add some color. 
+
+
+```r
+ggplot(data=gapminder, aes(x=lifeExp)) + 
+    geom_histogram(binwidth = .2, color= "blue", fill="black") 
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+---
+# ggplot: Plotting a continuous variable
+
+.med[**PRACTICE**: What if we want a density plot instead of a histogram? Google what geom_xxx we need to get this done?]
+
+---
+# ggplot: Plotting a continuous variable
+
+.med[How about one density plot per continent?]
+
+--
+
+```r
+ggplot(data=gapminder, aes(x=lifeExp, fill=continent)) +
+    geom_density(alpha=0.3)
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+--
+
+.pull-right.med[**PRACTICE**: Change the alpha value and see what that does.]
+
+---
+# Plotting a continuous vs a categorical
+
+Boxplots are useful when we have a categorical X and a continuous Y (or viceversa)
+
+
+```r
+ ggplot(data=gapminder, aes(x=continent, y=lifeExp)) +
+  geom_boxplot(outlier.size=2)
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+--
+
+.pull-right.med[**PRACTICE**: Give it some color (hint: see the colorful bar graph above)]
+
+---
+# Plotting two continuous 
+
+
+---
+
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+*gapminder
+```
+]
+ 
+.panel2-lineplot-auto[
+
+```
+## # A tibble: 1,704 x 6
+##    country     continent  year lifeExp      pop gdpPercap
+##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia       1952    28.8  8425333      779.
+##  2 Afghanistan Asia       1957    30.3  9240934      821.
+##  3 Afghanistan Asia       1962    32.0 10267083      853.
+##  4 Afghanistan Asia       1967    34.0 11537966      836.
+##  5 Afghanistan Asia       1972    36.1 13079460      740.
+##  6 Afghanistan Asia       1977    38.4 14880372      786.
+##  7 Afghanistan Asia       1982    39.9 12881816      978.
+##  8 Afghanistan Asia       1987    40.8 13867957      852.
+##  9 Afghanistan Asia       1992    41.7 16317921      649.
+## 10 Afghanistan Asia       1997    41.8 22227415      635.
+## # ... with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+* group_by(continent, year)
+```
+]
+ 
+.panel2-lineplot-auto[
+
+```
+## # A tibble: 1,704 x 6
+## # Groups:   continent, year [60]
+##    country     continent  year lifeExp      pop gdpPercap
+##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia       1952    28.8  8425333      779.
+##  2 Afghanistan Asia       1957    30.3  9240934      821.
+##  3 Afghanistan Asia       1962    32.0 10267083      853.
+##  4 Afghanistan Asia       1967    34.0 11537966      836.
+##  5 Afghanistan Asia       1972    36.1 13079460      740.
+##  6 Afghanistan Asia       1977    38.4 14880372      786.
+##  7 Afghanistan Asia       1982    39.9 12881816      978.
+##  8 Afghanistan Asia       1987    40.8 13867957      852.
+##  9 Afghanistan Asia       1992    41.7 16317921      649.
+## 10 Afghanistan Asia       1997    41.8 22227415      635.
+## # ... with 1,694 more rows
+```
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+* summarise(lifeExp = median(lifeExp))
+```
+]
+ 
+.panel2-lineplot-auto[
+
+```
+## # A tibble: 60 x 3
+## # Groups:   continent [5]
+##    continent  year lifeExp
+##    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;
+##  1 Africa     1952    38.8
+##  2 Africa     1957    40.6
+##  3 Africa     1962    42.6
+##  4 Africa     1967    44.7
+##  5 Africa     1972    47.0
+##  6 Africa     1977    49.3
+##  7 Africa     1982    50.8
+##  8 Africa     1987    51.6
+##  9 Africa     1992    52.4
+## 10 Africa     1997    52.8
+## # ... with 50 more rows
+```
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+* ggplot()
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+* aes(x= year)
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+* aes(y=lifeExp)
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_06_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+* aes(color = continent)
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_07_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+* geom_line()
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_08_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+  geom_line() +
+* geom_line(size = 1, linetype="dashed")
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_09_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+  geom_line() +
+  geom_line(size = 1, linetype="dashed") +
+* labs(x = "Year", y = "Life Expectancy")
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_10_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+  geom_line() +
+  geom_line(size = 1, linetype="dashed") +
+  labs(x = "Year", y = "Life Expectancy") +
+* theme_dark()
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_11_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-lineplot-auto[
+
+```r
+gapminder %&gt;%
+  group_by(continent, year) %&gt;%
+  summarise(lifeExp = median(lifeExp)) %&gt;%
+  ggplot() +
+  aes(x= year) +
+  aes(y=lifeExp) +
+  aes(color = continent) +
+  geom_line() +
+  geom_line(size = 1, linetype="dashed") +
+  labs(x = "Year", y = "Life Expectancy") +
+  theme_dark() +
+* theme(legend.position = "bottom")
+```
+]
+ 
+.panel2-lineplot-auto[
+![](ggplot_files/figure-html/lineplot_auto_12_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-lineplot-auto {
+  color: black;
+  width: 38.6060606060606%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-lineplot-auto {
+  color: black;
+  width: 59.3939393939394%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-lineplot-auto {
+  color: black;
+  width: NA%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+---
+# ggplot: Multiple Plots
+
+Sometimes we have too much on a single graph, and that makes things messy. We can use the 'facet_wrap' option:
+
+.pull-left[
+
+```r
+gapminder %&gt;%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap(~continent)
+```
+]
+
+.pull-right[
+![](ggplot_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+]
+
+---
+# PRACTICE
+
+.med[Make the above plot nicer: 
+
+1) Fix the axis labels 
+
+2) Add some color 
+
+3) Change the axis so that it's not in scientific notation
+
+4) Add a theme 
+]
+
+---
+# Saving graphs 
+
+.med[1) Create an object with the plot]
+
+.pull-left[
+
+```r
+plot1 &lt;- gapminder %&gt;%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap( ~ continent)
+```
+]
+
+.pull-left[
+
+```r
+plot1 
+```
+
+![](ggplot_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
+---
+# Saving graphs 
+
+.med[2) Save it from the Viewer Panel]
+
+.center[
+&lt;img src="figures/saving_graph.png" width="50%" height="40%" /&gt;
+]
+---
+# Saving graphs
+
+.med[3) Use the 'ggsave' function.] 
+
+
+
+```r
+plot1 &lt;- gapminder %&gt;%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  scale_x_log10() +
+  geom_point() +
+  facet_wrap( ~ continent) +
+  ggsave("plot1.png")
+```
+
+--
+
+.med[**PRACTICE**: Find this plot in your files.]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

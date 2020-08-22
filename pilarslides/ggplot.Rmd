@@ -219,12 +219,13 @@ ggplot(data=gapminder, aes(x=lifeExp)) +
 
 .med[**PRACTICE**: What if we want a density plot instead of a histogram? Google what geom_xxx we need to get this done?]
 
---
+---
+# ggplot: Plotting a continuous variable
 
-How about one density plot per continent? 
+.med[How about one density plot per continent?]
 
 --
-```{r fig.height = 5, fig.width = 6}
+```{r fig.height = 6, fig.width = 7}
 ggplot(data=gapminder, aes(x=lifeExp, fill=continent)) +
     geom_density(alpha=0.3)
 ```
@@ -263,9 +264,6 @@ gapminder %>%
   theme(legend.position = "bottom") 
 ```
 ---
-
----
-# Plotting two continuous 
 
 `r chunk_reveal(chunk_name = "lineplot")`
 ---
@@ -335,7 +333,7 @@ plot1
 
 .center[
 ```{r  out.height="40%", out.width="50%", echo=FALSE}
-knitr::include_graphics("saving.png") 
+knitr::include_graphics("figures/saving_graph.png") 
 ```
 ]
 ---
@@ -344,7 +342,7 @@ knitr::include_graphics("saving.png")
 .med[3) Use the 'ggsave' function.] 
 
 
-```{r, fig.height=5, fig.width=6}
+```{r, eval= FALSE, fig.height=5, fig.width=6}
 plot1 <- gapminder %>%
   ggplot(aes(gdpPercap, lifeExp)) +
   scale_x_log10() +

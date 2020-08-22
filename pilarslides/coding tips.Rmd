@@ -20,9 +20,11 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
 # Coding: The Script
 
-.med[Recall the difference between the Console and the Script.
+.med[Recall the difference between the Console and the Script.]
 
-The console is for "quick and dirty" coding, for trying out commands, etc. But most of the time you'll want to save your work. This is what the script is for.
+--
+
+.med[The console is for "quick and dirty" coding, for trying out commands, etc. But most of the time you'll want to save your work. This is what the script is for.
 
 In it, we write our code, and then we send it to the console for execution.]
 
@@ -63,7 +65,7 @@ mean(bday)
 You can also create sections of code by using four hashtags (or dashes) after your section title. This will make it easier to find your spot on the code (they will get long!).]
 
 ```{r  out.height="80%", out.width="70%", echo=FALSE}
-knitr::include_graphics("sections.png") 
+knitr::include_graphics("figures/sections.png") 
 ```
 
 ---
@@ -119,7 +121,7 @@ glimpse(gapmider)
 --
 .pull-left[
 ```{r  out.height="90%", out.width="80%", echo=FALSE}
-knitr::include_graphics("saving.png") 
+knitr::include_graphics("figures/saving.png") 
 ```
 ]
 --
@@ -129,20 +131,24 @@ Each time you open R you're environment will be empty. This means that the objec
 ---
 # Coding: Other good practices
 
-.med[NEVER write code that, when shared, changes someone else’s machine
-
-  - USE: #install tidyverse
-  
-  - NOT: install.packages("tidyverse")]
-
---- 
-# Coding: Working Directory
-
-.med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+.med[NEVER write code that, when shared, changes someone else’s machine]
 
 --
 
-.med[We want all of this to be in the same folder, so we'll tell R where this folder is. You will then be able to see these files under the "Files" pane, or with dir().]
+  - .med[USE: #install tidyverse]
+  
+--
+  
+  - .med[NOT: install.packages("tidyverse")]
+  
+---
+# Coding: Working Directory
+  
+  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+
+--
+  
+  .med[We want all of this to be in the same folder, so we'll tell R where this folder is. You will then be able to see these files under the "Files" pane, or with dir().]
 
 --
 
@@ -153,13 +159,14 @@ setwd("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2")
 ```
 
 --
-.med[*Windows users: you will have to change the backslash \ for the forward slash /*]
+  .med[*Windows users: you will have to change the backslash \ for the forward slash /*]
+
 
 ---
 # Reading in Data: The easy way 
 
 ```{r  out.height="80%", out.width="70%", echo=FALSE}
-knitr::include_graphics("importing.png") 
+knitr::include_graphics("figures/importing.png") 
 ```
 
 ---
@@ -174,7 +181,7 @@ knitr::include_graphics("importing.png")
 --
 
 ```{r}
-chicago <- read.csv("Census Data_selected_2008-2012.csv")
+chicago <- read.csv("data/Census Data_selected_2008-2012.csv")
 ```
 
 --
@@ -220,7 +227,7 @@ View(chicago)
 Alternatively, you can click the "play" button next to the name of the dataset in the Environment window. 
 
 ```{r  out.height="50%", out.width="50%", echo=FALSE}
-knitr::include_graphics("view.png") 
+knitr::include_graphics("figures/view.png") 
 ```
 
 ---

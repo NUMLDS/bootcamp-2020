@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Coding Tips and Exploring Data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Amanda and Pilar" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Coding Tips and Exploring Data
+### Amanda and Pilar
+### 22 August, 2020
+
+---
+
+
+
+
+# Coding: The Script
+
+.med[Recall the difference between the Console and the Script.]
+
+--
+
+.med[The console is for "quick and dirty" coding, for trying out commands, etc. But most of the time you'll want to save your work. This is what the script is for.
+
+In it, we write our code, and then we send it to the console for execution.]
+
+--
+
+.med[To execute our code, we put our cursor on the line and hit ctrl + Enter]
+
+--
+
+&lt;br&gt;
+
+.med[**Remember: whatever you write on the console IS NOT SAVED. What you write on the script is, but there may be some things you are not interested in saving!**]
+
+---
+# Coding: Keeping it neat
+
+.med[Most important: COMMENT YOUR CODE AND KEEP IT NEAT]
+
+--
+
+.med[Comments are written with hashtags #. R will not run anything that comes after one. 
+
+Comment everything that you do. Your future self, your coauthors, and replicators will appreciate it.]
+
+--
+
+```r
+# Create a vector with birthdates
+bday &lt;- c(1993,1991,1996,1989)
+
+# Calculate mean 
+mean(bday)
+```
+
+```
+## [1] 1992.25
+```
+
+---
+# Coding: Keeping it neat
+
+.med[
+You can also create sections of code by using four hashtags (or dashes) after your section title. This will make it easier to find your spot on the code (they will get long!).]
+
+&lt;img src="figures/sections.png" width="70%" height="80%" /&gt;
+
+---
+# Coding: Keeping it neat
+
+.med[ALWAYS use `&lt;-` as your assignment mechanism, NOT `= `]
+
+--
+
+.med[ALWAYS use spaces between operators, like `=`, `&lt;-`, `~`
+
+  - USE: mod1 &lt;- lm(formula = weight ~ height + age + gender) 
+  
+  - NOT: mod1&lt;-lm(formula=weight~height+age+gender)]
+  
+--
+  
+.center[*Tip: keyboard shortcut for &lt;- includes these spaces. Option + - on a Mac, or Alt + - on Linux and Windows.*]
+
+---
+# Coding: Loading libraries
+
+.med[Always a good idea to load your libraries at the top of your code.]
+
+--
+
+
+```r
+library(tidyverse)
+library(car)
+library(janitor)
+```
+
+--
+.med[If you load a library without installing it first, you will get this error:] 
+
+
+```r
+library(caret)
+```
+
+```
+## Error in library(caret): there is no package called 'caret'
+```
+
+
+--
+.med[If you try to run a command from a package without loading it first, you will get this error:]
+
+
+```r
+glimpse(gapmider)
+```
+
+```
+## Error in glimpse(gapmider): object 'gapmider' not found
+```
+
+---
+# Coding: What to save
+
+.med[Always save your script. NEVER save your environment upon exit. It's usually a good idea to start each session from scratch.]
+
+--
+.pull-left[
+&lt;img src="figures/saving.png" width="80%" height="90%" /&gt;
+]
+--
+.pull-right[.med[
+Each time you open R you're environment will be empty. This means that the objects you created in your previous session will not be saved (but you can always re-create them from the script).]] 
+
+---
+# Coding: Other good practices
+
+.med[NEVER write code that, when shared, changes someone else’s machine]
+
+--
+
+  - .med[USE: #install tidyverse]
+  
+--
+  
+  - .med[NOT: install.packages("tidyverse")]
+  
+---
+# Coding: Working Directory
+  
+  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+
+--
+  
+  .med[We want all of this to be in the same folder, so we'll tell R where this folder is. You will then be able to see these files under the "Files" pane, or with dir().]
+
+--
+
+.med[We do this by using the command setwd(""). You will copy-paste your folder's path in these quotations.]
+
+
+```r
+setwd("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2")
+```
+
+--
+  .med[*Windows users: you will have to change the backslash \ for the forward slash /*]
+
+
+---
+# Reading in Data: The easy way 
+
+&lt;img src="figures/importing.png" width="70%" height="80%" /&gt;
+
+---
+# Reading in Data: Most efficient way
+
+.med[Once you are comfortable with setwd() and how to type paths, this is the most efficient option. You can run a script that has a line to import the datasets.] 
+
+--
+
+.med[There are several commands to read files from outside R. The command you use depends on the type of data file. Below, one of the most common ones:] 
+
+--
+
+
+```r
+chicago &lt;- read.csv("data/Census Data_selected_2008-2012.csv")
+```
+
+--
+
+If I had not set my working directory, I would write the whole path to the file:
+
+
+```r
+chicago &lt;- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/Census Data_selected_2008-2012.csv")
+```
+
+---
+# Reading in Data 
+
+.med[Besides the Base R commands for importing data, many packages offer alternatives. See "readr" and "haven", both part of the Tidyverse collection.]
+
+--
+
+.med[Haven is useful for importing Stata files, which you will often encounter]
+
+
+
+```r
+install.packages("haven")
+library(haven)
+
+chicago_stat &lt;- read_dta("Census Data_selected_2008-2012.dta")
+```
+
+---
+# Exploring data 
+
+.med[There are several initial steps you can do to get a sense of what the dataset looks like, what variables it contains, how it's structured, etc.]
+
+--
+
+1) The first easy way is to use the command View(), which opens up the dataset in a new window.
+
+
+```r
+View(chicago)
+```
+
+--
+Alternatively, you can click the "play" button next to the name of the dataset in the Environment window. 
+
+&lt;img src="figures/view.png" width="50%" height="50%" /&gt;
+
+---
+# Exploring data 
+
+
+2) Look at the dimensions of the dataset:
+
+
+```r
+dim(chicago)
+```
+
+```
+## [1] 78 10
+```
+--
+
+3) Look at the names of the variables:
+
+
+```r
+names(chicago)
+```
+
+```
+##  [1] "Community.Area.Number"                       
+##  [2] "COMMUNITY.AREA.NAME"                         
+##  [3] "PERCENT.OF.HOUSING.CROWDED"                  
+##  [4] "PERCENT.HOUSEHOLDS.BELOW.POVERTY"            
+##  [5] "PERCENT.AGED.16..UNEMPLOYED"                 
+##  [6] "PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA"
+##  [7] "PERCENT.AGED.UNDER.18.OR.OVER.64"            
+##  [8] "PER.CAPITA.INCOME"                           
+##  [9] "HARDSHIP.INDEX"                              
+## [10] "ZONE"
+```
+
+---
+# Exploring the Data
+
+4) Look at the firs rows of the dataset. (Figure out how to look at the last rows too). 
+
+
+```r
+head(chicago)
+```
+
+```
+##   Community.Area.Number COMMUNITY.AREA.NAME PERCENT.OF.HOUSING.CROWDED
+## 1                     1         Rogers Park                        7.7
+## 2                     2          West Ridge                        7.8
+## 3                     3              Uptown                        3.8
+## 4                     4      Lincoln Square                        3.4
+## 5                     5        North Center                        0.3
+## 6                     6           Lake View                        1.1
+##   PERCENT.HOUSEHOLDS.BELOW.POVERTY PERCENT.AGED.16..UNEMPLOYED
+## 1                             23.6                         8.7
+## 2                             17.2                         8.8
+## 3                             24.0                         8.9
+## 4                             10.9                         8.2
+## 5                              7.5                         5.2
+## 6                             11.4                         4.7
+##   PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA PERCENT.AGED.UNDER.18.OR.OVER.64
+## 1                                         18.2                             27.5
+## 2                                         20.8                             38.5
+## 3                                         11.8                             22.2
+## 4                                         13.4                             25.5
+## 5                                          4.5                             26.2
+## 6                                          2.6                             17.0
+##   PER.CAPITA.INCOME HARDSHIP.INDEX  ZONE
+## 1             23939             39 North
+## 2             23040             46 North
+## 3             35787             20 North
+## 4             37524             17 North
+## 5             57123              6 North
+## 6             60058              5 North
+```
+---
+# Exploring Data
+
+4) Summarize the variables 
+
+
+```r
+summary(chicago)
+```
+
+```
+##  Community.Area.Number COMMUNITY.AREA.NAME PERCENT.OF.HOUSING.CROWDED
+##  Min.   : 1            Length:78           Min.   : 0.300            
+##  1st Qu.:20            Class :character    1st Qu.: 2.325            
+##  Median :39            Mode  :character    Median : 3.850            
+##  Mean   :39                                Mean   : 4.921            
+##  3rd Qu.:58                                3rd Qu.: 6.800            
+##  Max.   :77                                Max.   :15.800            
+##  NA's   :1                                                           
+##  PERCENT.HOUSEHOLDS.BELOW.POVERTY PERCENT.AGED.16..UNEMPLOYED
+##  Min.   : 3.30                    Min.   : 4.70              
+##  1st Qu.:13.35                    1st Qu.: 9.20              
+##  Median :19.05                    Median :13.85              
+##  Mean   :21.74                    Mean   :15.34              
+##  3rd Qu.:29.15                    3rd Qu.:20.00              
+##  Max.   :56.50                    Max.   :35.90              
+##                                                              
+##  PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA PERCENT.AGED.UNDER.18.OR.OVER.64
+##  Min.   : 2.50                                Min.   :13.50                   
+##  1st Qu.:12.07                                1st Qu.:32.15                   
+##  Median :18.65                                Median :38.05                   
+##  Mean   :20.33                                Mean   :35.72                   
+##  3rd Qu.:26.60                                3rd Qu.:40.50                   
+##  Max.   :54.80                                Max.   :51.50                   
+##                                                                               
+##  PER.CAPITA.INCOME HARDSHIP.INDEX      ZONE          
+##  Min.   : 8201     Min.   : 1.00   Length:78         
+##  1st Qu.:15805     1st Qu.:25.00   Class :character  
+##  Median :21669     Median :50.00   Mode  :character  
+##  Mean   :25597     Mean   :49.51                     
+##  3rd Qu.:28716     3rd Qu.:74.00                     
+##  Max.   :88669     Max.   :98.00                     
+##                    NA's   :1
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
