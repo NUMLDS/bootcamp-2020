@@ -1,0 +1,192 @@
+---
+title: 'Day -1: Intro to the Shell'
+author: "Lewis Meineke"
+date: "`r Sys.Date()`"
+output: 
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+params:
+    notes: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval=FALSE, comment='')
+```
+
+
+
+# Introduction
+
+_**[Software Carpentry session on the Unix shell](https://swcarpentry.github.io/shell-novice/)**_
+
+## Today's goals
+
+We have very limited time for a very big topic today, so rather than try to get you feeling totally comfortable working in the terminal, the goals for today are
+
+1. Get everybody up to a baseline level of understanding of the shell
+2. Get past the fear of breaking your computer by typing stuff into a terminal
+3. Prepare you for the other boot camp sessions
+4. Teach you the stuff that's hard to Google so that you'll find it easier to continue learning on your own
+
+## What is a "shell?"
+
+* A **shell** is a special program that receives text input on a command line, passes commands to other programs, prints their output back to the user (or somewhere else, if the user asks it to), and displays a prompt to signal that it's ready to receive a command.
+* A **terminal** is a program that displays a shell to the user. The terminal handles things like displaying colors and tabs, resizing windows, and otherwise making things convenient for the user.
+* **Bash** is a particular shell that is usually the default on Unix-based systems (such as Linux, macOS, Android, and many others). _Note:_ macOS just switched to zsh as its default shell. It shouldn't make too much difference for our work this week.
+* **Unix** is a type of operating system that follows certain conventions. It used to mean something different, but these days people usually use it to mean "an operating system that works with Bash"! 
+    * Pretty much every operating system you use is Unix-based, with the exception of Windows--but even Windows is making it easier than ever to use Bash. 
+        
+    
+## Why should a data analyst learn the shell?
+
+* The shell is the most general toolbox in the computing world. Concepts from the shell pop up everywhere in computing.
+* The shell lets you interact with servers exactly the same way you interact with your laptop.
+* The shell allows you to solve a lot of common problems very quickly, without learning how to do it in a more complex language and without waiting on an IT person.
+* Analytics trends come and go, but Bash is forever! People have been using it for almost 50 years and it's only getting more popular.
+
+# First shell commands
+
+* Windows users: open Git Bash. If you don't have it yet, [install git](https://git-scm.com/downloads).
+* Mac users: open the Terminal program.
+
+You should see something that looks like
+
+```{bash}
+lewis@mylaptop:~$
+```
+
+This is the prompt. The `$` at the end means that Bash will run whatever you type in next.
+
+```{bash}
+lewis@mylaptop:~$ pwd
+/home/lewis
+```
+
+
+```{bash}
+lewis@mylaptop:~$ date
+Mon Aug 24 13:32:22 BST 2020
+```
+
+_Note:_ I'll mostly omit the stuff before the `$` in the prompt from here on out just to keep things tidy. Your prompt will have more stuff in it.
+
+# Get the exercise data
+
+```{bash}
+$ curl -Lo data-shell.zip bit.ly/data-shell-zip
+$ unzip data-shell.zip
+$ cd data-shell
+```
+
+_**Exercises:** [Software Carpentry session on the Unix shell](https://swcarpentry.github.io/shell-novice/)_
+
+# Anatomy of a shell command
+
+![From https://www.learnenough.com/command-line-tutorial](https://softcover.s3.amazonaws.com/636/learn_enough_command_line/images/figures/anatomy.png "Anatomy of a shell command")
+
+**Prompt**: All the stuff up to the `$` is the prompt. This usually tells you your username, the computer you're connected to, and the directory you're in. (Other shells might display different information, or the same information differently.)
+
+If you haven't terminated a command properly, the prompt will change to let you know it's expecting more input:
+
+```{bash}
+$ echo 'hello world        ## the quote here is not closed!
+>
+```
+
+**Command**: The command is a program that is called by the shell. When you type in a command, the shell looks in a list of directories called the `PATH` to find an executable that matches the name of the command you typed in. You can see where the shell is finding a program with the command `which`:
+
+```{bash}
+$ which cat
+/bin/cat
+```
+
+**Options** change what the command does. Note they usually come **before** the argument. They can sometimes be written in two different ways:
+* Two dashes, then the full name of the option: `rm --force`
+* One dash, then a single letter: `rm -f`
+These two are equivalent.
+
+**Arguments**: A command can have zero, one, or many arguments. It all depends on the command and what you want it to do.
+
+
+# Some basic commands
+
+* `pwd`: print working directory
+* `ls`: list contents of the current directory. This one accepts lots of options!
+
+    ```{bash}
+    $ ls
+    data-shell  data-shell-zip
+    ```
+
+    ```{bash}
+    $ ls -a
+    .  ..  .bash_history  .bash_logout  .bashrc  .cache  .config  .profile  data-shell  data-shell-zip
+    ```
+* `echo`: prints text to standard output
+    ```{bash}
+    $ echo 'hello world'
+    hello world
+    ```
+* `cd`: change directory
+    ```{bash}
+    lewis@mylaptop:~$ pwd
+    /home/lewis
+    lewis@mylaptop:~$ cd data-shell
+    lewis@mylaptop:~/data-shell$
+    ```
+* `cp`, `mv`: copies or moves a file or folder
+* `cat`: short for "concatenate." Prints the contents of a file to standard output
+```{bash}
+$ cat notes.txt
+- finish experiments
+- write thesis
+- get post-doc position (pref. with Dr. Horrible)
+```
+* `head`, `tail`: prints the first or last lines of a file. Incredibly useful for huge text files!
+```{bash}
+$ head -3 creatures/basilisk.dat
+COMMON NAME: basilisk
+CLASSIFICATION: basiliscus vulgaris
+UPDATED: 1745-05-02
+```
+
+# Some special stuff
+
+### Special characters
+
+* `~`: your home directory
+* `.`: the directory you're currently in
+* `..`: one directory up from the one you're currently in
+* `/`: directory separator. If it's the **first** character in a path, it means it's an absolute path; otherwise the path is relative.
+* `\`: escape character. Use when you want Bash to interpret a character literally.
+```{bash}
+$ ls My Documents          ## Bash thinks you're listing two separate things
+ls: cannot access 'My': No such file or directory
+ls: cannot access 'Documents': No such file or directory
+$ ls My\ Documents
+'My Music'  'My Pictures'  'My Videos'
+```
+
+### The `Ctrl` key and copy/pasting
+
+* `Ctrl+C`: cancels the current line of input, or the currently running process if something is running, and gives you a fresh prompt. **`Ctrl+C` does not copy in a terminal!**
+* Git Bash users: Right-click the title bar -> Options -> Keys -> Check "Ctrl+Shift+Letter Shortcuts"
+    * You can now use `Ctrl+Shift+C` and `Ctrl+Shift+V`
+* Other terminal users: highlight text and right-click to copy, then right-click again to paste
+
+### Bonus: How to type faster with shortcuts
+
+A lot of this works outside the terminal!
+
+* `Tab` completion
+* Double-tap `Tab` to see options
+* `↑` and `↓` to go through your command history
+* `Ctrl + ←/→` to skip words
+* `Alt + Backspace` to delete words
+* `Ctrl + A`, `Ctrl + E` to go to beginning/end of line
+* `Ctrl + R` to search history
+
+
+Try typing `whoami` or `hostname`, and note how they show up in the prompt.
