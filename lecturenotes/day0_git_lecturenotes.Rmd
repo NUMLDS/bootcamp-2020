@@ -1,0 +1,88 @@
+---
+title: 'Day 0: Intro to Git'
+author: "Lewis Meineke"
+date: "`r Sys.Date()`"
+output: 
+    html_document:  
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# Introduction
+
+We'll mostly be following along with Software Carpentry again today, but I'll put this little diagram of the workflow right at the top here, since I find it helps when learning the workflow.
+
+![From https://rachelcarmena.github.io/2018/12/12/how-to-teach-git.html](https://raw.githubusercontent.com/rachelcarmena/how-to-teach/master/git/add-commit-push.png)
+
+### Today's goals
+
+* Introduce you to the git workflow and ensure that you understand:
+    * Local git repositories
+    * Remote git repositories
+    * Staging, tracking, committing, and pushing
+    * Reviewing repository history
+    * Branching and merging, at least conceptually (we may not get into detail)
+* Connect you to resources for continuing to learn git, GitHub, and how to integrate them into your actual workflows
+
+### But I already know git!
+
+Okay, then study the [visual reference](https://marklodato.github.io/visual-git-guide/index-en.htmlhttps://marklodato.github.io/visual-git-guide/index-en.html) to make **really** sure you know it.
+
+# Set up git
+
+[**Download and install git.**](https://git-scm.com/download/) It's okay to accept the default options in the installer. 
+
+* Windows users: you definitely want the default behavior to automatically handle line endings. If you didn't do this during installation, that's okay, you can change the setting like this:
+
+    ```{bash}
+    $ git config --global core.autocrlf true
+    ```
+
+## One-time setup
+
+```{bash}
+$ git config --global user.name 'My Name'
+$ git config --global user.email 'my@email.edu'
+```
+
+## Cheat sheet of our core git commands for today
+
+`git init`: Creates a new, empty git repository in the current directory.
+
+`git status`: Tells you what branch you're on, what files are in the staging area, and what untracked files are in your repo, plus some other useful information. Doesn't make any changes.
+
+`git log`: Summarizes the commit history for your repo. Doesn't change anything.
+
+`git add`: Adds an untracked/unstaged file to your staging area.
+
+`git commit`: Commits the changes in the staging area
+
+`git clone`: Gets a repo from a remote source, makes a copy of it locally, and sets it up to track the remote repo.
+
+`git pull`: Updates the local repo with any new commits that have been made on the remote repo.
+
+`git push`: Updates the remote repo with any new commits you've made on the local repo.
+
+
+# Resources for learning git
+
+Take your time learning git! It's absolutely critical but also sort of complex and unintuitive. I recommend going through one intro course on your own and then doing another one on the same material, just to make sure you really understand the concepts.
+
+[Learn Git Branching](https://learngitbranching.js.org/) is a very popular graphical walkthrough. Git really lends itself to visual learning.
+
+[Learn Enough Git to be Dangerous](https://www.learnenough.com/git-tutorial) is great for developing a practical understanding of the parts of Git that you really need to know. I highly recommend working through it (along with his other tutorials on the shell and text editors) to really get a solid grasp on these tools.
+
+[GitHub Learning Lab](https://lab.github.com/) is excellent for getting familiar with the GitHub interface. It's not really targeted at getting you to understand git, though--remember, GitHub is a separate service that uses git, but it's not actually part of git itself.
+
+[GitHub's resource page](https://try.github.io/) has some links to useful resources including cheatsheets and visualizations.
+
+Even though it's called [How to Teach Git](https://rachelcarmena.github.io/2018/12/12/how-to-teach-git.html), this page has a bunch more handy diagrams to help you understand things.
+
+I also recommend checking out NUIT's [Git resource list](https://github.com/nuitrcs/gitworkshop).
+
+If you start to get bewildered with some of the finer points of git, there's a [fake git manual page generator](https://git-man-page-generator.lokaltog.net/#) to reassure you that you are not alone.
