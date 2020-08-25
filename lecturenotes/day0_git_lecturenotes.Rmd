@@ -31,7 +31,7 @@ We'll mostly be following along with Software Carpentry again today, but I'll pu
 
 ### But I already know git!
 
-Okay, then study the [visual reference](https://marklodato.github.io/visual-git-guide/index-en.htmlhttps://marklodato.github.io/visual-git-guide/index-en.html) to make **really** sure you know it.
+Okay, then study the [visual reference](https://marklodato.github.io/visual-git-guide/index-en.html) to make **really** sure you know it.
 
 # Set up git
 
