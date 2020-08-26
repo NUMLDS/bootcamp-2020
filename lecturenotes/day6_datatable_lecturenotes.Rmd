@@ -24,26 +24,32 @@ notes<-params$notes
 ## What is `data.table`?
 
 > - "`data.table` is an R package that provides an enhanced version of data.frames" 
-> - "Briefly, if you are interested in reducing programming and compute time tremendously, then this package is for you." 
-
-  > - [authors of `data.table`](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
+> - "Briefly, if you are interested in reducing programming and compute time tremendously, then this package is for you." ([authors of `data.table`](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) )
   
   
 
 
 ## Why do we care?
 
-> - `data.table` is popular
-![](figures/cran_downloads_2019.png)
+> - `data.table` is popular (it's downloaded)
+![](figures/cran_downloads_2020.png)
 data pulled using `cranlogs` package
 
 ## 
 
-- `data.table` is fast (especially on larger data)
+- `data.table` is fast (especially on larger data) (<span style="color: blue;">data.table</span>, <span style="color: red;">dplyr</span>)
+- This figure shows a sample of benchmark timings for different packages that handle data. `data.table` timings are in blue, `dplyr` timings are in red. It can be seen here that `data.table` is much faster for this sample of commands (see website below for more details)
 ![](figures/benchmarks.png)
 https://h2oai.github.io/db-benchmark/
 
-## Why do we care?
+## 
+
+- `data.table` is memory efficient  (<span style="color: blue;">data.table</span>, <span style="color: red;">dplyr</span>)
+- similarly, this shows benchmark timings for certain operations on much larger data. Here, the `dplyr` causes a memory error, whereas the `data.table` command is able to run just fine
+![](figures/benchmarks2.png)
+https://h2oai.github.io/db-benchmark/
+
+## Additional reasons to care
 
 > - `data.table` comes with other features (file i/o, reshape functions)
 > - no need for multiple package dependencies
@@ -53,6 +59,8 @@ https://h2oai.github.io/db-benchmark/
 # `data.table` basics
 
 ## Load data
+
+Load the same data as a `data.frame` and as a `data.table` to compare.
 
 ```{r, echo=TRUE, results = 'hide', message=FALSE}
 
@@ -88,6 +96,9 @@ str(generation_dt)
 
 ```
 
+We can see here that the `data.table` object is also classified as a `data.frame`. This is because `data.table` is a wrapper around `data.frame`, and this is why you can pass a `data.table` to any function that takes a `data.frame` and it will work. The primary difference between using a `data.table` and a `data.frame` is the syntaxed used when YOU are directly working with the `data.table`. This is fairly different from the syntax you'd use to interact with a `data.frame`.
+
+Something else you may have noticed: `data.table`s print much more nicely than `data.frame`s. This is just one of the auxilliary benefits of using `data.table`!
 
 # How to use `data.table`s
 
@@ -118,15 +129,31 @@ generation_dt[wind > 4400 & mday(datetime) == 7]
 
 ```
 
+- note: mday is a `data.table` function that returns the integer day of the month. This is part of `data.table`'s IDateTime class, which makes dealing with datetime objects much faster 
+
 **Exercise:**
 
 - **try it!** select rows for which natural gas generation is less than or equal to 5,000 MW and large hydro generation is greater than 2,000 MW
+- **try it!** select rows for which solar generation is greater than coal generation
 - **bonus:** select rows for which coal generation is greater than 10 MW and solar generation is greater than the median value of solar generation
 
-**Answers:**
-```{r dt-filter-exercise}
+### Answers
+
+- **try it!** select rows for which natural gas generation is less than or equal to 5,000 MW and large hydro generation is greater than 2,000 MW
+```{r dt-filter-exercise1, eval=FALSE}
 
 generation_dt[natural_gas <= 5000 & large_hydro > 2000]
+
+```
+- **try it!** select rows for which solar generation is greater than coal generation
+```{r dt-filter-exercise2, eval=FALSE}
+
+generation_dt[solar > coal]
+
+```
+- **bonus:** select rows for which coal generation is greater than 10 MW and solar generation is greater than the median value of solar generation
+
+```{r dt-filter-exercise3, eval=FALSE}
 
 generation_dt[coal > 10 & solar > median(solar)]
 
@@ -135,6 +162,17 @@ generation_dt[coal > 10 & solar > median(solar)]
 # `j`: "what to do" (column operations)
 
 - perform any operation in `j`
+- ask for a column of data
+
+```{r dt-columns-1}
+
+generation_dt[,wind]
+
+```
+
+- note: what is the data type returned? (This is a vector. There is a way to tell it to return a one-column `data.table`, which we'll get to in a few slides)
+
+- perform operations with columns
 
 ```{r dt-columns0}
 
@@ -142,7 +180,7 @@ generation_dt[,wind + solar]
 
 ```
 
-- perform any operation in `j`
+- perform more operations with columns
 
 ```{r dt-columns1}
 
@@ -150,109 +188,210 @@ generation_dt[,3*wind + solar*biogas/2]
 
 ```
 
-- new columns may be assigned in `j` or a new table can be created
+- perform grouped operations with columns
 
+```{r dt-columns2}
+
+generation_dt[,mean(nuclear)]
+
+```
+- a bit of syntax in `j` can either create a new column (`:=`) or return a new `data.table` ( .() )
+
+- adding columns within the `data.table` uses `:=`
 ```{r}
 
-generation_dt[,newcol := 3*wind + solar*biogas/2]
+generation_dt[,morewind := 5*wind]
+generation_dt[,all_RE := wind+solar+geothermal]
 
-generation_dt[,.(newcol = 3*wind + solar*biogas/2)]
 ```
+
+- `:=` can also be used to modify columns
+```{r}
+
+generation_dt[,morewind := 5*morewind + 10]
+
+```
+
+- note that `:=` performs operations in place (instead of returning a `data.table`). This is important for efficiency reasons, and it's also important to be aware of
+
+- returning a new `data.table` uses `.()` (list alias). What do these return?
+
+```{r, eval=FALSE}
+
+generation_dt[,.(wind)]
+generation_dt[,.(RE_combo = 3*wind + solar*biogas/2)]
+generation_dt[,.(RE_combo = 3*wind + solar*biogas/2,
+                 high_wind = morewind)]
+```
+
 
 - columns may be deleted in `j`
 
 ```{r}
-generation_dt[,newcol := NULL]
+generation_dt[,morewind := NULL]
+generation_dt[,all_RE := NULL]
 
 ```
 
-**Exercise:**
 
-- **try it!** add a column called "total_hydro" that is the sum of the `small_hydro` and `large_hydro` columns 
-- **try it!** find the mean of the `nuclear` and `biogas` columns 
-- **bonus:** create a new table: for the hours when solar generation is zero, get the `datetime` and `total_thermal` (sum of natural gas and coal generation)
+- **try it!** add a column to generation_dt called "total_hydro" that is the sum of the `small_hydro` and `large_hydro` columns 
+- **try it!** return a new `data.table` with two columns: the mean of the `nuclear` column and the mean of the `biogas` column. What happens when you don't name those columns?
 
-**Answers**
-```{r dt-cols-exercise}
+### Answers
 
+- **try it!** add a column to generation_dt called "total_hydro" that is the sum of the `small_hydro` and `large_hydro` columns 
+```{r}
 generation_dt[,total_hydro := small_hydro + large_hydro]
-
-# generation_dt[,mean(nuclear)]
-# generation_dt[,mean(biogas)]
-# or
-generation_dt[,.(mean(nuclear), mean(biogas))]
-# or, with column names
-# generation_dt[,.(mean_nuc = mean(nuclear), mean_biogas = mean(biogas))]
-
-generation_dt[solar == 0, .(datetime, total_thermal = natural_gas + coal)]
-
 ```
+- **try it!** return a new `data.table` with two columns: the mean of the `nuclear` column and the mean of the `biogas` column. What happens when you don't name those columns?
+```{r}
+generation_dt[,.(mean_nuc = mean(nuclear), mean_biogas = mean(biogas))]
+generation_dt[,.(mean(nuclear), mean(biogas))]
+```
+
+## combine `i` and `j` operations
+
+- **try it!** for the hours (rows) when wind generation is greater then 4,500 MW, add 500 to the values of small_hydro
+
+- **try it!** when solar generation is zero, reurn a `data.table` with two columns: `datetime` and `total_thermal` (sum of natural gas and coal generation)
+
+- **bonus** Use `:=` to create a new column called more_solar (which is 9 times the values in the solar column) but only for hours where solar > 0. What happens in the other rows?
+
+### Answers
+
+- **try it!** for the hours (rows) when wind generation is greater then 4,500 MW, add 500 to the values of small_hydro
+
+``` {r}
+generation_dt[wind > 4500, small_hydro := small_hydro + 500]
+```
+
+- **try it!** when solar generation is zero, reurn a `data.table` with two columns: `datetime` and `total_thermal` (sum of natural gas and coal generation)
+
+``` {r}
+generation_dt[solar == 0, .(datetime, total_thermal = natural_gas + coal)]
+```
+
+- **bonus** Use `:=` to create a new column called more_solar (which is 9 times the values in the solar column) but only for hours where solar > 0. What happens in the other rows?
+
+``` {r}
+generation_dt[solar > 0, more_solar := solar*9]
+```
+
+This will fill in the rest of the rows (where solar > 0 is not true) with NA.
+
 
 
 # `by`: "grouped by what"
 
+## `by`: "grouped by what"
+  
 - add grouping to any operation
+- what does this do?
 
 ```{r dt-group}
 
 generation_dt[,mean(nuclear), by = mday(datetime)]
 
+```
+
+>- how could you add more useful names to these columns? 
+  
+## `by`: "grouped by what"
+  
+- adding more useful column names:
+
+```{r}
+
+generation_dt[,.(mean_nuc = mean(nuclear)), by = .(day = mday(datetime))]
 
 ```
   
+## `by`: "grouped by what"
   
-- combine with everything we've learned about `i` and `j`
+- this is where we can see the (now familiar) power of long form data:
+
+```{r }
+# melt generation_dt
+generation_dt_long <- melt(generation_dt, 
+                           id.vars = "datetime", 
+                           variable.name = "gen_type", 
+                           value.name = "MW")
+
+```
+
+- what is that warning message about? (hint: check str(generation_dt)). How could this be avoided in the future?
+
+## `by`: "grouped by what"
+  
+- now find the mean of MW by gen_type...
+
+```{r }
+generation_dt_long[,.(mean_MW = mean(MW)), by = gen_type]
+
+```
+  
+- or by day and by gen_type...
+
+```{r }
+generation_dt_long[,.(mean_MW = mean(MW)), 
+                   by = .(day = mday(datetime), gen_type)]
+
+```  
+
+- note that by accepts: a single column name, a list, or a character vector 
+  
+## `by`: "grouped by what"
+  
+- `by` combines easily with everything we've learned about `i` and `j`
+- example: find the mean and sum of generation for each day, for all resources EXCEPT natural gas
 
 ```{r dt-group2}
 
-generation_dt[,.(mean_nuc = mean(nuclear), mean_wind = mean(wind)), 
-              by = mday(datetime)]
+generation_dt_long[gen_type != "natural_gas",
+                   .(mean_MW = mean(MW), sum_MW = sum(MW)), 
+                   by = mday(datetime)]
 
 ```
   
-  
-- combine with everything we've learned about `i` and `j`
-
-```{r dt-group3}
-
-generation_dt[hour(datetime) > 19,
-              .(mean_nuc = mean(nuclear), mean_wind = mean(wind)), 
-              by = mday(datetime)]
-
-```
-    
-**Exercise:**
+## `by`: "grouped by what"
 
 - **try it!** find the median solar generation by hour. 
 - **try it!** for hours when the solar generation is greater than zero, find the maximum natural gas generation by day
 
-**Answers:**
+### Answers
+  
+- **try it!** find the median solar generation by day 
+```{r, eval=FALSE}
+generation_dt[,median(solar), by = mday(datetime)]
 
-```{r dt-ex}
+generation_dt_long[gen_type == "solar", median(MW), by = mday(datetime)]
+```
 
-generation_dt[,median(solar), by = hour(datetime)]
+- **try it!** for hours when the solar generation is greater than zero, find the maximum natural gas generation by day
 
+```{r, eval=FALSE}
 generation_dt[solar > 0, max(natural_gas), by = mday(datetime)]
 
 ```
 
 ## `data.table` syntax recap
 
-> - column names are variables inside `dt[]`
   ![](figures/dt_structure.png)
 
 > - the combination of `i`, `j`, and `by` is very powerful
+> - column names are variables inside `dt[]`
 > - few other components; outside scope of this review
 
-# `data.table` upgrades to other functions
+## `data.table` upgrades to other functions
 
-`data.table` co-opts some functions we've already talked about
+`data.table` contains its own versions some functions we've already talked about, for example. These generally are optimized for `data.table`s and have extra (advanced) features
 
 > - `melt`
 > - `dcast`
 > - `merge`
 > - `order`
-> - This means we can repeat what we did this morning almost exactly
+
+Generally, a calling melt(dt) will invoke melt.data.table(dt), though there are edge cases in which you need to specify whether you are calling melt.data.table or melt.data.frame. The fact that all these come with `data.table` means you only have to load one package, which often makes life simpler.
 
 ## `dplyr` -> `data.table`
 
@@ -320,7 +459,29 @@ all_generation_long[,`:=`(day2 = as_date(datetime),
 
 ```
 
-# A few bonus features
+# A few more `data.table` properties and bonus features
+
+
+## `set` functions
+
+- Remember `:=`? It is part of `data.table`'s `set` functions, which all update properties of the `data.table` by reference
+
+```{r, eval=FALSE, echo=TRUE}
+# set colum
+dt[,col1 := 2*col2]
+
+# set column names
+setnames(dt, "old", "new")
+
+# set row order
+setorder(dt, col1, -col2, ...)
+
+# set anything
+set(dt, i, j, value)
+
+```
+
+- The "set" syntax can be a little less clear than the dt[] syntax, so use with caution. However, efficiency gains can be huge.
 
 # `fread` and `fwrite`
 
@@ -368,25 +529,6 @@ benchmark(read.csv(data_file_large, stringsAsFactors = F),
 
 ```
 
-# `set` functions
-
-- `set` functions update properties of the `data.table` by reference
-
-```{r, eval=FALSE, echo=TRUE}
-# set column names
-setnames(dt, "old", "new")
-
-# set row order
-setorder(dt, col1, -col2, ...)
-
-# set anything
-set(dt, i, j)
-
-# set colum
-dt[,col1 := 2*col2]
-
-```
-
 # Special variables
 
 `data.table`s also contain some special read-only symbols that are often useful: 
@@ -397,17 +539,45 @@ dt[,col1 := 2*col2]
 ```{r, eval=FALSE, echo=TRUE}
 
 # for .N: convenient
-all_generation_long[,.N] 
-all_generation_long[,.N, by = type]
+generation_dt[,.N] 
 
 # for .I: more advanced syntax
-all_generation_long[,.I]
+generation_dt[,.I]
 
 ```
 
-# Other features: keys
+# Special variables
 
-- keys: one or more columns, pre-sorted index of the table.
+**try it!** Use `.N` to find the number of rows in generation_dt_long
+
+**try it!** Use `.N` to find the number of hours in which solar generation was greater than 500 MW
+
+
+### Answers
+
+**try it!** Use `.N` to find the number of rows in generation_dt_long
+
+```{r, eval=FALSE, echo=TRUE}
+
+generation_dt_long[,.N]
+
+```
+
+**try it!** Use `.N` to find the number of hours in which solar generation was greater than 500 MW
+
+
+```{r, eval=FALSE, echo=TRUE}
+
+generation_dt[solar > 500, .N]
+generation_dt_long[gen_type == "solar" & MW > 500,.N]
+
+```
+
+
+## Other features: keys
+
+- keys: one or more columns, pre-sorted index of the table. Setting a key makes joining and other operations much faster, because rows are already sorted (note: set function)
+- I rarely use it unless I'm working with lots of data, mostly because I prefer to explicitly name columns for clarity (when possible)
 
 ```{r, eval=FALSE, echo=TRUE}
 
