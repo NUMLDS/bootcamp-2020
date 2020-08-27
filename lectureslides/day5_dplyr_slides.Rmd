@@ -40,7 +40,7 @@ library(tidyverse)
 - drop variables with `-`
   - `select(df, -gdpPercap)`
 
-## Reload data from Day 4 - I just copied - may want this in an RData or csv file instead
+## Load energy data
 
 ```{r importing}
 library(here)
