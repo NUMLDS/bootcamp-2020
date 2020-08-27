@@ -1,7 +1,7 @@
 ---
 title: "Intro to R"
 author: "Amanda and Pilar"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "08/31/2020"
 output: 
   xaringan::moon_reader:
     seal: true 
@@ -295,9 +295,9 @@ x
 # PRACTICE
 
 .large[
-1) Install the package "tidyverse" 
+1) Install and load the package "dplyr" 
 
 <br>
 
-2) Download and save the documentation for the package 
+2) Find the help file for the command "mutate"
 ]
