@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 # R and R studio
 
 ```{r  out.height="100%", out.width="100%", echo=FALSE}
-knitr::include_graphics("rpic.png") 
+knitr::include_graphics("figures/rpic.png") 
 ```
 
 Source: Modern Drive
@@ -29,7 +29,7 @@ Source: Modern Drive
 ---
 # R Studio Interface
 ```{r  out.height="80%", out.width="80%", echo=FALSE}
-knitr::include_graphics("rladies.png") 
+knitr::include_graphics("figures/rladies.png") 
 ```
 Source: R Ladies
 
@@ -37,7 +37,7 @@ Source: R Ladies
 # Customizing R Studio 
 .center[
 ```{r  out.height="40%", out.width="50%", echo=FALSE}
-  knitr::include_graphics("mactheme.png")
+  knitr::include_graphics("figures/mactheme.png")
 ```
 ]
 
@@ -70,8 +70,6 @@ sqrt(9)
 
 ```{r}
 1 < 2
-
-2 >= 1
 
 1 == 2
 
@@ -119,11 +117,15 @@ We usually want to store objects so we can work with them later. We do this by a
 year <- 2020
 ```
 
+--
+
 What type of object is "year"?
 
 ```{r}
 class(year)
 ```
+
+--
 
 ```{r}
 prof_name <- "Jean"
@@ -138,14 +140,12 @@ A vector is a combination of more than one object (of the same class). We can cr
 
 ```{r}
 names <- c("Jean", "Amanda", "Pilar")
-names
 class(names)
 ```
 --
 
 ```{r}
 grad_year <- c(2016, 2021, 2023)
-grad_year
 class(grad_year)
 ```
 --
@@ -184,8 +184,11 @@ var()
 
 .large[
   - Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.
+  
   - Data frames are *heterogenous*: the vectors in a data frames can each be of a different data type.
+  
   - Columns are typically variables and rows are observations.
+  
   - You can make make data frames with `data.frame()`, or by combining vectors with `cbind()` or `rbind()`.
   ]
 ---
@@ -195,6 +198,8 @@ var()
 dataset <- cbind(names, grad_year, area)
 dataset 
 ```
+
+--
 
 ```{r}
 dataset <- data.frame(names = c("Jean","Amanda","Pilar"), 
@@ -221,7 +226,7 @@ dataset$new_grad_year
 # Packages
 
 ```{r  out.height="80%", out.width="80%", echo=FALSE}
-knitr::include_graphics("packages.png") 
+knitr::include_graphics("figures/packages.png") 
 ```
 
 --
@@ -247,7 +252,7 @@ names <- "Jean", "Amanda", "Pilar"
 .med[In some occasions, R will warn you about this even before executing the code.]
 
 ```{r  out.height="90%", out.width="90%", echo=FALSE}
-knitr::include_graphics("error.png") 
+knitr::include_graphics("figures/error.png") 
 ```
 
 ---

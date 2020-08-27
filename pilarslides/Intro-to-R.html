@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Intro to R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Amanda and Pilar" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Intro to R
+### Amanda and Pilar
+### 27 August, 2020
+
+---
+
+
+
+
+# R and R studio
+
+&lt;img src="figures/rpic.png" width="100%" height="100%" /&gt;
+
+Source: Modern Drive
+
+---
+# R Studio Interface
+&lt;img src="figures/rladies.png" width="80%" height="80%" /&gt;
+Source: R Ladies
+
+---
+# Customizing R Studio 
+.center[
+&lt;img src="figures/mactheme.png" width="50%" height="40%" /&gt;
+]
+
+Tools --&gt; Global Options --&gt; Appearance
+
+---
+# R as a calculator
+
+
+```r
+2+2
+```
+
+```
+## [1] 4
+```
+
+```r
+2/3
+```
+
+```
+## [1] 0.6666667
+```
+
+```r
+log(10)
+```
+
+```
+## [1] 2.302585
+```
+
+```r
+abs(-1)
+```
+
+```
+## [1] 1
+```
+
+```r
+sqrt(9)
+```
+
+```
+## [1] 3
+```
+
+---
+# Logical statements
+
+.med[Common logical operators: 
+
+  - == (is equal)
+  - != (not equal)
+  - &lt; (greater than), &gt; (less than)
+  - &amp; (and), | (or)
+]
+
+---
+# Logical statements
+
+
+```r
+1 &lt; 2
+```
+
+```
+## [1] TRUE
+```
+
+```r
+2 &gt;= 1
+```
+
+```
+## [1] TRUE
+```
+
+```r
+1 == 2
+```
+
+```
+## [1] FALSE
+```
+
+```r
+2 != 2
+```
+
+```
+## [1] FALSE
+```
+
+```r
+1 &gt; 0 &amp; 2 &gt; 0
+```
+
+```
+## [1] TRUE
+```
+
+```r
+1 &lt; 0 | 2 &lt;= 3
+```
+
+```
+## [1] TRUE
+```
+
+---
+# PRACTICE 
+.large[
+1) Calculate square root of 109090
+
+&lt;br&gt;
+
+2) What number is larger: The log of 2000 or the square root of 51? (Try to do this in one line only)
+
+&lt;br&gt;
+
+3) What is the maximum number between: the square root of 200, seven times 2, and log of 3000 (Try to do this in one line only)
+]
+
+---
+# Objects
+
+.large[
+- R is based on objects: variables, functions, dataframes, etc.
+
+&lt;br&gt;
+- Objects can be of different types (or "class"). The types of operations you can perform will depend on the class. 
+
+&lt;br&gt;
+
+- Most common class of objects: numeric, character, logical, matrix, data.frame, list, function.
+]
+
+---
+# Objects
+
+We usually want to store objects so we can work with them later. We do this by attributing a name to that object. 
+
+
+```r
+year &lt;- 2020
+```
+
+--
+
+What type of object is "year"?
+
+
+```r
+class(year)
+```
+
+```
+## [1] "numeric"
+```
+
+--
+
+
+```r
+prof_name &lt;- "Jean"
+prof_name
+```
+
+```
+## [1] "Jean"
+```
+
+```r
+class(prof_name)
+```
+
+```
+## [1] "character"
+```
+
+---
+# Vectors (combining objects)
+
+A vector is a combination of more than one object (of the same class). We can create vectors with c() which stands for "combine". 
+
+
+```r
+names &lt;- c("Jean", "Amanda", "Pilar")
+class(names)
+```
+
+```
+## [1] "character"
+```
+--
+
+
+```r
+grad_year &lt;- c(2016, 2021, 2023)
+class(grad_year)
+```
+
+```
+## [1] "numeric"
+```
+--
+
+
+```r
+area &lt;- c("Methods", "American Politics", "Comparative Politics")
+```
+
+---
+# PRACTICE 
+.large[
+1) Create an object with your first name and a second object with your last name.
+
+&lt;br&gt;
+
+2) Create a vector that contains your first and last name. (Try the function "paste" too)
+]
+
+---
+# Functions to describe numeric vectors
+
+.large[
+summary()
+
+mean()
+
+median()
+
+sd()
+
+var()
+]
+
+---
+# Dataframes 
+
+.large[
+  - Data frames are the core data structure in R. A data frame is a list of named vectors with the same length.
+  
+  - Data frames are *heterogenous*: the vectors in a data frames can each be of a different data type.
+  
+  - Columns are typically variables and rows are observations.
+  
+  - You can make make data frames with `data.frame()`, or by combining vectors with `cbind()` or `rbind()`.
+  ]
+---
+# Dataframes (combining vectors)
+
+
+```r
+dataset &lt;- cbind(names, grad_year, area)
+dataset 
+```
+
+```
+##      names    grad_year area                  
+## [1,] "Jean"   "2016"    "Methods"             
+## [2,] "Amanda" "2021"    "American Politics"   
+## [3,] "Pilar"  "2023"    "Comparative Politics"
+```
+
+--
+
+
+```r
+dataset &lt;- data.frame(names = c("Jean","Amanda","Pilar"), 
+                 grad_year = c(2016, 2021, 2023), 
+                 area = c("Methods", "American Politics", "Comparative Politics"))
+dataset
+```
+
+```
+##    names grad_year                 area
+## 1   Jean      2016              Methods
+## 2 Amanda      2021    American Politics
+## 3  Pilar      2023 Comparative Politics
+```
+---
+# Dataframes
+
+Data frames can be indexed by using variable/column names: `df$var` or `df["var"]`.
+
+
+```r
+dataset$names
+```
+
+```
+## [1] "Jean"   "Amanda" "Pilar"
+```
+
+```r
+dataset$grad_year[dataset$names == "Jean"]
+```
+
+```
+## [1] 2016
+```
+
+```r
+dataset$new_grad_year &lt;- dataset$grad_year - 2
+
+dataset$new_grad_year
+```
+
+```
+## [1] 2014 2019 2021
+```
+
+---
+# Packages
+
+&lt;img src="figures/packages.png" width="80%" height="80%" /&gt;
+
+--
+
+
+| On phone     | On R                 |
+|--------------|----------------------|
+| Download app | install.packages("") |
+| Open app     | library()            |
+
+
+---
+# Basics of R: Errors and Warnings
+
+.med[Error: If you get an error, the command will not be executed. This can be due to many things (including silly spelling mistakes, missing parentheses, etc.)]
+
+
+```r
+names &lt;- "Jean", "Amanda", "Pilar"
+```
+
+```
+## Error: &lt;text&gt;:1:16: unexpected ','
+## 1: names &lt;- "Jean",
+##                    ^
+```
+
+--
+
+.med[In some occasions, R will warn you about this even before executing the code.]
+
+&lt;img src="figures/error.png" width="90%" height="90%" /&gt;
+
+---
+# Basics of R: Errors and Warnings
+
+.med[If you get a warning, the command will still be executed, but with some tweaking.]
+
+--
+
+
+```r
+x &lt;- as.numeric(c("1", "2", "X"))
+```
+
+```
+## Warning: NAs introduced by coercion
+```
+&lt;br&gt;
+--
+
+.med[Make sure that "tweaking" still gets you the result you want.]
+
+
+```r
+x
+```
+
+```
+## [1]  1  2 NA
+```
+---
+# Where to find help 
+
+.med[
+1) In R:
+ - type ?mean 
+ - In "Help" window on lower-right pane
+
+
+2) Google
+
+
+3) StackExchange, StackOverflow
+
+
+4) Package documentation, Package vignettes
+]
+
+---
+# PRACTICE
+
+.large[
+1) Install the package "tidyverse" 
+
+&lt;br&gt;
+
+2) Download and save the documentation for the package 
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
