@@ -4,6 +4,7 @@
     <title>Coding Tips and Exploring Data</title>
     <meta charset="utf-8" />
     <meta name="author" content="Amanda and Pilar" />
+    <meta name="date" content="2020-09-02" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -15,7 +16,7 @@ class: center, middle, inverse, title-slide
 
 # Coding Tips and Exploring Data
 ### Amanda and Pilar
-### 22 August, 2020
+### 09/02/2020
 
 ---
 
@@ -111,11 +112,11 @@ library(janitor)
 
 
 ```r
-library(caret)
+library(BioConductor)
 ```
 
 ```
-## Error in library(caret): there is no package called 'caret'
+## Error in library(BioConductor): there is no package called 'BioConductor'
 ```
 
 
@@ -160,7 +161,7 @@ Each time you open R you're environment will be empty. This means that the objec
 ---
 # Coding: Working Directory
   
-  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that contains our data) or we may want to save things like plots.]
 
 --
   
@@ -206,8 +207,15 @@ If I had not set my working directory, I would write the whole path to the file:
 
 
 ```r
-chicago &lt;- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/Census Data_selected_2008-2012.csv")
+chicago &lt;- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/data/Census Data_selected_2008-2012.csv")
 ```
+
+---
+# PRACTICE
+
+.large[1) Download the Chicago dataset from Canvas (both the .csv and the .dta)]
+
+.large[2) Upload the csv version to R.]
 
 ---
 # Reading in Data 
@@ -216,15 +224,19 @@ chicago &lt;- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session
 
 --
 
-.med[Haven is useful for importing Stata files, which you will often encounter]
+.med["haven" is useful for importing Stata files, which you will often encounter]
 
+--
+
+.med[**PRACTICE**: Install and load the package "haven". Use it to read in the .dta version of the Chicago dataset.]
+
+--
 
 
 ```r
-install.packages("haven")
 library(haven)
 
-chicago_stat &lt;- read_dta("Census Data_selected_2008-2012.dta")
+chicago_stat &lt;- read_dta("data/Census Data_selected_2008-2012.dta")
 ```
 
 ---
@@ -242,9 +254,10 @@ View(chicago)
 ```
 
 --
-Alternatively, you can click the "play" button next to the name of the dataset in the Environment window. 
-
+Alternatively, you can click the on the dataset icon next to the name of the dataset in the Environment window. 
+.center[
 &lt;img src="figures/view.png" width="50%" height="50%" /&gt;
+]
 
 ---
 # Exploring data 
@@ -281,6 +294,9 @@ names(chicago)
 ##  [9] "HARDSHIP.INDEX"                              
 ## [10] "ZONE"
 ```
+--
+
+**PRACTICE**: Now try the same with chicago_stat. What's different?
 
 ---
 # Exploring the Data
@@ -366,6 +382,119 @@ summary(chicago)
 ##  Max.   :88669     Max.   :98.00                     
 ##                    NA's   :1
 ```
+
+---
+# PRACTICE 
+
+1) Find the variable that has the neighborhood names and print it out (i.e. show the neighborhood names).
+
+2) Get the descriptive statistics for percent of households below poverty. 
+
+3) What can you say about Rogers Park's level of poverty in comparison to the rest of the city? 
+
+4) Which neighborhood has the highest poverty rate? What zone is it located in? 
+
+5) Create a new variable that indicates whether the poverty rate is above or below the average poverty rate of the city.  
+
+6) Use the command 'plot' to make a scatter plot between poverty rates and percent without HS diploma. (We'll learn how to make prettier plots in the last session)
+
+---
+
+
+
+---
+# More skills ! 😃
+
+.med[Find, download and upload the data for the latest wave of the World Value Survey.]
+
+
+```r
+wvs &lt;- read_dta("data/WVS_Cross-National_Wave_7_stata_v1_4.dta")
+```
+--
+
+.med[Also find and download the codebook for the dataset.]
+
+---
+# Tables 
+
+.med[One-way tables are useful to see the values the variable takes on and how it is distributed.]
+
+--
+
+.med[Let's explore attitudes towards women by looking at some of the questions in the WVS (Q29-Q33). For example:] 
+
+
+```r
+table(wvs$Q30)
+```
+
+```
+## 
+##     1     2     3     4 
+##  6232 10785 31423 20078
+```
+
+---
+# Tables
+
+.med[Two way tables allow us to see how two variables are related to each other.] 
+
+--
+
+.med[Do men and women both think that men make better political leaders?]
+
+--
+
+
+```r
+table(wvs$Q29, wvs$Q260)
+```
+
+```
+##    
+##         1     2
+##   1  5941  4602
+##   2  9363  8663
+##   3 12611 14874
+##   4  4333  7353
+```
+
+---
+# Tables
+
+.med[Although these tables are informative, it's better to see these numbers as proportions.]
+
+--
+
+.med[Among men, what percentage "Agree strongly" that men make better poltiical leaders? What is this percentage among women?]
+
+--
+
+
+```r
+prop.table(table(wvs$Q29, wvs$Q260),2)
+```
+
+```
+##    
+##             1         2
+##   1 0.1842285 0.1296630
+##   2 0.2903436 0.2440832
+##   3 0.3910630 0.4190804
+##   4 0.1343649 0.2071734
+```
+
+--
+
+What is that 2 doing there? What happens if we change it for a 1? 
+
+---
+# PRACTICE 
+
+.med[1) Create a two-way table between sex and question Q30 (University is more important for a boy than for a girl)]
+
+.med[2) How do opinions about women differ between religious and non-religious people? Look for question Q6 in the codebook. Pick a question (Q29-Q33) and cross it with Q6.]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
