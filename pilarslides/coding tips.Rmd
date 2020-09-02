@@ -1,7 +1,7 @@
 ---
 title: "Coding Tips and Exploring Data"
 author: "Amanda and Pilar"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "09/02/2020"
 output: 
   xaringan::moon_reader:
     seal: true 
@@ -102,7 +102,7 @@ library(janitor)
 .med[If you load a library without installing it first, you will get this error:] 
 
 ```{r error= TRUE}
-library(caret)
+library(BioConductor)
 ```
 
 
@@ -144,7 +144,7 @@ Each time you open R you're environment will be empty. This means that the objec
 ---
 # Coding: Working Directory
   
-  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that cointains our data) or we may want to save things like plots.]
+  .med[Your working directory is the folder in your computer where the script is saved. We usually want to bring in other files into R (such as a .csv file that contains our data) or we may want to save things like plots.]
 
 --
   
@@ -189,8 +189,15 @@ chicago <- read.csv("data/Census Data_selected_2008-2012.csv")
 If I had not set my working directory, I would write the whole path to the file:
 
 ```{r, eval=FALSE}
-chicago <- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/Census Data_selected_2008-2012.csv")
+chicago <- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/data/Census Data_selected_2008-2012.csv")
 ```
+
+---
+# PRACTICE
+
+.large[1) Download the Chicago dataset from Canvas (both the .csv and the .dta)]
+
+.large[2) Upload the csv version to R.]
 
 ---
 # Reading in Data 
@@ -199,14 +206,18 @@ chicago <- read.csv("C:/Users/pilim/Dropbox/Northwestern/TA/Math Camp/Session 2/
 
 --
 
-.med[Haven is useful for importing Stata files, which you will often encounter]
+.med["haven" is useful for importing Stata files, which you will often encounter]
 
+--
 
-```{r, eval=FALSE}
-install.packages("haven")
+.med[**PRACTICE**: Install and load the package "haven". Use it to read in the .dta version of the Chicago dataset.]
+
+--
+
+```{r, eval=TRUE}
 library(haven)
 
-chicago_stat <- read_dta("Census Data_selected_2008-2012.dta")
+chicago_stat <- read_dta("data/Census Data_selected_2008-2012.dta")
 
 ```
 
@@ -224,11 +235,12 @@ View(chicago)
 ```
 
 --
-Alternatively, you can click the "play" button next to the name of the dataset in the Environment window. 
-
+Alternatively, you can click the on the dataset icon next to the name of the dataset in the Environment window. 
+.center[
 ```{r  out.height="50%", out.width="50%", echo=FALSE}
 knitr::include_graphics("figures/view.png") 
 ```
+]
 
 ---
 # Exploring data 
@@ -246,6 +258,9 @@ dim(chicago)
 ```{r}
 names(chicago)
 ```
+--
+
+**PRACTICE**: Now try the same with chicago_stat. What's different?
 
 ---
 # Exploring the Data
@@ -264,4 +279,92 @@ head(chicago)
 summary(chicago)
 ```
 
+---
+# PRACTICE 
+
+1) Find the variable that has the neighborhood names and print it out (i.e. show the neighborhood names).
+
+2) Get the descriptive statistics for percent of households below poverty. 
+
+3) What can you say about Rogers Park's level of poverty in comparison to the rest of the city? 
+
+4) Which neighborhood has the highest poverty rate? What zone is it located in? 
+
+5) Create a new variable that indicates whether the poverty rate is above or below the average poverty rate of the city.  
+
+6) Use the command 'plot' to make a scatter plot between poverty rates and percent without HS diploma. (We'll learn how to make prettier plots in the last session)
+
+---
+
+```{r echo=FALSE}
+chicago$pov <- NA  
+chicago$pov[chicago$PERCENT.HOUSEHOLDS.BELOW.POVERTY>=22] <- "Yes"
+chicago$pov[chicago$PERCENT.HOUSEHOLDS.BELOW.POVERTY<22] <- "No"
+```
+
+---
+# More skills ! `r emo::ji("smiley")`
+
+.med[Find, download and upload the data for the latest wave of the World Value Survey.]
+
+```{r}
+wvs <- read_dta("data/WVS_Cross-National_Wave_7_stata_v1_4.dta")
+```
+--
+
+.med[Also find and download the codebook for the dataset.]
+
+---
+# Tables 
+
+.med[One-way tables are useful to see the values the variable takes on and how it is distributed.]
+
+--
+
+.med[Let's explore attitudes towards women by looking at some of the questions in the WVS (Q29-Q33). For example:] 
+
+```{r}
+table(wvs$Q30)
+```
+
+---
+# Tables
+
+.med[Two way tables allow us to see how two variables are related to each other.] 
+
+--
+
+.med[Do men and women both think that men make better political leaders?]
+
+--
+
+```{r}
+table(wvs$Q29, wvs$Q260)
+```
+
+---
+# Tables
+
+.med[Although these tables are informative, it's better to see these numbers as proportions.]
+
+--
+
+.med[Among men, what percentage "Agree strongly" that men make better poltiical leaders? What is this percentage among women?]
+
+--
+
+```{r}
+prop.table(table(wvs$Q29, wvs$Q260),2)
+```
+
+--
+
+What is that 2 doing there? What happens if we change it for a 1? 
+
+---
+# PRACTICE 
+
+.med[1) Create a two-way table between sex and question Q30 (University is more important for a boy than for a girl)]
+
+.med[2) How do opinions about women differ between religious and non-religious people? Look for question Q6 in the codebook. Pick a question (Q29-Q33) and cross it with Q6.]
 
