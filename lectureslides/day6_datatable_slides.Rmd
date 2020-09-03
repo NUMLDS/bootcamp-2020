@@ -9,6 +9,7 @@ output:
     reveal_plugins: ["notes"]
 params:
   notes: no
+height: 800
 ---
 
 ```{r setup, include=FALSE}
@@ -513,15 +514,31 @@ benchmark(read.csv(data_file_large, stringsAsFactors = F),
 
 ```
 
+## Special variables
 
-# Special variables
+`data.table`s also contain some special read-only symbols that are often useful: 
+
+- `.N`: number of rows in the current group
+- `.I`: a vector, `1:nrow(dt)`, usually used for more advanced operations
+
+```{r, eval=FALSE, echo=TRUE}
+
+# for .N: convenient
+generation_dt[,.N] 
+
+# for .I: more advanced syntax
+generation_dt[,.I]
+
+```
+
+## Special variables
 
 **try it!** Use `.N` to find the number of rows in generation_dt_long
 
 **try it!** Use `.N` to find the number of hours in which solar generation was greater than 500 MW
 
 
-# Special variables
+## Special variables
 
 **try it!** Use `.N` to find the number of rows in generation_dt_long
 

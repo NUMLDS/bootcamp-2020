@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Ali Ehlen" />
-  <meta name="dcterms.date" content="2020-08-26" />
+  <meta name="dcterms.date" content="2020-09-02" />
   <title>Day 6: Advanced data manipulation 3 - data.table</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -515,7 +515,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <section>
     <h1 class="title">Day 6: Advanced data manipulation 3 - data.table</h1>
     <h2 class="author">Ali Ehlen</h2>
-    <h3 class="date">2020-08-26</h3>
+    <h3 class="date">2020-09-02</h3>
 </section>
 
 <section><section id="introduction" class="title-slide slide level1"><h1>Introduction</h1></section><section id="what-is-data.table" class="slide level2">
@@ -1138,28 +1138,49 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <a class="sourceLine" id="cb49-31" title="31"><span class="co">#                                              test replications elapsed relative user.self sys.self user.child sys.child</span></a>
 <a class="sourceLine" id="cb49-32" title="32"><span class="co"># 2                          fread(data_file_large)           20    2.67    1.000      7.07     1.10         NA        NA</span></a>
 <a class="sourceLine" id="cb49-33" title="33"><span class="co"># 1 read.csv(data_file_large, stringsAsFactors = F)           20   74.59   27.936     71.53     3.05         NA        NA</span></a></code></pre></div>
-</section></section>
-<section id="special-variables" class="title-slide slide level1"><h1>Special variables</h1></section>
-<section><section id="special-variables-1" class="title-slide slide level1"><h1>Special variables</h1></section><section id="other-features-keys" class="slide level2">
+</section><section id="special-variables" class="slide level2">
+<h2>Special variables</h2>
+<p><code>data.table</code>s also contain some special read-only symbols that are often useful:</p>
+<ul>
+<li><code>.N</code>: number of rows in the current group</li>
+<li><code>.I</code>: a vector, <code>1:nrow(dt)</code>, usually used for more advanced operations</li>
+</ul>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="co"># for .N: convenient</span></a>
+<a class="sourceLine" id="cb50-2" title="2">generation_dt[,.N] </a>
+<a class="sourceLine" id="cb50-3" title="3"></a>
+<a class="sourceLine" id="cb50-4" title="4"><span class="co"># for .I: more advanced syntax</span></a>
+<a class="sourceLine" id="cb50-5" title="5">generation_dt[,.I]</a></code></pre></div>
+</section><section id="special-variables-1" class="slide level2">
+<h2>Special variables</h2>
+<p><strong>try it!</strong> Use <code>.N</code> to find the number of rows in generation_dt_long</p>
+<p><strong>try it!</strong> Use <code>.N</code> to find the number of hours in which solar generation was greater than 500 MW</p>
+</section><section id="special-variables-2" class="slide level2">
+<h2>Special variables</h2>
+<p><strong>try it!</strong> Use <code>.N</code> to find the number of rows in generation_dt_long</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">generation_dt_long[,.N]</a></code></pre></div>
+<p><strong>try it!</strong> Use <code>.N</code> to find the number of hours in which solar generation was greater than 500 MW</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">generation_dt[solar <span class="op">&gt;</span><span class="st"> </span><span class="dv">500</span>, .N]</a>
+<a class="sourceLine" id="cb52-2" title="2">generation_dt_long[gen_type <span class="op">==</span><span class="st"> &quot;solar&quot;</span> <span class="op">&amp;</span><span class="st"> </span>MW <span class="op">&gt;</span><span class="st"> </span><span class="dv">500</span>,.N]</a></code></pre></div>
+</section><section id="other-features-keys" class="slide level2">
 <h2>Other features: keys</h2>
 <ul>
 <li>keys: one or more columns, pre-sorted index of the table. Setting a key makes joining and other operations much faster, because rows are already sorted (note: set function)</li>
 <li>I rarely use it unless I’m working with lots of data, mostly because I prefer to explicitly name columns for clarity (when possible)</li>
 </ul>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="co"># check the current key</span></a>
-<a class="sourceLine" id="cb50-2" title="2"><span class="kw">key</span>(generation_dt)</a>
-<a class="sourceLine" id="cb50-3" title="3"></a>
-<a class="sourceLine" id="cb50-4" title="4"><span class="co"># set key</span></a>
-<a class="sourceLine" id="cb50-5" title="5"><span class="kw">setkey</span>(generation_dt, datetime)</a>
-<a class="sourceLine" id="cb50-6" title="6"><span class="kw">key</span>(generation_dt)</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1"><span class="co"># check the current key</span></a>
+<a class="sourceLine" id="cb53-2" title="2"><span class="kw">key</span>(generation_dt)</a>
+<a class="sourceLine" id="cb53-3" title="3"></a>
+<a class="sourceLine" id="cb53-4" title="4"><span class="co"># set key</span></a>
+<a class="sourceLine" id="cb53-5" title="5"><span class="kw">setkey</span>(generation_dt, datetime)</a>
+<a class="sourceLine" id="cb53-6" title="6"><span class="kw">key</span>(generation_dt)</a></code></pre></div>
 </section><section id="other-features-joins" class="slide level2">
 <h2>Other features: joins</h2>
 <ul>
 <li>joins: <code>data.table</code> has a special join syntax</li>
 </ul>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">imports_dt &lt;-<span class="st"> </span><span class="kw">fread</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;ca_energy_imports.csv&quot;</span>))</a>
-<a class="sourceLine" id="cb51-2" title="2"></a>
-<a class="sourceLine" id="cb51-3" title="3">imports_dt</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1">imports_dt &lt;-<span class="st"> </span><span class="kw">fread</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;ca_energy_imports.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb54-2" title="2"></a>
+<a class="sourceLine" id="cb54-3" title="3">imports_dt</a></code></pre></div>
 <pre><code>##                 datetime   imports
 ##   1: 2019-09-03 00:00:00  7527.333
 ##   2: 2019-09-03 01:00:00  6930.333
@@ -1177,8 +1198,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <ul>
 <li>joins: <code>data.table</code> has a special join syntax. this returns a new <code>data.table</code>. It does not modify imports_dt in place</li>
 </ul>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1"><span class="co"># set key or specify on </span></a>
-<a class="sourceLine" id="cb53-2" title="2">imports_dt[generation_dt, on =<span class="st"> &quot;datetime&quot;</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="co"># set key or specify on </span></a>
+<a class="sourceLine" id="cb56-2" title="2">imports_dt[generation_dt, on =<span class="st"> &quot;datetime&quot;</span>]</a></code></pre></div>
 <pre><code>##                 datetime   imports   biogas  biomass      coal geothermal
 ##   1: 2019-09-03 00:00:00  7527.333 238.9167 407.0833  9.000000   967.2500
 ##   2: 2019-09-03 01:00:00  6930.333 239.0000 406.5000  9.000000   970.3333
@@ -1220,10 +1241,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <ul>
 <li>joins: <code>data.table</code> has a special join syntax. this does modify imports_dt in place (the presence of <code>:=</code> is a hint)</li>
 </ul>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1"><span class="co"># operations can be performed in the same step as the merge</span></a>
-<a class="sourceLine" id="cb55-2" title="2">imports_dt[generation_dt, on =<span class="st"> &quot;datetime&quot;</span>, imports_gas <span class="op">:</span><span class="er">=</span><span class="st"> </span>imports <span class="op">+</span><span class="st"> </span>i.natural_gas]</a>
-<a class="sourceLine" id="cb55-3" title="3"></a>
-<a class="sourceLine" id="cb55-4" title="4">imports_dt</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="co"># operations can be performed in the same step as the merge</span></a>
+<a class="sourceLine" id="cb58-2" title="2">imports_dt[generation_dt, on =<span class="st"> &quot;datetime&quot;</span>, imports_gas <span class="op">:</span><span class="er">=</span><span class="st"> </span>imports <span class="op">+</span><span class="st"> </span>i.natural_gas]</a>
+<a class="sourceLine" id="cb58-3" title="3"></a>
+<a class="sourceLine" id="cb58-4" title="4">imports_dt</a></code></pre></div>
 <pre><code>##                 datetime   imports imports_gas
 ##   1: 2019-09-03 00:00:00  7527.333    17238.17
 ##   2: 2019-09-03 01:00:00  6930.333    16085.33
@@ -1241,10 +1262,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <ul>
 <li>joins: <code>data.table</code> has a special join syntax. This can become very complex if you want it to!</li>
 </ul>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1"><span class="co"># operations can be performed in the same step as the merge</span></a>
-<a class="sourceLine" id="cb57-2" title="2">imports_dt[generation_dt[<span class="kw">hour</span>(datetime) <span class="op">==</span><span class="st"> </span><span class="dv">2</span>], on =<span class="st"> &quot;datetime&quot;</span>, imports_gas_<span class="dv">2</span> <span class="op">:</span><span class="er">=</span><span class="st"> </span>imports <span class="op">+</span><span class="st"> </span>i.natural_gas]</a>
-<a class="sourceLine" id="cb57-3" title="3"></a>
-<a class="sourceLine" id="cb57-4" title="4">imports_dt</a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1"><span class="co"># operations can be performed in the same step as the merge</span></a>
+<a class="sourceLine" id="cb60-2" title="2">imports_dt[generation_dt[<span class="kw">hour</span>(datetime) <span class="op">==</span><span class="st"> </span><span class="dv">2</span>], on =<span class="st"> &quot;datetime&quot;</span>, imports_gas_<span class="dv">2</span> <span class="op">:</span><span class="er">=</span><span class="st"> </span>imports <span class="op">+</span><span class="st"> </span>i.natural_gas]</a>
+<a class="sourceLine" id="cb60-3" title="3"></a>
+<a class="sourceLine" id="cb60-4" title="4">imports_dt</a></code></pre></div>
 <pre><code>##                 datetime   imports imports_gas imports_gas_2
 ##   1: 2019-09-03 00:00:00  7527.333    17238.17            NA
 ##   2: 2019-09-03 01:00:00  6930.333    16085.33            NA
@@ -1287,6 +1308,7 @@ document.getElementsByTagName('head')[0].appendChild(style);
         transition: 'default', // none/fade/slide/convex/concave/zoom
         // Transition style for full page slide backgrounds
         backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+        height: 800,
 
 
 

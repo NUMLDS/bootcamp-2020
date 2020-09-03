@@ -22,6 +22,12 @@ notes<-params$notes
 source(here::here("data/day3_objects.R"))
 ```
 
+Or, if you want the option of using data.table syntax, also run this to convert the objects to data.tables. All the plotting will is the same, but you will need it for some data preparation.
+```{r, warning=FALSE, message=FALSE}
+library(data.table)
+source(here::here("data/day3_objects_setDT.R"))
+```
+
 # Introduction to ggplot2
 
 ## What is ggplot2?
@@ -132,8 +138,7 @@ Recall the role of pipes (`%>%`) in `dplyr`. Since `dplyr` and `ggplot2` are bot
 For example, consider the above plot. Instead of specifying the data in the `ggplot()` function, we can supply the data through a pipe. Instead of using the subsetted `gapminder07` data, we can use the original `gapminder` and use a `filter()` function to select the 2007 observations only.
 
 ```{r data prep 1}
-library(gapminder)
-
+# dplyr
 gapminder %>% 
   filter(year == 2007) %>% 
   ggplot() + 
@@ -143,29 +148,47 @@ gapminder %>%
        x = "GDP per capita", y = "Life expectancy")
 ```
 
+```{r }
+# data.table
+gapminder[year == 2007] %>% 
+    ggplot() + 
+    geom_point(aes(x = gdpPercap, y = lifeExp)) + 
+    geom_hline(aes(yintercept = mean(lifeExp))) + 
+    labs(title = "Relationship between life expectancy and GDP per capita in 2007", 
+         x = "GDP per capita", y = "Life expectancy")
+```
+
 For another example of preparing data for plotting, let's turn to the California energy data, which we will use for the rest of the ggplot session. Recall that you used dplyr to create long-format data frames `long_gen` (all generation data) and `long_merged_gen` (all generation + imports data). Say we wanted to visualize the total energy generated in the state over time. Starting with `long_gen`, and using `group_by()` and `summarize()`, we can sum the output for each date-time value (i.e. each hour) and feed this directly into `ggplot()`. Note that this kind of graphing task is one of the uses of having a long-format version of your data.
 
 ```{r data prep 2}
 # this is copied from day 4
-library(reshape2)
 library(lubridate)
-generation <- read.csv(here::here("data/ca_energy_generation.csv"), stringsAsFactors = F)
 generation$datetime <- as_datetime(generation$datetime)
 long_gen <- melt(generation, id.vars = "datetime",
                            variable.name = "source",
                            value.name = "usage")
 
+# dplyr
 long_gen %>% 
   group_by(datetime) %>% 
   summarise(output=sum(usage)) %>% 
   ggplot() + 
   geom_col(aes(x=datetime, y=output)) + 
   labs(title="Total energy generated, by hour", x="Hour", y="Output (MW)")
+
+# data.table
+setDT(long_gen) # convert to data.table
+long_gen[,.(output=sum(usage)),by = datetime] %>% 
+  ggplot() + 
+  geom_col(aes(x=datetime, y=output)) + 
+  labs(title="Total energy generated, by hour", x="Hour", y="Output (MW)")
+
 ```
 
 Perhaps we are concerned that the above plot has too much granularity. Instead, we want to plot the total output per *day* instead of per *hour*. Again, we can achieve this by manipulating our data prior to piping it into `ggplot()`. Note that we use the `date()` function in `lubridate` which takes a date-time value and returns the date portion only.
 
 ```{r data prep 3}
+# dplyr
 long_gen %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date) %>% 
@@ -173,6 +196,13 @@ long_gen %>%
   ggplot() + 
   geom_col(aes(x=date, y=output)) + 
   labs(title="Total energy generated, by day", x="Day", y="Output (MW)")
+
+# data.table
+long_gen[,.(output=sum(usage)), by = .(date = as.Date(datetime))] %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output)) + 
+  labs(title="Total energy generated, by day", x="Day", y="Output (MW)")
+
 ```
 
 # Geometric objects
@@ -326,6 +356,7 @@ For a full list of the components that can be modified in the theme layer, see t
 A common coordinate system adjustment layer is `coord_flip()`, which rotates the plot such that the `x` and `y` axes are flipped. Let's see an example with the bar chart that we generated with `geom_col()` earlier in the session.
 
 ```{r coord_flip}
+# dplyr
 long_gen %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date) %>% 
@@ -334,6 +365,14 @@ long_gen %>%
   geom_col(aes(x=date, y=output)) + 
   labs(title="Total energy generated, by day", x="Day", y="Output (MW)") + 
   coord_flip()
+
+# data.table
+long_gen[,.(output=sum(usage)), by = .(date = as.Date(datetime))] %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output)) + 
+  labs(title="Total energy generated, by day", x="Day", y="Output (MW)") + 
+  coord_flip()
+
 ```
 
 You can manipulate the coordinate system in other ways:
@@ -378,6 +417,7 @@ long_merged_energy %>%
 Let's take a look at a more complex plot that uses grouping to generate multiple lines. For example, we might look at the above plot and think that the repeated patterns over multiple days is too noisy. Perhaps we are interested in the average trend over the course of a single day. To visualize this, we can plot the average output of each energy source per hour over the 7 days in the data. Comments are included in the code below describing what each step does. Note how the code for this plot combines several of the topics we have discussed so far (data manipulation before plotting, scales, themes, and labels).
 
 ```{r aes colors 2}
+# dplyr
 long_merged_energy %>% 
   # Create a variable indicating hour only
   mutate(hour=lubridate::hour(datetime)) %>% 
@@ -385,6 +425,20 @@ long_merged_energy %>%
   group_by(hour, source) %>% 
   # Compute mean output for each hour-source unit
   summarise(output=mean(usage)) %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  # Plot lines for output over hour, grouped by source
+  geom_line(aes(x=hour, y=output, group=source, col=source), size=1) + 
+  # Use Set3 color palette to distinguish lines from each other, and give legend a title
+  scale_color_brewer(palette="Set3", name="Energy Source") + 
+  # Use dark theme to make colors more visible + 
+  theme_dark() + 
+  # Add labels
+  labs(title="Average hourly output by energy source", subtitle="Data collected during Sept 3-9, 2018",
+       x="Hour", y="Mean output (MW)")
+
+# data.table
+long_merged_energy[,.(output=mean(usage)), by = .(hour(datetime), source)] %>% 
   # Pipe data into ggplot
   ggplot() + 
   # Plot lines for output over hour, grouped by source
@@ -407,10 +461,17 @@ In the above example, all groups are plotted overlaying each other. One way to v
 For example, let's plot a column chart with the total energy output per day. Note that we use the `fill = ` argument here to demarcate each group in a different color. By default, ggplot stacks all the groups on top of each other.
 
 ```{r col stack}
+# dplyr
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
   summarize(output=sum(usage)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source)) + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+
+# data.table
+long_merged_energy[,.(output=sum(usage)), by = .(date = as.Date(datetime), source)] %>% 
   ggplot() + 
   geom_col(aes(x=date, y=output, group=source, fill=source)) + 
   labs(title="Energy use by day", x="Day", y="Output (MW)")
@@ -419,10 +480,17 @@ long_merged_energy %>%
 Instead of stacking the groups on top of each other, we can also use the `position = "dodge"` argument to create a column per group and arrange them next to each other horizontally.
 
 ```{r col dodge}
+# dplyr
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
   summarize(output=sum(usage)) %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="dodge") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+
+# data.table
+long_merged_energy[,.(output=sum(usage)), by = .(date = as.Date(datetime), source)] %>% 
   ggplot() + 
   geom_col(aes(x=date, y=output, group=source, fill=source), position="dodge") + 
   labs(title="Energy use by day", x="Day", y="Output (MW)")
@@ -431,6 +499,7 @@ long_merged_energy %>%
 A third alternative is to use `position = "fill"`, which normalizes the height of each bar and as such shows the proportion of the data in each bin that consists of each group.
 
 ```{r col fill}
+# dplyr
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
@@ -438,6 +507,13 @@ long_merged_energy %>%
   ggplot() + 
   geom_col(aes(x=date, y=output, group=source, fill=source), position="fill") + 
   labs(title="Energy use by day", x="Day", y="Output (MW)")
+
+# data.table
+long_merged_energy[,.(output=sum(usage)), by = .(date = as.Date(datetime), source)] %>% 
+  ggplot() + 
+  geom_col(aes(x=date, y=output, group=source, fill=source), position="fill") + 
+  labs(title="Energy use by day", x="Day", y="Output (MW)")
+
 ```
 
 Let's see another example of how position adjustment works with an area plot, of energy output over time by source. `geom_area()` defaults to `position="stack"` when using groups, but I have explicitly defined it here for illustration.
@@ -453,6 +529,8 @@ long_merged_energy %>%
 We might look at this plot and think it's not particularly helpful. To simplify the above plot, we can do two things: (1) use the categories contained in the `regroup` data frame to reduce the number of categories; and (2) switch to `position="fill"` instead of `position="stack"`.
 
 ```{r area stack 2}
+
+# dplyr
 # Make sure regroup data has been imported
 regroup <- read_csv("data/ca_energy_regroup.csv")
 # Prepare data frame
@@ -466,6 +544,19 @@ long_merged_energy %>%
   geom_area(aes(x=datetime, y=output, group=group, fill=group), position="fill") + 
   labs(title="Energy use over time", subtitle="Data collected during September 3-9, 2018", 
        x="Hour", y="Output (MW)")
+
+# data.table
+long_merged_energy_dt <- as.data.table(long_merged_energy)
+setDT(regroup)
+long_merged_energy_dt[regroup, on = c(source = "type"), group := i.group]
+
+long_merged_energy_dt[,.(output = sum(usage)), by = .(group, datetime)] %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  geom_area(aes(x=datetime, y=output, group=group, fill=group), position="fill") + 
+  labs(title="Energy use over time", subtitle="Data collected during September 3-9, 2018", 
+       x="Hour", y="Output (MW)")
+
 ```
 
 ## Shapes and linetypes
@@ -473,7 +564,7 @@ long_merged_energy %>%
 For certain `geom` functions, such as `geom_point()`, we can demarcate groups by shape. This is especially helpful in conjuction with line plots. For example, let's plot total output by day, grouped using the grouping variable from `regroup`. First, we will plot lines and use colors to demarcate groups. Then, we will plot points and use shapes to demarcate groups.
 
 ```{r aes shapes}
-# Prepare data
+# dplyr
 long_merged_energy %>%
   rename(type = source) %>% 
   merge(regroup, by = "type") %>% 
@@ -486,18 +577,35 @@ long_merged_energy %>%
   geom_point(aes(x=date, y=output, group=group, shape=group)) + 
   labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018",
        x="Date", y="Output (MW)")
+
+# data.table
+long_merged_energy_dt[,.(output = sum(usage)), by = .(group, date = as.Date(datetime))] %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  geom_line(aes(x=date, y=output, group=group, col=group), size=0.8) +
+  geom_point(aes(x=date, y=output, group=group, shape=group)) + 
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018",
+       x="Date", y="Output (MW)")
 ```
 
 The `shape = ` approach works well for points, but when working with line plots, we can demarcate groups by `linetype = ` instead. For example, instead of combining colored lines and shapes in the above plot, let's use linetypes to demarcate groups.
 
 ```{r aes linetypes}
-# Prepare data
+# dplyr
 long_merged_energy %>%
   rename(type = source) %>% 
   merge(regroup, by = "type") %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, group) %>%
   summarise(output=sum(usage)) %>% 
+  # Pipe data into ggplot
+  ggplot() + 
+  geom_line(aes(x=date, y=output, group=group, linetype=group), size=1) +
+  labs(title="Output by source group over time", subtitle="Data collected during September 3-9, 2018",
+       x="Date", y="Output (MW)")
+
+# data.table
+long_merged_energy_dt[,.(output = sum(usage)), by = .(group, date = as.Date(datetime))] %>% 
   # Pipe data into ggplot
   ggplot() + 
   geom_line(aes(x=date, y=output, group=group, linetype=group), size=1) +
@@ -558,7 +666,7 @@ long_gen %>%
 That's much better! Note that we can combine faceting with the previous skills we've learned to incorporate multiple groupings. For example, we can use map the source groups in `regroup` to the color aesthetic in `geom_line` as follows. Since this is a fairly complicated mix of data manipulation and visualization, comments are included describing each step.
 
 ```{r facet 3}
-# Begin data preparation
+# dplyr
 long_gen %>% 
   # Rename "source" variable to "type", to prepare for merging
   rename(type = source) %>%
@@ -579,6 +687,24 @@ long_gen %>%
   theme_bw() + 
   # Customize theme to move the legend to the bottom
   theme(legend.position = "bottom")
+
+# data.table
+long_gen[regroup, on = c(source = "type"), group := i.group] %>% 
+  ggplot() + 
+  # Generate lines of output ~ datetime, color based on "group" variable, and increase size
+  geom_line(aes(x=datetime, y=usage, group=group, col=group), size=1) + 
+  # Adjust color palette for "group" colors and give legend a better name
+  scale_color_brewer(palette="Set1", name="Type of energy source") +
+  # Create facets by source, with free scales
+  facet_wrap(~source, scales="free") + 
+  # Add labels
+  labs(title="Generation over time, by energy source", subtitle="Hourly data from September 3-9, 2018", 
+       x="Hour", y="Output (MW)") + 
+  # Use the minmal theme
+  theme_bw() + 
+  # Customize theme to move the legend to the bottom
+  theme(legend.position = "bottom")
+
 ```
 
 # Final notes
