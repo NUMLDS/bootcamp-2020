@@ -15,6 +15,14 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
 notes<-params$notes
 ```
 
+# Session Outline 
+
+1. Pull request (theory and practice) by the Wonderful Ali
+2. Open exercise file, save with name in submissions folder
+3. RMD and Intro to data manipulation
+4. Git commit, push, pull **in R studio**
+5. Pull request your submission to MSiA by the Wonderful Ali
+
 # Reporting analysis with Rmarkdown and GitHub
 
 ## Rmarkdown & GitHub
@@ -24,12 +32,42 @@ notes<-params$notes
 - Rmarkdown runs R code, compiles, and produces a report in chosen format
 - This presentation was created using Rmarkdown!
 
-## Day 1, Part 2 Exercise
+## Exercises in R
 
 1) Open the `day4_Rmd-datamanip1_exercises.Rmd`
-2) Save as: `Day4Exercise_LastnameFirstname.Rmd`.
-2) Read in the gapminder data set
-3) As you answer questions, be sure to annotate your work with as much detail as possible!
+2) Save as: `Day4Exercise_LastnameFirstname.Rmd` within the `submissions` folder
+3) Read in the gapminder data set
+4) As you answer questions, be sure to annotate your work with as much detail as possible!
+5) At the end of the day, we'll push it over to MSiA
+
+# RMD 
+
+>- If you're familiar with LaTex, Rmarkdown (RMD) uses most of the same syntax you're used to when writing in Latex
+>- RMD documents have two major components: The written text and the code
+>- This means you can write up analyses and insert figures and tables in the same document! 
+>- It does mean that there are special codes requires to be able to do this, however
+>- Basically the R script is the scratch paper and the RMD is where you put your final code and analysis into one document 
+
+## RMD Codes 
+
+>- The white spaces in RMD look similar to the script, however the white spaces will not run code; they are used to write out sentences like analyses, document headings, etc... 
+>- To work with code, you must initiate a chunk via \`\`\`\{r\} and end it with \`\`\`
+
+## Useful specifications, example
+
+![specifications](figures/rmd cheats.png)
+
+[Useful Cheat Sheet](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+## Knitting 
+
+As you work through your file, you can knit it to different formats in order to see what it looks like. Ultimately you can share the output as a document or memo. 
+
+- knit to pdf requires Latex
+- knit options are specified manually when pressing the arrow next to knit 
+
+![knit image](figures/knit.png)
+
 
 # Advanced data manipulation, part 1: reshaping and merging
 
