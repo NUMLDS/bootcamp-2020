@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 4.35, fig.width = 4.75)
 notes<-params$notes
 ```
 
-# Session Outline
+## Session Outline
 
 - Pull request (theory and practice) by the Wonderful Ali
 - Open exercise file, save with name in submissions folder
