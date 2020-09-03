@@ -529,7 +529,7 @@ benchmark(read.csv(data_file_large, stringsAsFactors = F),
 
 ```
 
-# Special variables
+## Special variables
 
 `data.table`s also contain some special read-only symbols that are often useful: 
 
@@ -546,7 +546,7 @@ generation_dt[,.I]
 
 ```
 
-# Special variables
+## Special variables
 
 **try it!** Use `.N` to find the number of rows in generation_dt_long
 

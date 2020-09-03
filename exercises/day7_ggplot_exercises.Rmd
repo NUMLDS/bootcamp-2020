@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo=answers, eval=answers,
 
 # Load the data
 
-Load the gapminder data.
+Load the gapminder data. You can use dplyr or data.table! Solutions for both methods (where they differ) are given in the answer sheet.
 
 ```{asis}
 ### Answer 
@@ -28,6 +28,12 @@ Load the gapminder data.
 
 ```{r}
 gapminder <- read.csv(here::here("data/gapminder5.csv"))
+
+# if using data.table, can read in using fread
+gapminder <- fread(here::here("data/gapminder5.csv"))
+
+# or read in as a data.frame and change to a data.table
+setDT(gapminder)
 ```
 
 # Bringing skills together: histogram

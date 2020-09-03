@@ -1,0 +1,8 @@
+setDT(long_gen)
+setDT(imports)
+setDT(generation)
+setDT(merged_energy)
+setDT(long_merged_energy)
+setDT(regroup)
+setDT(gapminder)
+setDT(gapminder07)

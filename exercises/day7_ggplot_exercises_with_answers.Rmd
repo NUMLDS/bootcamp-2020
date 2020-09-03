@@ -19,13 +19,14 @@ knitr::opts_chunk$set(echo=answers, eval=answers,
 ```
 
 ```{r}
-library(tidyverse)
+library(tidyverse) 
+library(data.table)
 ```
 
 
 # Load the data
 
-Load the gapminder data.
+Load the gapminder data. You can use dplyr or data.table! Solutions for both methods (where they differ) are given in the answer sheet.
 
 ```{asis}
 ### Answer 
@@ -33,6 +34,12 @@ Load the gapminder data.
 
 ```{r}
 gapminder <- read.csv(here::here("data/gapminder5.csv"))
+
+# if using data.table, can read in using fread
+gapminder <- fread(here::here("data/gapminder5.csv"))
+
+# or read in as a data.frame and change to a data.table
+setDT(gapminder)
 ```
 
 # Bringing skills together: histogram
@@ -152,6 +159,7 @@ ggplot(gapminder, aes(pop)) +
 ```
 
 ```{r}
+# dplyr version
 gapminder %>% 
     group_by(year, continent) %>% 
     mutate(population = sum(pop)) %>% 
@@ -165,9 +173,33 @@ gapminder %>%
 ```
 
 ```{r}
+# data.table version
+gapminder[,.(population = sum(pop)), by = .(year, continent)] %>% 
+    ggplot() +
+    geom_line(aes(x = year, y = population)) +
+    facet_wrap(~continent) +
+    scale_y_continuous(labels = comma) +
+    labs(title="Population of continents over time", caption="Source: Gapminder", x="Year", y="Population") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+# dplyr version
 gapminder %>% 
     group_by(year, continent) %>% 
     mutate(population = sum(pop)) %>% 
+    ggplot() +
+    geom_line(aes(x = year, y = population, color = continent)) +
+    scale_y_continuous(labels = comma) +
+    labs(title="Population of continents over time", caption="Source: Gapminder", x="Year", y="Population") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+# data.table version
+gapminder[,.(population = sum(pop)), by = .(year, continent)] %>% 
     ggplot() +
     geom_line(aes(x = year, y = population, color = continent)) +
     scale_y_continuous(labels = comma) +
@@ -185,8 +217,22 @@ Reconstruct this graph.
 ```
 
 ```{r}
+# dplyr version
 gapminder %>% 
     filter(country %in% c("China", "India", "Japan", "Hong Kong China", "Malaysia", "Taiwan", "Vietnam", "Indonesia", "Nepal")) %>% 
+    ggplot(aes(gdpPercap, lifeExp)) +
+    geom_point(size = 0.3) +
+    geom_smooth(colour="black", size=0.5) +
+    facet_wrap(~country) +
+    labs(title="Life expectancy against GDP per capita in a sample of Asian countries", caption="Source: Gapminder", y="Life expectancy",
+         x="GDP per capita") +
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5), panel.border = element_blank(), strip.background = element_rect(colour="white", fill="white"))
+```
+
+```{r}
+# data.table version
+gapminder[country %in% c("China", "India", "Japan", "Hong Kong China", "Malaysia", "Taiwan", "Vietnam", "Indonesia", "Nepal")] %>% 
     ggplot(aes(gdpPercap, lifeExp)) +
     geom_point(size = 0.3) +
     geom_smooth(colour="black", size=0.5) +

@@ -11,6 +11,7 @@ output:
     reveal_plugins: ["notes"]
 params:
   notes: no
+height: 800
 ---
 
 ```{r setup, include=FALSE}
@@ -36,6 +37,12 @@ Run the following code to have `imports`, `generation`, `merged_energy`, `long_g
 
 ```{r, warning=FALSE, message=FALSE}
 source(here::here("data/day3_objects.R"))
+```
+
+Or, if you want the option of using data.table syntax, also run this to convert the objects to data.tables. All the plotting will is the same, but you will need it for some data preparation.
+```{r, warning=FALSE, message=FALSE}
+library(data.table)
+source(here::here("data/day3_objects_setDT.R"))
 ```
 
 ## Components of a basic plot
@@ -117,7 +124,9 @@ Steps:
 
 ## Example: Energy generated over time
 
-```{r data prep 2}
+```{r data prep 2,message=FALSE}
+# long_gen[,.(output = sum(output)), by = datetime] %>%
+#   ggplot() + 
 long_gen %>% 
   group_by(datetime) %>% 
   summarise(output=sum(output)) %>% 
@@ -134,7 +143,10 @@ Task:<br>Plot a column chart *hydroelectric* power generated over time.
 
 ## Exercise 2: Hydro power generated over time
 
-```{r data prep ex1}
+```{r data prep ex1,message=FALSE}
+# long_gen[source %in% c("small_hydro", "large_hydro"),
+#          .(output = sum(output)), by = datetime] %>%
+#   ggplot() +
 long_gen %>% 
   filter(source=="large_hydro"|source=="small_hydro") %>%
   group_by(datetime) %>% 
@@ -147,6 +159,8 @@ long_gen %>%
 ## Exercise 2: Hydro power generated over time
 
 ```{r data prep ex2}
+# generation[,.(datetime, hydro = large_hydro+small_hydro)] 
+#     ggplot() +
 generation %>% 
   mutate(hydro=large_hydro+small_hydro) %>%
   ggplot() + 
@@ -238,7 +252,9 @@ Task:<br>Create a column chart that shows the total output per source.
 
 ## Exercise 3: Total output per source
 
-```{r exercise3}
+```{r exercise3,message=FALSE}
+# long_merged_energy[,.(output = sum(output)), by = source] %>%
+#     ggplot() +
 long_merged_energy %>%
   group_by(source) %>% 
   summarise(output=sum(output)) %>%
@@ -335,7 +351,9 @@ imports %>%
 
 ## Example: coord_flip()
 
-```{r coord_flip pre}
+```{r coord_flip pre,message=FALSE}
+# long_gen[,.(output = sum(output)), by = .(date = as.Date(datetime))] %>%
+#     ggplot() +
 long_gen %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date) %>% summarise(output=sum(output)) %>% 
@@ -345,7 +363,9 @@ long_gen %>%
 
 ## Example: coord_flip()
 
-```{r coord_flip post}
+```{r coord_flip post,message=FALSE}
+# long_gen[,.(output = sum(output)), by = .(date = as.Date(datetime))] %>%
+#     ggplot() +
 long_gen %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date) %>% summarise(output=sum(output)) %>% 
@@ -392,11 +412,12 @@ Task:<br>Create a line plot that compares generation of wind, solar, and geother
 ## Exercise 4: Colors and fill
 
 ```{r aes colors ex}
+# long_merged_energy[source %in% c("wind", "solar", "geothermal")] %>%
+#     ggplot() +
 long_merged_energy %>%
   filter(source=="wind"|source=="solar"|source=="geothermal") %>% 
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, col=source), 
-            size=1.5) + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
   labs(title="Wind vs. Solar vs. Geothermal generation", 
        subtitle="Hourly data from September 3-9, 2018", 
        x="Hour", y="Output (MW)")
@@ -405,10 +426,11 @@ long_merged_energy %>%
 ## Customizing with scale_color layers
 
 ```{r aes colors 2}
+# long_merged_energy[source %in% c("wind", "solar", "geothermal")] %>%
+#     ggplot() +
 long_merged_energy %>% filter(source=="wind"|source=="solar"| source=="geothermal") %>% 
   ggplot() + 
-  geom_line(aes(x=datetime, y=output, group=source, col=source),
-            size=1.5) + 
+  geom_line(aes(x=datetime, y=output, group=source, col=source), size=1.5) + 
   scale_color_brewer(palette="Accent", name="Energy source") + 
   labs(title="Wind vs. Solar vs. Geothermal generation", 
        subtitle="Hourly data from September 3-9, 2018", 
@@ -442,7 +464,9 @@ Steps:
 
 ## Example: Energy use by day
 
-```{r col stack}
+```{r col stack,message=FALSE}
+# long_merged_energy[,.(output = sum(output)), 
+#                    by = .(source, date = as.Date(datetime))] %>%
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
@@ -462,7 +486,9 @@ long_merged_energy %>%
 
 ## Example: Energy use by day (pos dodge)
 
-```{r col dodge}
+```{r col dodge,message=FALSE}
+# long_merged_energy[,.(output = sum(output)), 
+#                    by = .(source, date = as.Date(datetime))] %>%
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
@@ -475,7 +501,9 @@ long_merged_energy %>%
 
 ## Example: Energy use by day (pos fill)
 
-```{r col fill}
+```{r col fill,message=FALSE}
+# long_merged_energy[,.(output = sum(output)), 
+#                    by = .(source, date = as.Date(datetime))] %>%
 long_merged_energy %>% 
   mutate(date=lubridate::date(datetime)) %>% 
   group_by(date, source) %>% 
@@ -506,8 +534,15 @@ Steps:
 
 ## Example: Energy source group by day
 
-```{r prep shapes}
-# Prepare data
+```{r prep shapes,message=FALSE}
+# Prepare data - data.table
+# long_merged_energy[regroup, on = c(source = "type"), group := i.group]
+# 
+# long_merged_energy_regroup = 
+#     long_merged_energy[,.(output = sum(output)), 
+#                        by = .(group, date = as.Date(datetime))]
+
+# Prepare data - dplyr
 long_merged_energy_regroup <- long_merged_energy %>%
   rename(type = source) %>% 
   merge(regroup, by = "type") %>% 
@@ -515,7 +550,6 @@ long_merged_energy_regroup <- long_merged_energy %>%
   group_by(date, group) %>%
   summarise(output=sum(output))
 
-# Take a look at our prepared data
 head(long_merged_energy_regroup)
 ```
 
@@ -573,7 +607,9 @@ Task:<br>Visualize the average output for each hour of the day, grouped by sourc
 
 ## Exercise 5: Average hourly output by source
 
-```{r exercise5 setup}
+```{r exercise5 setup,message=FALSE}
+# ex5 <- long_merged_energy[,.(output = sum(output)), by = .(hour(datetime), source)] %>%
+#     ggplot() +
 ex5 <- long_merged_energy %>% 
   mutate(hour=lubridate::hour(datetime)) %>% 
   group_by(hour, source) %>% 
@@ -586,6 +622,8 @@ ex5 <- long_merged_energy %>%
        x="Hour of the day", y="Output (MW)") + 
   theme_bw()
 ```
+
+## Exercise 5: Average hourly output by source
 
 You can save images created by ggplot in three ways:
 
@@ -669,6 +707,11 @@ Remember:
 ## Exercise 6: Facets
 
 ```{r data prep for facets ex}
+# data.table - don't need to create a new data.table
+# long_gen[regroup, on = c(source = "type"), group := i.group]
+# long_gen_regroup <- long_gen
+
+# dplyr
 long_gen_regroup <- long_gen %>%
   rename(type = source) %>% 
   merge(regroup, by="type")

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ali Ehlen" />
 
-<meta name="date" content="2020-08-26" />
+<meta name="date" content="2020-09-02" />
 
 <title>Day 6: Advanced data manipulation 3 - data.table</title>
 
@@ -1512,7 +1512,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Day 6: Advanced data manipulation 3 - data.table</h1>
 <h4 class="author">Ali Ehlen</h4>
-<h4 class="date">2020-08-26</h4>
+<h4 class="date">2020-09-02</h4>
 
 </div>
 
@@ -2270,9 +2270,8 @@ benchmark(read.csv(data_file_large, stringsAsFactors = F),
 # 2                          fread(data_file_large)           20    2.67    1.000      7.07     1.10         NA        NA
 # 1 read.csv(data_file_large, stringsAsFactors = F)           20   74.59   27.936     71.53     3.05         NA        NA</code></pre>
 </div>
-</div>
-<div id="special-variables" class="section level1">
-<h1>Special variables</h1>
+<div id="special-variables" class="section level2">
+<h2>Special variables</h2>
 <p><code>data.table</code>s also contain some special read-only symbols that are often useful:</p>
 <ul>
 <li><code>.N</code>: number of rows in the current group</li>
@@ -2284,8 +2283,8 @@ generation_dt[,.N]
 # for .I: more advanced syntax
 generation_dt[,.I]</code></pre>
 </div>
-<div id="special-variables-1" class="section level1">
-<h1>Special variables</h1>
+<div id="special-variables-1" class="section level2">
+<h2>Special variables</h2>
 <p><strong>try it!</strong> Use <code>.N</code> to find the number of rows in generation_dt_long</p>
 <p><strong>try it!</strong> Use <code>.N</code> to find the number of hours in which solar generation was greater than 500 MW</p>
 <div id="answers-4" class="section level3">
@@ -2295,6 +2294,7 @@ generation_dt[,.I]</code></pre>
 <p><strong>try it!</strong> Use <code>.N</code> to find the number of hours in which solar generation was greater than 500 MW</p>
 <pre class="r"><code>generation_dt[solar &gt; 500, .N]
 generation_dt_long[gen_type == &quot;solar&quot; &amp; MW &gt; 500,.N]</code></pre>
+</div>
 </div>
 <div id="other-features-keys" class="section level2">
 <h2>Other features: keys</h2>
