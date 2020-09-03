@@ -1,0 +1,55 @@
+---
+title: "Exercises Day 2"
+author: "Richard Paquin Morel, adapted from exercises by Christina Maimone"
+date: "`r Sys.Date()`"
+output: html_document
+params:
+    answers: FALSE
+---
+
+
+```{r, echo=FALSE, eval=TRUE}
+answers<-params$answers
+```
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo=answers, eval=answers,
+                      warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+## Load the data
+
+Load the `gapminder` dataset.
+
+```{asis}
+### Answer
+```
+
+```{r}
+library(tidyverse)
+
+generation <- read_csv("../data/ca_energy_generation.csv")
+imports <- read_csv("../data/ca_energy_imports.csv")
+
+# using dplyer
+# gather -> make data long
+# spread -> make data wide
+# gather(df, 
+  # key = new column name, 
+  # value = new numbers in that column)
+
+long_gen <- gather(generation, key = source, value = usage, -datetime)
+head(long_gen)
+head(long_gen[order(long_gen$datetime), ])
+
+spread(long_gen, key = source, value = usage) %>% slice(1:5)
+
+# reshape2
+# melt
+# cast
+
+merged_energy <- merge(generation, imports, by = "datetime")
+long_merged_energy <- gather(merged_energy, key = source, value = usage, -datetime)
+dim(long_merged_energy)
+```
