@@ -17,11 +17,11 @@ notes<-params$notes
 
 # Session Outline 
 
-1. Pull request (theory and practice) by the Wonderful Ali
-2. Open exercise file, save with name in submissions folder
-3. RMD and Intro to data manipulation
-4. Git commit, push, pull **in R studio**
-5. Pull request your submission to MSiA by the Wonderful Ali
+1) Pull request (theory and practice) by the Wonderful Ali
+2) Open exercise file, save with name in submissions folder
+3) RMD and Intro to data manipulation
+4) Git commit, push, pull **in R studio**
+5) Pull request your submission to MSiA by the Wonderful Ali
 
 # Reporting analysis with Rmarkdown and GitHub
 
