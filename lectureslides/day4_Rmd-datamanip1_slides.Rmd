@@ -140,7 +140,7 @@ head(generation)
 ```
 
 
-## Using `reshape2`
+## Using `dplyr`
 
 - `gather` --> make data long
 - `spread` --> make data wide
