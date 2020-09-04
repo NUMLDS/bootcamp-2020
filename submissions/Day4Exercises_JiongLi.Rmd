@@ -39,6 +39,7 @@ imports <- read.csv("../data/ca_energy_imports.csv")
 ```
 
 ```{r}
+## wide to long 
 long_gen <- gather(generation, key = source, value = usage, -datetime)
 head(long_gen)
 ```
