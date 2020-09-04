@@ -7,12 +7,22 @@ params:
     answers: FALSE
 ---
 ```{r, echo=FALSE, eval=TRUE}
+# load package and two data files
+library(tidyverse)
 generation <- read_csv('../data/ca_energy_generation.csv')
+head(generation)
 imports <- read_csv('../data/ca_energy_imports.csv')
+# make data(generation) table long using gather() function
+long_gen <- gather(generation, key = source, value = usage, -datetime)
+head(long_gen)
+# merge generation table and imports table by common column 'datetime'
 merged_energy <- merge(generation, imports, by = 'datetime')
+dim(merged_energy)
+head(merged_energy)
+# make data(merged_energy) table long using gather() function
 long_merged_energy <- gather(merged_energy,key = source, value = usage, -datetime)
 head(long_merged_energy)
-print(dim(long_merged_energy))
+dim(long_merged_energy)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
