@@ -1,0 +1,46 @@
+---
+title: "FinalRExercise_HuangZixiao.Rmd"
+author: "Zixiao Huang"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(tidyverse) 
+library(data.table)
+```
+
+# Task 1: Import your data (nys_schools.csv and nys_acs.csv)
+```{r}
+# Read the data of schools
+schools <- read.csv(here::here("Desktop/Northwestern/Bootcamp/bootcamp-2020/data/nys_schools.csv"))
+
+# Read the data of counties
+counties <- read.csv(here::here("Desktop/Northwestern/Bootcamp/bootcamp-2020/data/nys_acs.csv"))
+```
+
+# Task 2: Explore your data
+
+# Task 3: Recoding and Variable Manipulation
+1. Deal with missing values, which are currently encoded as -99
+```{r}
+
+
+
+
+```
+
+
+
+
+
