@@ -15,8 +15,8 @@ I know the markdown is messy, but I was trying to focus mostly on the code rathe
 
 ## 1. Load data
 ```{r load_data}
-schools <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_schools.csv"), stringsAsFactors=FALSE)
-counties <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_acs.csv"), stringsAsFactors=FALSE)
+schools <- read.csv(here::here("data/nys_schools.csv"), stringsAsFactors=FALSE)
+counties <- read.csv(here::here("data/nys_acs.csv"), stringsAsFactors=FALSE)
 ```
 
 ## 2. Exploring Data
