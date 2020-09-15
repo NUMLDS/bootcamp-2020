@@ -10,21 +10,92 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
+# Exercise 8
+I know the markdown is messy, but I was trying to focus mostly on the code rather than the formatting. I will keep in mind formatting in future projects.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+## 1. Load data
+```{r load_data}
+schools <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_schools.csv"), stringsAsFactors=FALSE)
+counties <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_acs.csv"), stringsAsFactors=FALSE)
 ```
 
-## Including Plots
+## 2. Exploring Data
 
-You can also embed plots, for example:
+```{r explore}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#quick look at the structure of each dataset
+head(schools)
+head(counties)
+
+#see the number of rows and columns we have total
+dim(schools)
+dim(counties)
+
+#see all column data types
+str(schools)
+str(counties)
+
+#see descriptive statistics
+summary(schools)
+summary(counties)
 ```
+It appears all text columns are "chr", whereas all numerical columns are "num" or "int" which is what we want when looking at the column data types. It also appears there is some missing data since there are "-99" values in all of the numerical columns somewhere in the schools dataset when looking at summary statistics of the columns. -99 does not make sense as a percentage, math score, etc. so it must be being used as a missing value holder.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+It also seems there's a wide variety of sizes on enrolled students and mean math scores across the different schools. Percentage of students qualifying for free lunch is much higher across the board that students qualifying for reduced price lunch. County statistics vary widely as well.
+
+## 3. Recoding Data
+```{r recode}
+
+#remove rows with missing values
+schools = schools[schools$total_enroll != -99,]
+schools = schools[schools$mean_ela_score != -99,]
+schools = schools[schools$mean_math_score != -99,]
+summary(schools)
+
+#create data tables
+library(data.table)
+schools_dt <- data.table(schools)
+counties_dt <- data.table(counties)
+
+#create poverty group column using quartiles
+counties_dt$country_per_poverty <- NA
+counties_dt[, poverty_level := ifelse(county_per_poverty <= .10903, "Low",
+                                ifelse(county_per_poverty <= .14929, "Medium",
+                                ifelse(county_per_poverty > .14929, "High", NA)))]
+  
+head(counties_dt)
+str(counties_dt)
+
+#Scale math and reading scores within each year for all schools
+
+```
+A categorical poverty variable was created for each country where the bottom quartile of counties in percent poverty were considered to have a "Low" poverty level, the middle two quartiles were considered "Medium", and the highest quartile considered "High" poverty counties.
+
+## 4. Merge Datasets
+
+```{r merge}
+#group schools at the county level and get a rough estimate of county aggregations
+group_schools <- schools_dt[, .(sum(total_enroll), mean(per_free_lunch), mean(per_reduced_lunch), mean(per_lep), mean(mean_ela_score), mean(mean_math_score)), by = c("county_name", "year")]
+setnames(group_schools, c("county_name", "year", "total_enrolled", "mean_per_free_lunch", "mean_per_reduced_lunch", "mean_per_lep", "mean_ela_score", "mean_math_score"))
+head(group_schools)
+
+#merge county and school information into one dataset
+merged_dt = group_schools[counties_dt, on = c("county_name", "year")]
+head(merged_dt)
+```
+## 5. Create Summary Tables
+```{r summary}
+#create a table that shows percentage of students qualifying for free/reduced lunch and poverty percentage per county in the most recent year, 2016
+county_summary2016 <- merged_dt[year == 2016,.(county_name, year, mean_per_free_lunch+mean_per_reduced_lunch,county_per_poverty)]
+setnames(county_summary2016, "V3", "per_free/reduced_lunch")
+head(county_summary2016)
+
+#counties with top and bottom 5 poverty rate
+county_pov_worst2016 <- merged_dt[year == 2016,.(county_name, year, mean_per_free_lunch+mean_per_reduced_lunch,county_per_poverty, mean_ela_score, mean_math_score)]
+setnames(county_pov_worst2016, "V3", "per_free/reduced_lunch")
+ordered_county <- county_pov_worst2016[order(county_per_poverty)]
+#lowest 5 county poverty levels
+head(ordered_county[1:5,])
+#highest 5 county poverty levels
+head(ordered_county[(nrow(ordered_county)-4):nrow(ordered_county),])
+```
