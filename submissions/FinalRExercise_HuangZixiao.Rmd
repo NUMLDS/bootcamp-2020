@@ -30,16 +30,52 @@ counties <- read.csv(here::here("Desktop/Northwestern/Bootcamp/bootcamp-2020/dat
 ```
 
 # Task 2: Explore your data
+```{r}
+summary(schools)
+summary(counties)
+```
 
 # Task 3: Recoding and Variable Manipulation
 1. Deal with missing values, which are currently encoded as -99
 ```{r}
-
-
-
-
+# Set all missing values to NA since later in our calculations and analysis, 
+# we can just ignore them.
+schools <- replace(schools, schools == -99, NA)
+counties <- replace(counties, counties == -99, NA)
 ```
 
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
+```{r}
+# Group counties into three different poverty groups by using the median_household_income column
+# Set the counties with lowest 25% median household income (first quartile) as "high" poverty group (income <= 46347)
+# Set the counties with highest 25% median household income (fourth quartile) as "low" poverty group (income > 56448)
+# Set the middle 50% as "medium" poverty group (46347 < income <= 56448)
+
+# Start by creating a new variable with all missing values
+counties$poverty_level <- NA
+# Replace lowest 25% value with "high"
+counties$poverty_level[counties$median_household_income <= 46347] <- "high"
+# Replace middle 50% value with "medium"
+counties$poverty_level[counties$median_household_income <= 56448 & counties$median_household_income > 46347] <- "medium"
+# Replace highest 25% value with "low"
+counties$poverty_level[counties$median_household_income > 56448] <- "low" 
+```
+
+3. Create a new variable that is the standardized z-score for math and English Language Arts (ELA)
+for each year.
+```{r}
+# First group by year, then use the scale() function
+schools <- schools %>%
+            group_by(year) %>%
+            mutate(z_score_math = scale(mean_math_score),
+            z_score_ela = scale(mean_ela_score))
+```
+
+# Task 4: Merge datasets
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset.
+```{r}
+
+```
 
 
 
