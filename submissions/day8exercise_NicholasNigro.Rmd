@@ -58,7 +58,6 @@ schools_dt <- data.table(schools)
 counties_dt <- data.table(counties)
 
 #create poverty group column using quartiles
-counties_dt$country_per_poverty <- NA
 counties_dt[, poverty_level := ifelse(county_per_poverty <= .10903, "Low",
                                 ifelse(county_per_poverty <= .14929, "Medium",
                                 ifelse(county_per_poverty > .14929, "High", NA)))]
@@ -67,7 +66,8 @@ head(counties_dt)
 str(counties_dt)
 
 #Scale math and reading scores within each year for all schools
-
+schools_dt[, scaled_ela_score := scale(mean_ela_score), by=c("county_name", "year")]
+schools_dt[, scaled_math_score := scale(mean_math_score), by=c("county_name", "year")]
 ```
 A categorical poverty variable was created for each country where the bottom quartile of counties in percent poverty were considered to have a "Low" poverty level, the middle two quartiles were considered "Medium", and the highest quartile considered "High" poverty counties.
 
@@ -75,8 +75,8 @@ A categorical poverty variable was created for each country where the bottom qua
 
 ```{r merge}
 #group schools at the county level and get a rough estimate of county aggregations
-group_schools <- schools_dt[, .(sum(total_enroll), mean(per_free_lunch), mean(per_reduced_lunch), mean(per_lep), mean(mean_ela_score), mean(mean_math_score)), by = c("county_name", "year")]
-setnames(group_schools, c("county_name", "year", "total_enrolled", "mean_per_free_lunch", "mean_per_reduced_lunch", "mean_per_lep", "mean_ela_score", "mean_math_score"))
+group_schools <- schools_dt[, .(sum(total_enroll), median(per_free_lunch), median(per_reduced_lunch), median(per_lep), median(scaled_ela_score), median(scaled_math_score)), by = c("county_name", "year")]
+setnames(group_schools, c("county_name", "year", "total_enrolled", "median_per_free_lunch", "median_per_reduced_lunch", "median_per_lep", "median_ela_score", "median_math_score"))
 head(group_schools)
 
 #merge county and school information into one dataset
@@ -86,16 +86,22 @@ head(merged_dt)
 ## 5. Create Summary Tables
 ```{r summary}
 #create a table that shows percentage of students qualifying for free/reduced lunch and poverty percentage per county in the most recent year, 2016
-county_summary2016 <- merged_dt[year == 2016,.(county_name, year, mean_per_free_lunch+mean_per_reduced_lunch,county_per_poverty)]
+county_summary2016 <- merged_dt[year == 2016,.(county_name, year, median_per_free_lunch+median_per_reduced_lunch,county_per_poverty)]
 setnames(county_summary2016, "V3", "per_free/reduced_lunch")
 head(county_summary2016)
 
 #counties with top and bottom 5 poverty rate
-county_pov_worst2016 <- merged_dt[year == 2016,.(county_name, year, mean_per_free_lunch+mean_per_reduced_lunch,county_per_poverty, mean_ela_score, mean_math_score)]
+county_pov_worst2016 <- merged_dt[year == 2016,.(county_name, year, median_per_free_lunch+median_per_reduced_lunch, county_per_poverty, median_ela_score, median_math_score)]
 setnames(county_pov_worst2016, "V3", "per_free/reduced_lunch")
 ordered_county <- county_pov_worst2016[order(county_per_poverty)]
 #lowest 5 county poverty levels
 head(ordered_county[1:5,])
 #highest 5 county poverty levels
 head(ordered_county[(nrow(ordered_county)-4):nrow(ordered_county),])
+```
+
+## 6. Data Visualization
+
+```{R visualization}
+
 ```
