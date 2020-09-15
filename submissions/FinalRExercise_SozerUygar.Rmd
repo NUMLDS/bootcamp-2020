@@ -1,0 +1,44 @@
+---
+title: "UygarSozer_finalbootcampex"
+author: "Uygar Sozer"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Load required packages
+library(tidyverse)
+library(lubridate)
+library(data.table)
+```
+
+```{r}
+#Reading in the data
+acs <- read.csv("data/nys_acs.csv")
+schools <- read.csv("data/nys_schools.csv")
+```
+
+## Exploring the data
+acs dataset contains no missing variables.
+schools dataset does contain missing variables, coded in various ways. ("NA", "-99", "N/A" etc.)
+
+```{r}
+#Converts all -99 values to NA, input: vector, output: vector with NA
+naconvert <- function(x) {
+  x = na_if(x, -99)
+}
+#Mutate datasets with respect to -99 values
+schools <- schools %>% mutate(across(.fns = naconvert))
+acs <- acs %>% mutate(across(.fns = naconvert))
+```
+
+```{r}
+
+```
+
+
+
