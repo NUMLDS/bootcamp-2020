@@ -103,5 +103,13 @@ head(ordered_county[(nrow(ordered_county)-4):nrow(ordered_county),])
 ## 6. Data Visualization
 
 ```{R visualization}
+library(ggplot2)
 
+#Free/reduced price lunch vs. test scores graphs
+ggplot(schools_dt[year=="2016"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_ela_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled ELA Score by NY Schools in 2016", x="Fraction of Students With Reduced Lunch Price", y="Normalized ELA Score")
+ggplot(schools_dt[year=="2016"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_math_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled Math Score by NY Schools in 2016", x="Fraction of Students With Reduced Lunch Price", y="Normalized Math Score")
+
+#test scores across counties by poverty level
+ggplot(merged_dt[year=="2016"]) + geom_boxplot(aes(poverty_level, median_ela_score)) + labs(title = "Poverty Level vs. Scaled ELA Score by NY Counties in 2016", x="Poverty Level of County", y="Normalized ELA Score")
+ggplot(merged_dt[year=="2016"]) + geom_boxplot(aes(poverty_level, median_math_score)) + labs(title = "Poverty Level vs. Scaled Math Score by NY Counties in 2016", x="Poverty Level of County", y="Normalized Math Score")
 ```
