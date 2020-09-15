@@ -18,8 +18,8 @@ library(data.table)
 
 ```{r}
 #Reading in the data
-acs <- read.csv("data/nys_acs.csv")
-schools <- read.csv("data/nys_schools.csv")
+acs <- read.csv(here::here("data/nys_acs.csv"))
+schools <- read.csv(here::here("data/nys_schools.csv"))
 ```
 
 ## Exploring the data
@@ -36,9 +36,27 @@ schools <- schools %>% mutate(across(.fns = naconvert))
 acs <- acs %>% mutate(across(.fns = naconvert))
 ```
 
+We will add a categorical variable poverty_level
 ```{r}
+##pov_cutoff = quantile(acs$median_household_income, c(0.33, 0.66))
+##acs %>% filter(median_household_income < pov_cutoff[1]) %>% mutate(poverty_level = "high")
+##acs %>% filter(median_household_income >= pov_cutoff[1] & median_household_income < pov_cutoff[2] ) %>% mutate(poverty_level = "medium")
+##acs %>% filter(median_household_income >= pov_cutoff[2]) %>% mutate(poverty_level = "low")
 
+setDT(acs)
+acs[median_household_income < pov_cutoff[1], poverty_level := "high"]
+acs[median_household_income >= pov_cutoff[1] & median_household_income < pov_cutoff[2], poverty_level :="medium"]
+acs[median_household_income >= pov_cutoff[2], poverty_level := "low"]
 ```
 
+```{r}
+setDT(schools)
+schools[, z_ela_score := scale(mean_ela_score)]
+schools[, z_math_score := scale(mean_math_score)]
+```
+
+```{r}
+merged_schools <- merge(schools, acs, all.x = TRUE)
+```
 
 
