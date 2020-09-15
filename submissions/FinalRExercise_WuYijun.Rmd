@@ -1,0 +1,210 @@
+---
+title: "FinalRExercise_WuYijun"
+author: "Yijun Wu"
+date: "9/15/2020"
+output: html_document
+---
+
+# MSIA Boot Camp - Final R exercise
+
+You've learned quite a lot about R in a short time. Congratulations! This exercise is designed to give you some additional practice on the material we have discussed this week while the lectures are still fresh in your mind, and to integrate different tools and skills that you have learned.
+
+## Instructions
+
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
+
+```{r}
+library(here)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+nys_schools <- read.csv(here("data/nys_schools.csv"), stringsAsFactors = F)
+nys_acs <- read.csv(here("data/nys_acs.csv"), stringsAsFactors = F)
+```
+
+
+
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+
+```{r}
+str(nys_schools)
+sum(is.na(nys_schools))
+summary(nys_schools)
+```
+"nys_schools" contains a total of 12 variables. Among these variables school id, total enrollment, percentage of free lunch, percentage of reduced price lunch, percentage of of students with limited english proficiency, mean reading score for all grades and mean math score for all grades are numbers; school name, district name, county_name and region are characters; year is integer. There is no missing value in this data frame. However, there are some abnormal values. For example, from the summary table we can see there are some negative values, while all these values should be positive. Also, for percentage of free lunch and reduced price lunch, there are values exceed 1, which are abnormal. 
+
+
+```{r}
+str(nys_acs)
+sum(is.na(nys_acs))
+summary(nys_acs)
+```
+"nys_acs" contains a total of 5 variables, including county name as character, year and median household income as integers, and county per poverty and county per bachalor as numbers. There is no missing value and abnormal value in this data frame.
+
+
+
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+
+```{r}
+#1. Instead of removing all rows that contains missing values, I choose to change the missing values to NA in order to keep the intergrety of the data. I also change the percentage that greater than 1 to NA. 
+for (i in 1: nrow(nys_schools)){
+  for (j in 1: ncol(nys_schools)){
+    if(nys_schools[i, j] == -99){
+      nys_schools[i, j] = NA
+    }
+  }
+}
+nys_schools$per_free_lunch <- ifelse(nys_schools$per_free_lunch > 1, NA, nys_schools$per_free_lunch)
+nys_schools$per_reduced_lunch <- ifelse(nys_schools$per_reduced_lunch > 1, NA, nys_schools$per_reduced_lunch)
+sum(is.na(nys_schools))
+```
+
+```{r message=FALSE, warning=FALSE}
+#2. I first calculate the average percentage fo poverty for each county over years. Then use quantile() to find the cutoff for 33% and 66%. Finally, I labeled the county with lowest 33% of the poverty rate as "Low", the county with the middle 33% of poverty rate as "Median", and the county with the highest 33% of the poverty rate as "High". 
+poverty_group <- nys_acs %>%
+                 select(county_name, county_per_poverty) %>%
+                 group_by(county_name) %>%
+                 summarise(avg_per_poverty = mean(county_per_poverty)) %>%
+                 mutate(poverty_level = case_when(avg_per_poverty <= quantile(avg_per_poverty, 0.33) ~ "Low", 
+                                                  avg_per_poverty > quantile(avg_per_poverty, 0.33) & avg_per_poverty <= quantile(avg_per_poverty, 0.66) ~ "Medium",
+                                                  avg_per_poverty > quantile(avg_per_poverty, 0.66) ~ "High"))
+
+```
+
+```{r}
+#3.
+nys_schools <- nys_schools %>% 
+              group_by(year) %>%
+              mutate(ela_z_score = scale(mean_ela_score), math_z_score = scale(mean_math_score))
+```
+
+
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+```{r message=FALSE, warning=FALSE}
+county_data <- nys_schools %>% 
+               group_by(county_name, year) %>%
+               summarize(total_enroll = sum(total_enroll, na.rm = T), 
+                         avg_per_free_lunch = mean(per_free_lunch, na.rm = T), 
+                         avg_per_reduced_luch = mean(per_reduced_lunch, na.rm = T),
+                         avg_per_lep = mean(per_lep, na.rm = T),
+                         avg_ela_score = mean(ela_z_score, na.rm = T),
+                         avg_math_score = mean(math_z_score, na.rm = T)) %>%
+               inner_join(nys_acs, by.x = c("county_name", "year"), by.y = c("name", "year")) %>%
+               full_join(poverty_group, by = "county_name") 
+```
+
+
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+```{r}
+#1
+county_data %>%
+  group_by(county_name) %>%
+  summarise(total_enroll = mean(total_enroll), 
+            per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_luch), 
+            per_poverty = mean(avg_per_poverty))
+```
+
+```{r}
+#2
+summary <- county_data %>%
+           group_by(county_name) %>%
+           summarise(per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_luch),
+                     per_poverty = mean(avg_per_poverty),
+                     mean_ela_score = mean(avg_ela_score),
+                     mean_math_score = mean(avg_math_score)) %>%
+           arrange(by = per_poverty)
+#Counties with top 5 poverty rates
+head(arrange(summary, desc(per_poverty)), 5)
+#Counties with bottom 5 poverty rates
+tail(arrange(summary, desc(per_poverty)), 5)
+```
+
+
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+# 1
+nys_schools %>%
+  mutate(free_reduced_price_luch = per_free_lunch+ per_reduced_lunch) %>%
+  ggplot()+
+  geom_point(aes(x = free_reduced_price_luch , y = ela_z_score)) +
+  labs(title = "Relationship between Access to Free/Reduced Lunch and Reading Test Performance", x = "Access to Free/Reduced Lunch ", y = "Reading Test Performace(Z-score)")
+
+nys_schools %>%
+  mutate(free_reduced_price_luch = per_free_lunch+ per_reduced_lunch) %>%
+  ggplot()+
+  geom_point(aes(x = free_reduced_price_luch , y = math_z_score)) +
+  labs(title = "Relationship between Access to Free/Reduced Lunch and Math Test Performance", x = "Access to Free/Reduced Lunch ", y = "Math Test Performace(Z-score)")
+```
+```{r}
+#2
+county_data %>%
+  select(county_name, avg_ela_score, poverty_level) %>%
+  group_by(county_name) %>%
+  mutate(avg_test_performance = mean(avg_ela_score)) %>%
+  ggplot()+
+  geom_col(aes(x = county_name, y = avg_test_performance, group = poverty_level, col = poverty_level))+
+  labs(title = "Average reading test performance across counties", x = "County", y = "Average reading test performance")+ 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+county_data %>%
+  select(county_name, avg_math_score, poverty_level) %>%
+  group_by(county_name) %>%
+  mutate(avg_test_performance = mean(avg_math_score)) %>%
+  ggplot()+
+  geom_col(aes(x = county_name, y = avg_test_performance, group = poverty_level, col = poverty_level))+
+  labs(title = "Average math test performance across counties", x = "County", y = "Average math test performance")+ 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
+
+
+
+
+
+
+## Github submission
+
+When you have completed the exercise, save your Markdown file in the `submissions` folder of your forked repo using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`. Commit changes periodically, and push commits when you are done.
+
+You can optionally create a pull request to submit this file (and other exercise files from the bootcamp sessions) to the base repo that lives in the MSiA organization. If you would like to do this, make sure that all new files you have created are in the `submissions` folder, and then create a pull request that asks to merge changes from your forked repo to the base repo. 
+
+## Reminders
+
+- Remember to **load necessary packages**.
+- Remember to **comment extensively** in your code. Since you will be working in an RMarkdown file, you can describe your workflow in the text section. But you should also comment within all of your code chunks.
+- Attempt to knit your Markdown file into HTML format before committing it to Github. Troubleshoot any errors with the knit process by checking the lines referred to in the error messages.
