@@ -1,0 +1,177 @@
+---
+title: "Exercises Day 8"
+author: "Sara Ho"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+#### Task 1: Import your data 
+
+Import necessary packages.
+```{r}
+library(tidyverse)
+library(data.table)
+```
+
+Load the data.
+
+```{r}
+schools <- fread(here::here("data", "nys_schools.csv"))
+counties <- fread(here::here("data", "nys_acs.csv"))
+```
+
+#### Task 2: Explore your data
+
+```{r}
+summary(schools)
+
+# since we need county level data later, let's remove schools without a county
+schools <- schools[county_name != -99]
+
+# are there still remaining -99?
+metric_names <- c("total_enroll", "per_free_lunch", "per_reduced_lunch",
+                  "per_lep", "mean_ela_score", "mean_math_score")
+schools[, (metric_names) := replace(.SD, .SD == -99, NA)
+        , .SDcols = metric_names]
+summary(schools)
+```
+
+```{r}
+summary(schools)
+schools[per_free_lunch > 1, per_free_lunch := per_free_lunch / 100]
+schools[per_free_lunch > 1, per_free_lunch := NA]
+```
+
+#### Task 3: Recoding and variable manipulation
+
+```{r}
+sum_counties <- summary(counties[,county_per_poverty])
+sum_counties["1st Qu."]
+sum_counties["3rd Qu."]
+
+counties[county_per_poverty < sum_counties["1st Qu."],
+         pov_cat := "low"]
+counties[county_per_poverty >= sum_counties["1st Qu."],
+         pov_cat := "medium"]
+counties[county_per_poverty > sum_counties["3rd Qu."],
+         pov_cat := "high"]
+```
+
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year 
+
+
+```{r}
+schools[, z_mean_ela_score := scale(mean_ela_score), year]
+schools[, z_mean_math_score := scale(mean_math_score), year]
+```
+
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. 
+
+
+```{r}
+schools[ , num_free_lunch := round(total_enroll * per_free_lunch)]
+schools[ , num_reduced_lunch := round(total_enroll * per_reduced_lunch)]
+
+merged <- merge(schools, counties, by = c("county_name", "year"), all.x = TRUE)
+```
+
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+
+```{r}
+# mean county poverty across the years for which there is data
+sum_table_1 <- merged[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+                           tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
+                           tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
+                           mean_poverty = mean(county_per_poverty, na.rm = TRUE))
+                       , county_name]
+```
+
+
+```{r}
+sum_table_1[, p_reduced_lunch := tot_reduced_lunch / tot_enroll]
+sum_table_1[, p_free_lunch := tot_free_lunch / tot_enroll]
+sum_table_1[, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
+sum_table_1
+```
+
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch,mean reading score, and mean math score.
+
+NOTE: the max year for counties is 2016, while the max year for schools is 2017
+
+```{r}
+# let's get the poverty rates for 2016
+low_pov_counties <- counties[year == max(year)][order(county_per_poverty)] %>% slice(1:5)
+high_pov_counties <- counties[year == max(year)][order(county_per_poverty, decreasing = TRUE)] %>% slice(1:5)
+```
+
+```{r}
+# scores are not comparable from year to year, but they should be comparable
+# from school to school as long as the years are the same!
+low_pov_schools <- schools[low_pov_counties, on = "county_name"]
+
+low_pov_sum <- low_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+                     tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
+                     tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
+                     mean_poverty = mean(county_per_poverty, na.rm = TRUE),
+                     mean_math_score = mean(mean_math_score, na.rm = TRUE),
+                     mean_ela_score = mean(mean_ela_score, na.rm = TRUE))
+                 , county_name][, pov_cat := "low"]
+
+high_pov_schools <- schools[high_pov_counties, on = "county_name"]
+
+high_pov_sum <- high_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+                      tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
+                      tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
+                      mean_poverty = mean(county_per_poverty, na.rm = TRUE),
+                      mean_math_score = mean(mean_math_score, na.rm = TRUE),
+                      mean_ela_score = mean(mean_ela_score, na.rm = TRUE))
+                  , county_name][, pov_cat := "high"]
+
+sum_table_2 <- rbind(low_pov_sum, high_pov_sum)
+```
+
+#### Task 6: Data visualization
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+```{r}
+ggplot(schools) + 
+  geom_point(mapping = aes(x = per_free_lunch, y = z_mean_ela_score)) + 
+  labs(title = "Percent receiving free lunch v test scores")
+```
+
+
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+sum_table_3 <- merged[ , .(mean_ela = mean(z_mean_ela_score, na.rm = TRUE),
+                           mean_math = mean(z_mean_math_score, na.rm = TRUE))
+                       , pov_cat]
+
+sum_table_3 <- melt(sum_table_3, id.vars = "pov_cat")
+
+ggplot(sum_table_3[!is.na(pov_cat)]) + 
+  geom_col(aes(x = pov_cat, y = value)) + 
+  facet_wrap(~variable)
+  labs(title = "average ela test scores")
+```
+
+
+
+
+
+
+
+
