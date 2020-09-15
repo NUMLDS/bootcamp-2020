@@ -74,9 +74,27 @@ schools <- schools %>%
 # Task 4: Merge datasets
 Create a county-level dataset that merges variables from the schools dataset and the ACS dataset.
 ```{r}
+county_school <- merge(schools, counties, by = c("county_name", "year"))
+```
+
+# Task 5: Generate summary tables
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of 
+population in poverty. 
+```{r}
+tmp <- county_school %>%
+       group_by(county_name) %>%
+       select(total_enroll, per_free_lunch, per_reduced_lunch, county_per_poverty) 
+
 
 ```
 
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students 
+qualifying for free or reduced price lunch, mean reading score, and mean math score.
 
+# Task 6: Data Visualization
+1. The relationship between access to free/reduced price lunch and test performance, at the school level.
 
+2. Average test performance across counties with high, low, and medium poverty.
 
+# Task 7: Answering questions
+What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
