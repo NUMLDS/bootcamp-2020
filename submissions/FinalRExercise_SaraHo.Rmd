@@ -10,7 +10,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE,
                       cache = FALSE, tidy = FALSE)
 ```
 
-#### Task 1: Import your data 
+### 1: Import data and packages 
 
 Import necessary packages.
 ```{r}
@@ -18,22 +18,24 @@ library(tidyverse)
 library(data.table)
 ```
 
-Load the data.
-
+Load the data
 ```{r}
 schools <- fread(here::here("data", "nys_schools.csv"))
 counties <- fread(here::here("data", "nys_acs.csv"))
 ```
 
-#### Task 2: Explore your data
+### 2: Explore data
 
 ```{r}
 summary(schools)
+```
 
+Deal with missing values, which are currently coded as `-99`.
+```{r}
 # since we need county level data later, let's remove schools without a county
 schools <- schools[county_name != -99]
 
-# are there still remaining -99?
+# for remaining columns, convert -99 to NA
 metric_names <- c("total_enroll", "per_free_lunch", "per_reduced_lunch",
                   "per_lep", "mean_ela_score", "mean_math_score")
 schools[, (metric_names) := replace(.SD, .SD == -99, NA)
@@ -41,13 +43,18 @@ schools[, (metric_names) := replace(.SD, .SD == -99, NA)
 summary(schools)
 ```
 
+Address percentages (fractions) that are over 1
 ```{r}
-summary(schools)
 schools[per_free_lunch > 1, per_free_lunch := per_free_lunch / 100]
+
+# if there are remaining columns still over 1, remove those data points
 schools[per_free_lunch > 1, per_free_lunch := NA]
+summary(schools)
 ```
 
-#### Task 3: Recoding and variable manipulation
+#### 3: Recoding and variable manipulation
+
+Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
 
 ```{r}
 sum_counties <- summary(counties[,county_per_poverty])
@@ -62,32 +69,33 @@ counties[county_per_poverty > sum_counties["3rd Qu."],
          pov_cat := "high"]
 ```
 
-3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year 
-
+The tests that the NYS Department of Education administers changes from time to time, so scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year.
 
 ```{r}
 schools[, z_mean_ela_score := scale(mean_ela_score), year]
 schools[, z_mean_math_score := scale(mean_math_score), year]
 ```
 
-#### Task 4: Merge datasets
-
-Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. 
-
-
+Create variables that represent the total number of students in free and reduced lunch.
 ```{r}
 schools[ , num_free_lunch := round(total_enroll * per_free_lunch)]
 schools[ , num_reduced_lunch := round(total_enroll * per_reduced_lunch)]
+```
 
+#### 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. 
+
+```{r}
 merged <- merge(schools, counties, by = c("county_name", "year"), all.x = TRUE)
 ```
 
 
 #### Task 5: Create summary tables
 
-Generate tables showing the following:
+For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
 
-1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+First, get the number of total students per county enrolled in free or reduced lunch program:
 
 ```{r}
 # mean county poverty across the years for which there is data
@@ -98,6 +106,7 @@ sum_table_1 <- merged[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
                        , county_name]
 ```
 
+Then, convert the total numbers to percentages (fractions)
 
 ```{r}
 sum_table_1[, p_reduced_lunch := tot_reduced_lunch / tot_enroll]
@@ -106,7 +115,7 @@ sum_table_1[, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
 sum_table_1
 ```
 
-2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch,mean reading score, and mean math score.
+For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch,mean reading score, and mean math score.
 
 NOTE: the max year for counties is 2016, while the max year for schools is 2017
 
@@ -140,11 +149,12 @@ high_pov_sum <- high_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRU
                   , county_name][, pov_cat := "high"]
 
 sum_table_2 <- rbind(low_pov_sum, high_pov_sum)
+sum_table_2
 ```
 
 #### Task 6: Data visualization
 
-1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+The relationship between access to free/reduced price lunch and test performance, at the *school* level.
 
 ```{r}
 ggplot(schools) + 
@@ -153,7 +163,7 @@ ggplot(schools) +
 ```
 
 
-2. Average test performance across *counties* with high, low, and medium poverty.
+Average test performance across *counties* with high, low, and medium poverty.
 
 ```{r}
 sum_table_3 <- merged[ , .(mean_ela = mean(z_mean_ela_score, na.rm = TRUE),
@@ -168,9 +178,16 @@ ggplot(sum_table_3[!is.na(pov_cat)]) +
   labs(title = "average ela test scores")
 ```
 
+#### Task 7: Answering questions
 
 
+Using the skills you have learned in the past three days, tackle the following question: 
 
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
 
 
 
