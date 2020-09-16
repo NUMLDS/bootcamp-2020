@@ -97,7 +97,7 @@ county_data <- nys_schools %>%
                group_by(county_name, year) %>%
                summarize(total_enroll = sum(total_enroll, na.rm = T), 
                          avg_per_free_lunch = mean(per_free_lunch, na.rm = T), 
-                         avg_per_reduced_luch = mean(per_reduced_lunch, na.rm = T),
+                         avg_per_reduced_lunch = mean(per_reduced_lunch, na.rm = T),
                          avg_per_lep = mean(per_lep, na.rm = T),
                          avg_ela_score = mean(ela_z_score, na.rm = T),
                          avg_math_score = mean(math_z_score, na.rm = T)) %>%
@@ -118,7 +118,7 @@ Generate tables showing the following:
 county_data %>%
   group_by(county_name) %>%
   summarise(total_enroll = mean(total_enroll), 
-            per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_luch), 
+            per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_lunch), 
             per_poverty = mean(avg_per_poverty))
 ```
 
@@ -126,7 +126,7 @@ county_data %>%
 #2
 summary <- county_data %>%
            group_by(county_name) %>%
-           summarise(per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_luch),
+           summarise(per_free_reduced_lunch = mean(avg_per_free_lunch+avg_per_reduced_lunch),
                      per_poverty = mean(avg_per_poverty),
                      mean_ela_score = mean(avg_ela_score),
                      mean_math_score = mean(avg_math_score)) %>%
@@ -192,6 +192,22 @@ You may use summary tables, statistical models, and/or data visualization in pur
 
 Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
 
+```{r}
+county_data %>%
+  filter(poverty_level == "High") %>%
+  ggplot() +
+  geom_line(aes(x = county_per_poverty, y = avg_ela_score, group = year, col = year))
+county_data %>%
+  filter(poverty_level == "High") %>%
+  ggplot() +
+  geom_line(aes(x = county_per_poverty, y = avg_math_score, group = year, col = year))
+```
+
+
+
+There is a relationship between poverty and test performace. We can see from the plots in task 6 question 2. For both reading and math test performance, counties with low poverty rates have significant better performance when compared to counties with high poverty rates. 
+
+This relationship overall has no change over time. However, from the above plot we can see that for the counties with extreme high poverty rate (percentage of poverty greater then 0.2), both reading and math scores are increasing over years. According to the plots in task 6 question 1, access to free/reduced price lunch does not seem to morderate the relationship. 
 
 
 
