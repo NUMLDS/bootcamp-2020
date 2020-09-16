@@ -1,0 +1,393 @@
+---
+title: "Final Exercise MSiA Bootcamp 2020"
+author: "Louis-Charles Genereux"
+date: "15/09/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(data.table)
+library(tidyverse)
+```
+
+# Task 1: Import the data
+
+The 'schools' dataframe contains data on schools within New York State. SOURCE: New York State Department of Education
+The 'demographics' dataframe contains census data on counties in which schools are situated. SOURCE: US Census Bureau
+
+```{r data}
+schools <- read_csv(here::here("data/nys_schools.csv"))
+demographics <- read_csv(here::here("data/nys_acs.csv"))
+
+```
+
+# Task 2: Exploring the data
+
+### Exploring the 'schools' dataframe
+
+Summary of schools dataframe
+
+```{r schools}
+summary(schools)
+```
+
+
+Investigating NA or erroneous values - counting the number of rows per column
+
+```{r identifying empty rows in Schools}
+#determining the number of rows in the schools data frame
+nrow(schools)
+
+#writing a function to count the numbers of rows that are NAs per column
+na_row_counter <- function(df) {
+  # for each column, this code will return the number of rows that satisfy the conditions 
+  # the which function returns the position within the column which matches the condition (in vector form)
+  # the length function returns the number of rows that match the condition
+ length(which(df == -99 | df == -99.0000 | df == "-99" | df == "-99.0" | df == "-99.0000" | is.na(df)))
+}
+
+# apply the na_row_counter function for  every column of the dataframe and return a df with count of NAs/ -99
+data.frame(sapply(schools, na_row_counter))
+
+```
+
+### Exploring the 'demographics' dataframe
+
+Summary of demographics dataframe
+
+```{r demographics}
+summary(demographics)
+```
+
+
+Investigating NA or erroneous values - counting the number of rows per column
+
+```{r identifying empty rows in Demographics}
+#determining the number of rows in the schools data frame
+nrow(demographics)
+
+# apply the na_row_counter function for  every column of the dataframe and return a df with count of NAs/ -99
+data.frame(sapply(demographics, na_row_counter))
+
+```
+
+# Task 3: Recoding and variable manipulation
+
+## 3.1 Deal with missing values in the 'Schools' dataframe
+
+I will remove the NA or empty values, as I do not want erroneous data to affect my analyses
+
+```{r schools remove NA}
+# function to finding values within a vector (row within a dataframe)
+row_to_be_deleted <- function(df) {
+  if(any(df %in% c(NA, -99, "-99", "-99.0", "-99.0000" ))) {
+    # retun 1 if row should be removed
+    1 
+  } else {
+    # return 0 if row should be kept
+    0
+  }
+}
+
+# Apply function to rows, resulting in new column called "rows_to_be_removed"
+schools$rows_to_be_removed <- apply(schools, 1, row_to_be_deleted)
+
+# Remove rows containing empty values (keep only rows where rows_to_be_removed = 0)
+schools_clean <- schools[schools$rows_to_be_removed==0, ]
+
+# removing column which we used to identify NA rows
+schools_clean <- schools_clean[,-c(13)] 
+
+# final adjustment - adding absolute "total free lunch" and "total reduced lunch"
+schools_clean$total_free_lunch <- schools_clean$total_enroll * schools_clean$per_free_lunch
+schools_clean$total_red_lunch <- schools_clean$total_enroll * schools_clean$per_reduced_lunch
+
+
+```
+
+## 3.2 Classifying counties based on their levels of poverty
+
+I will classify counties as "high", "medium", and "low" poverty for each year, given that I have data across various years and that some counties have changed their relative position over time
+
+```{r demographics poverty levels}
+
+### Compute the cutoffs for low, medium and high poverty levels for each year
+
+# Create dataframe to keep results
+yearly_poverty_cutoffs <- data.frame("year" = NA, "tier_one" = NA, "tier_two" = NA)
+
+# Set up loop to fill data frame
+n_years_demographics <- max(demographics$year) - min(demographics$year) + 1
+for (i in 1:n_years_demographics) {
+  current_year <- min(demographics$year) + i - 1
+  yearly_poverty_cutoffs[i,1] <-current_year
+  yearly_poverty_cutoffs[i,2] <- quantile(demographics$county_per_poverty[demographics$year==current_year], c(.33))
+  yearly_poverty_cutoffs[i,3] <- quantile(demographics$county_per_poverty[demographics$year==current_year], c(.66))
+}
+
+### Classify counties as low, medium or high poverty based on the year by year quantiles calculated
+
+# create new column
+demographics$poverty_classification <- NA
+
+n_row_demographic_data <- nrow(demographics)
+for (i in 1:n_row_demographic_data) {
+    year_index <- as.double(demographics[i, "year"])
+    county_poverty <- as.double(demographics[i, "county_per_poverty"])
+    low_cutoff <- yearly_poverty_cutoffs$tier_one[yearly_poverty_cutoffs$year==year_index]
+    high_cutoff <- yearly_poverty_cutoffs$tier_two[yearly_poverty_cutoffs$year==year_index]
+    
+    if (county_poverty < low_cutoff) {
+      demographics$poverty_classification[i] <- "low relative poverty"
+    } else if (county_poverty < high_cutoff) {
+      demographics$poverty_classification[i] <- "medium relative poverty"
+    } else {
+      demographics$poverty_classification[i] <- "high relative poverty"
+    }
+}
+
+head(demographics[,c(1,2,3,4,6)], 10)
+```
+
+## 3.3 Scale test scores
+
+I will create a z-score for the math and ELA tests so that a school's performance can be compared year on year relative to peers
+
+```{r scaling test scores}
+
+schools_clean %>%
+  group_by(year) %>%
+  mutate(scaled_math_score = scale(mean_math_score, center = TRUE, scale = TRUE)) %>%
+  mutate(scaled_ela_score = scale(mean_ela_score, center = TRUE, scale = TRUE))
+
+
+```
+
+https://www.r-bloggers.com/r-tutorial-series-centering-variables-and-generating-z-scores-with-the-scale-function/
+
+
+# Task 4: Merging data frames
+
+Inner join, so that only observations that match in both dataframes are retained
+
+```{r joining tables}
+
+schools_and_demographics <- inner_join(schools_clean, demographics, by= c("year" = "year", "county_name" = "county_name"))
+str(schools_and_demographics)
+
+```
+
+# Task 5: Create summary tables
+
+### Table 1: Total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty, for each county in 2016
+
+```{r table 1}
+
+table_1 <-
+  schools_and_demographics  %>%
+  filter(year == 2016) %>%
+  group_by(county_name) %>%
+  summarise(enrollment = sum(total_enroll), 
+            per_f_lunch = (sum(total_free_lunch)/sum(enrollment)),
+            per_red_lunch =(sum(total_red_lunch)/sum(enrollment)),
+            per_poverty = mean(county_per_poverty))
+
+head(table_1[order(table_1$enrollment, decreasing = TRUE),])
+summary(table_1)
+```
+
+### Table 2: Percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score, for the counties with the top 5 and bottom 5 poverty rate in 2016
+
+```{r table 2}
+
+# table for 5 poorest counties (highest poverty rate)
+table_2a <-
+  schools_and_demographics  %>%
+  filter(year == 2016) %>%
+  group_by(county_name) %>%
+  summarise(percent_in_poverty = mean(county_per_poverty),
+            enrollment = sum(total_enroll),
+            per_f_lunch = (sum(total_free_lunch)/sum(enrollment)),
+            per_lunch =(sum(total_red_lunch)/sum(enrollment)),
+            mean_reading= mean(mean_ela_score),
+            mean_math = mean(mean_math_score)) %>%
+  top_n(5, percent_in_poverty)
+
+# table for 5 richest counties (lowest poverty rate)
+table_2b <-
+  schools_and_demographics  %>%
+  filter(year == 2016) %>%
+  group_by(county_name) %>%
+  summarise(percent_in_poverty = mean(county_per_poverty),
+            enrollment = sum(total_enroll),
+            per_f_lunch = (sum(total_free_lunch)/sum(enrollment)),
+            per_lunch =(sum(total_red_lunch)/sum(enrollment)),
+            mean_reading= mean(mean_ela_score),
+            mean_math = mean(mean_math_score)) %>%
+  top_n(-5, percent_in_poverty)
+
+# merging the top 5 to the bottom 5
+table_2 <- rbind(table_2a, table_2b)
+
+# creating the desired output
+head(table_2[order(table_2$percent_in_poverty, decreasing = TRUE),],10)
+summary(table_2)
+
+```
+
+# 6: Data visualization
+
+6.1 The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+```{r plot 1}
+schools_and_demographics %>%
+  filter(year == 2016) %>%
+  group_by(school_name) %>%
+  ggplot() + geom_point(aes(x= per_free_lunch, y = mean_math_score), col="red") +
+  labs(title = "Relationship between student socio-economic background \nand math test scores, in New-York, 2016",
+       subtitle = "At the school level, where one dot = 1 school",
+       x= "Percentage of student body elligible for free lunch", y="Mean math test scores")
+
+```
+
+6.2 Average test performance across *counties* with high, low, and medium poverty.
+
+```{r plot 2}
+schools_and_demographics %>%
+  filter(year == 2016) %>%
+  group_by(poverty_classification) %>%
+  ggplot( aes(x= reorder(poverty_classification, mean_math_score, FUN = median), y = mean_math_score, fill = poverty_classification)) +
+ geom_boxplot() +
+  labs(title="Relationship between poverty and mean math test scores",
+  subtitle="New York counties, in 2016")+
+  theme(legend.position="right") +
+  xlab("Relative level of poverty")+
+  ylab("Mean math test score")
+
+```
+
+#   7: Answering questions
+
+**What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?**
+
+A quick visualization reveals that schools within poorer counties have continuously yielded lower math test scores than schools within richer counties between 2009 and 2016.
+
+```{r facet}
+
+schools_and_demographics %>%
+  group_by(poverty_classification) %>%
+  filter(poverty_classification == "low relative poverty" | poverty_classification == "high relative poverty" ) %>%
+  ggplot( aes(x= reorder(poverty_classification, mean_math_score, na.rm = TRUE), y = mean_math_score, fill = poverty_classification)) +
+ geom_boxplot(outlier.shape=NA) +
+  labs(title="Relationship between poverty and mean math test scores",
+  subtitle="New York counties between 2009 and 2016")+
+  facet_wrap(~year, scales = "free") +
+  theme(legend.position="right", axis.text.x = element_blank()) +
+  xlab("Relative level of poverty")+
+  ylab("Mean math test score")
+
+```
+
+We can see below that there is a strong positive correlation between county poverty levels and access to free lunches, meaning that schools in poor counties tend to have high levels of students qualifying for free lunches.
+
+However, based on this high correlation, it might be misleading to use both county poverty rate and access to free lunch as two predictors of math scores
+
+```{r relationship between poverty and test scores, considering free lunches, over time}
+### Evaluating the correlation between district poverty and percentage of students qualifying for free lunch
+
+# Create dataframe to keep results
+relationship_between_county_poverty_and_free_lunch <- data.frame("year" = NA, "correlation" = NA)
+
+years_observed <- unique(schools_and_demographics$year)
+row_counter <- 1
+for (i in years_observed) {
+  year_index <- i
+  county_poverty_for_year <- schools_and_demographics$county_per_poverty[schools_and_demographics$year==year_index]
+  free_lunch_for_year <- schools_and_demographics$per_free_lunch[schools_and_demographics$year==year_index]
+  correlation <- cor(county_poverty_for_year, free_lunch_for_year )
+  relationship_between_county_poverty_and_free_lunch[row_counter,1] <- year_index
+  relationship_between_county_poverty_and_free_lunch[row_counter,2] <- correlation
+  row_counter <- row_counter +1
+}
+relationship_between_county_poverty_and_free_lunch[1:8,]
+
+```
+
+Using univariate models to predict test scores (given that we cannot use both county poverty and access to free lunch in the same model - due to high collinearity), we see that poverty can explain significant variation in test scores
+
+Over 8 years, the proportion of a school's students accessing free lunches has explained ~45% of variation in test scores (affecting test scores downward). This is 30% more variation explained than by looking at county poverty only (which itself only explains ~15% of stest score variation)
+
+```{r regression analysis}
+### Evaluating the relationship between district poverty, percentage of students qualifying for free lunch and test scores
+
+# Create dataframe to keep results
+regression_results_univariate <- data.frame("year" = NA, "Coefficient for poverty" = NA,  
+                                            "poverty model significance (R2)" = NA,   
+                                            "Coefficient for free lunch"= NA,  
+                                            "free lunch model significance (R2)" = NA,   
+                                            "strongest predictor")
+
+years_observed <- unique(schools_and_demographics$year)
+row_counter <- 1
+for (i in years_observed) {
+  year_index <- i
+  
+  yearly_data <- schools_and_demographics[schools_and_demographics$year==year_index,]
+  model_poverty <-lm(mean_ela_score ~ county_per_poverty  , data = yearly_data)
+  model_lunch <-lm(mean_ela_score ~  per_free_lunch , data = yearly_data)
+
+  
+  regression_results_univariate[row_counter,1] <- year_index
+  regression_results_univariate[row_counter,2] <- summary(model_poverty)$coefficients[2]
+  regression_results_univariate[row_counter,3] <- summary(model_poverty)$r.squared
+  regression_results_univariate[row_counter,4] <- summary(model_lunch)$coefficients[2]
+  regression_results_univariate[row_counter,5] <- summary(model_lunch)$r.squared
+  regression_results_univariate[row_counter,6] <- ifelse(summary(model_poverty)$r.squared >= summary(model_lunch)$r.squared, "poverty",
+                                              "lunch")
+
+  row_counter <- row_counter +1
+}
+regression_results_univariate[1:8,]
+
+### Comparing both approaches
+
+# Mean variation in test scores explained by free lunch 
+mean(regression_results_univariate$free.lunch.model.significance..R2.)
+
+# Incremental variation in test scores explained through free lunch model vs county poverty model
+mean(regression_results_univariate$free.lunch.model.significance..R2.) - mean(regression_results_univariate$poverty.model.significance..R2.)
+
+
+```
+
+To be ignored (given high collinearity between poverty and access to free lunch)
+
+```{r regression analysis - bivariate models}
+### Evaluating the relationship between district poverty, percentage of students qualifying for free lunch and test scores
+
+# Create dataframe to keep results
+regression_results <- data.frame("year" = NA, "Coefficient for poverty" = NA,  "P-value for poverty" = NA,   
+                                 "Coefficient for free lunch"= NA,  "P-value for free lunch" = NA,   
+                                 "Model significance (R2)")
+
+years_observed <- unique(schools_and_demographics$year)
+row_counter <- 1
+for (i in years_observed) {
+  year_index <- i
+  
+  yearly_data <- schools_and_demographics[schools_and_demographics$year==year_index,]
+  model <-lm(mean_ela_score ~ county_per_poverty + per_free_lunch , data = yearly_data)
+  
+  regression_results[row_counter,1] <- year_index
+  regression_results[row_counter,2] <- summary(model)$coefficients[2]
+  regression_results[row_counter,3] <- summary(model)$coefficients[2,4]
+  regression_results[row_counter,4] <- summary(model)$coefficients[3]
+  regression_results[row_counter,5] <- summary(model)$coefficients[3,4]
+  regression_results[row_counter,6] <- summary(model)$r.squared
+
+  row_counter <- row_counter +1
+}
+regression_results[1:8,]
+
+```
