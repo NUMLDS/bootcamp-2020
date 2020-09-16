@@ -1,0 +1,281 @@
+---
+title: "Final R Exercise"
+author: "Christina Chang"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+```
+
+# Task 1
+```{r}
+schools <- read.csv(here::here("data", "nys_schools.csv"))
+acs <- read.csv(here::here("data", "nys_acs.csv"))
+```
+
+# Task 2
+```{r}
+# Variable names
+names(schools)
+
+# Dimensions
+dim(schools)
+
+# Summary statistics for each column
+summary(schools)
+
+# Number of NA for each column
+sapply(schools, function(x) sum(is.na(x)))
+```
+The schools data set has dimensions 35663 rows and 12 columns. There are both categorical variables and numerical variables. There are no missing values.
+
+```{r}
+# Variable names
+names(acs)
+
+# Dimensions
+dim(acs)
+
+# Summary statistics for each column
+summary(acs)
+
+# Number of NA for each column
+sapply(acs, function(x) sum(is.na(x)))
+```
+The counties data set has dimensions 496 rows and 5 columns. There is one categorical variable and and 4 numerical variables. There are no missing values.
+
+# Task 3
+```{r}
+# Problem 1
+## Replace -99 with NA
+schools[schools == -99] <- NA
+acs[acs == -99] <- NA
+
+## Drop rows with missing values
+schools <- schools[complete.cases(schools), ]
+acs <- acs[complete.cases(acs), ]
+
+# Problem 2
+## Low poverty: county_per_poverty < 1st quartile
+## Medium poverty: 1st quartile <= county_per_poverty < 3rd quartile
+## High poverty: county_per_poverty > 3rd quartile
+acs$poverty_group <- NA
+acs$poverty_group[acs$county_per_poverty<quantile(acs$county_per_poverty,0.25)] <- "Low"
+acs$poverty_group[(acs$county_per_poverty>=quantile(acs$county_per_poverty,0.25)) & (acs$county_per_poverty<quantile(acs$county_per_poverty,0.75))] <- "Medium"
+acs$poverty_group[acs$county_per_poverty>=quantile(acs$county_per_poverty,0.75)] <- "High"
+
+
+# Problem 3
+schools <- 
+  schools %>%
+  group_by(year) %>%
+  mutate(scaled_ela = scale(mean_ela_score),
+         scaled_math = scale(mean_math_score)) %>%
+   ungroup %>%
+   as.data.frame()
+```
+The data was split into three groups based on the values of the `county_per_poverty` variable: (1) observations < 1st quartile (2) observations >= 1st quartile and < 3rd quartile (3) observations >= 3rd quartile. I chose to split the data this way because I thought the medium group should be the middle 50% of the data. 
+
+# Task 4
+```{r}
+# Group school data by county and take the mean of each variable
+schools_agg <- schools %>% 
+  select(county_name, total_enroll,per_free_lunch, per_reduced_lunch,
+         per_lep, scaled_ela, scaled_math) %>%
+  group_by(county_name) %>%
+  summarize(total_enroll = sum(total_enroll),
+            per_free_lunch = mean(per_free_lunch),
+            per_reduced_lunch = mean(per_reduced_lunch),
+            per_lep = mean(per_lep),
+            scaled_ela = mean(scaled_ela),
+            scaled_math = mean(scaled_math))
+
+# Group county data by county and take mean over years for each variable
+acs_agg <- acs %>% 
+  select(-year) %>%
+  group_by(county_name) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            median_household_income = mean(median_household_income),
+            county_per_bach = mean(county_per_bach))
+
+
+# Merge the acs data to get county level data
+schools_acs_merge <- merge(acs_agg, schools_agg, by = "county_name")
+```
+When moving from school to county level data, I decided to sum the enrollment values and take the mean of the rest of the numerical values. 
+
+# Task 5
+```{r}
+# Problem 1
+## For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+schools_acs_merge %>% 
+  select(county_name, total_enroll, per_free_lunch,
+         per_reduced_lunch, county_per_poverty)
+
+# Problem 2
+## For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+schools_acs_merge %>%
+  arrange(county_per_poverty) %>%
+  filter(row_number() > max(row_number()) - 5 | row_number() <= 5) %>% 
+  select(county_name, county_per_poverty, per_free_lunch,
+         per_reduced_lunch, scaled_ela, scaled_math)
+```
+
+# Task 6
+```{r}
+# Problem 1
+#The relationship between access to free/reduced price lunch and test performance, at the school level.
+
+# Summarize by school
+score_price_df <- schools %>%
+  select(school_name, scaled_ela, scaled_math, per_free_lunch,
+         per_reduced_lunch) %>%
+  group_by(school_name) %>%
+  summarize(scaled_ela = mean(scaled_ela),
+            scaled_math = mean(scaled_math),
+            per_free_lunch = mean(per_free_lunch),
+            per_reduced_lunch = mean(per_reduced_lunch))
+
+# Take the average of the two test scores
+score_price_df$scaled_score_avg <- (score_price_df$scaled_ela +
+                               score_price_df$scaled_math) / 2
+
+# Plot
+score_price_melt <- score_price_df %>%
+  select(per_free_lunch, per_reduced_lunch, scaled_score_avg) %>%
+  melt(id.vars = c("scaled_score_avg"), 
+       variable.name = "lunch_type",
+       value.name = "percent")
+
+score_price_melt %>%
+  ggplot() + geom_point(aes(x = percent, y = scaled_score_avg), 
+                        alpha = 0.25) +
+  facet_wrap(~lunch_type) +
+  labs(title = "Average Test Score vs Percent Qualifying for Lunch
+       Discount by Lunch Discount Type",
+       x = "Percent", 
+       y = "Average Scaled Score")
+
+# Problem 2
+#Average test performance across counties with high, low, and medium poverty.
+
+# Select relevant columns
+acs_test_perform <- schools_acs_merge %>%
+  select(county_per_poverty, scaled_ela, scaled_math)
+
+# Add poverty grouping
+acs_test_perform$poverty_group <- NA
+acs_test_perform$poverty_group[acs_test_perform$county_per_poverty<quantile(acs_test_perform$county_per_poverty,0.25)] <- "Low"
+acs_test_perform$poverty_group[(acs_test_perform$county_per_poverty>=quantile(acs_test_perform$county_per_poverty,0.25)) & (acs_test_perform$county_per_poverty<quantile(acs_test_perform$county_per_poverty,0.75))] <- "Medium"
+acs_test_perform$poverty_group[acs_test_perform$county_per_poverty>=quantile(acs_test_perform$county_per_poverty,0.75)] <- "High"
+
+# Reorder the groups order
+acs_test_perform$poverty_group <- 
+  factor(acs_test_perform$poverty_group, 
+         levels=c("Low", "Medium", "High"))
+
+# Plot
+acs_test_perform %>%
+  select(poverty_group, scaled_ela, scaled_math) %>%
+  melt(id.vars = c("poverty_group"),
+       variable.name = "score_type",
+       value.name = "score") %>%
+  ggplot(aes(x = poverty_group, y = score, fill = score_type)) +
+  geom_boxplot() +
+  labs(title = "Test Scores by Poverty Group",
+       x = "Poverty Group",
+       y = "Score")
+``` 
+
+# Task 7
+According to the plot in Task 6, if a county has high poverty rates, then the students are more likely to have lower test scores. If a county has low poverty rates, then the students are more likely to have higher test scores. 
+
+```{r}
+# Relationship between poverty & test scores over time
+
+# Group school data by county and take the mean of each variable
+schools_agg <- schools %>% 
+  select(county_name, year, total_enroll, per_free_lunch,
+         per_reduced_lunch, per_lep, scaled_ela, scaled_math) %>%
+  group_by(county_name, year) %>%
+  summarize(total_enroll = sum(total_enroll),
+            per_free_lunch = mean(per_free_lunch),
+            per_reduced_lunch = mean(per_reduced_lunch),
+            per_lep = mean(per_lep),
+            scaled_ela = mean(scaled_ela),
+            scaled_math = mean(scaled_math))
+
+# Group county data by county and take mean over years for each variable
+acs_agg <- acs %>% 
+  group_by(county_name, year) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            median_household_income = mean(median_household_income),
+            county_per_bach = mean(county_per_bach))
+
+
+# Merge the acs data to get county level data
+schools_acs_merge <- merge(acs_agg, schools_agg, 
+                           by = c("county_name", "year"))
+
+# Select relevant columns
+acs_test_perform <- schools_acs_merge %>%
+  select(county_per_poverty, year, scaled_ela, scaled_math,
+         per_free_lunch, per_reduced_lunch)
+
+# Add poverty grouping
+acs_test_perform$poverty_group <- NA
+acs_test_perform$poverty_group[acs_test_perform$county_per_poverty<quantile(acs_test_perform$county_per_poverty,0.25)] <- "Low"
+acs_test_perform$poverty_group[(acs_test_perform$county_per_poverty>=quantile(acs_test_perform$county_per_poverty,0.25)) & (acs_test_perform$county_per_poverty<quantile(acs_test_perform$county_per_poverty,0.75))] <- "Medium"
+acs_test_perform$poverty_group[acs_test_perform$county_per_poverty>=quantile(acs_test_perform$county_per_poverty,0.75)] <- "High"
+
+# Reorder the groups order
+acs_test_perform$poverty_group <- 
+  factor(acs_test_perform$poverty_group, 
+         levels=c("Low", "Medium", "High"))
+
+# Plot
+acs_test_perform %>%
+  select(poverty_group, year, scaled_ela, scaled_math) %>%
+  melt(id.vars = c("poverty_group", "year"),
+       variable.name = "score_type",
+       value.name = "score") %>%
+  ggplot(aes(x = poverty_group, y = score, fill = score_type)) +
+  geom_boxplot() +
+  labs(title = "Test Scores by Poverty Group",
+       x = "Poverty Group",
+       y = "Score") +
+  facet_wrap(~year)
+```
+
+The relationship between poverty and test performance seem to be fairly consistent over the years. 
+
+```{r}
+acs_test_perform$scaled_score_avg <- (acs_test_perform$scaled_ela +
+                               acs_test_perform$scaled_math) / 2
+
+acs_test_perform %>%
+  select(poverty_group, scaled_score_avg, per_free_lunch,
+         per_reduced_lunch) %>%
+  melt(id.vars = c("poverty_group","scaled_score_avg"),
+       variable.name = "lunch_type",
+       value.name = "percent") %>%
+  ggplot(aes(x = scaled_score_avg, y = percent, col = lunch_type)) + 
+  geom_point(alpha = 0.3) +
+  facet_wrap(~poverty_group, dir = "v",) +
+  labs(title = "Average Score by Percent with Lunch Discount and
+  Poverty Group", x = "Average Score", y = "Percent with Lunch 
+  Discount")
+```
+
+The plot shows that access to free/reduced price lunch doesn't have much effect on the relationship between poverty group and test scores. Regardless of the lunch price, students in the low poverty group have the higher test scores and students in the high poverty group have the lower test scores.
+
+
+
