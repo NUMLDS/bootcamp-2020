@@ -81,27 +81,47 @@ county_school <- merge(schools, counties, by = c("county_name", "year"))
 1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of 
 population in poverty. 
 ```{r}
-tmp <- county_school %>%
-        mutate(free_lunch = total_enroll * per_free_lunch, reduced_lunch = total_enroll * per_reduced_lunch) %>%
-        group_by(county_name) %>%
-        summarise(sum_enroll = sum(total_enroll, na.rm = T),
-                 per_free_lunch = sum(total_enroll, na.rm = T) / sum(free_lunch, na.rm = T),
-                 per_reduced_lunch = sum(total_enroll, na.rm = T) / sum(reduced_lunch, na.rm = T),
-                 per_poverty = mean(county_per_poverty)) 
+summary1 <- county_school %>%
+              mutate(free_lunch = total_enroll * per_free_lunch, reduced_lunch = total_enroll * per_reduced_lunch) %>%
+              group_by(county_name) %>%
+              summarise(sum_enroll = sum(total_enroll, na.rm = T),
+                  per_free_lunch = sum(total_enroll, na.rm = T) / sum(free_lunch, na.rm = T),
+                  per_reduced_lunch = sum(total_enroll, na.rm = T) / sum(reduced_lunch, na.rm = T),
+                  per_poverty = mean(county_per_poverty)) 
 
-tmp
+summary1
 ```
 
 2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students 
 qualifying for free or reduced price lunch, mean reading score, and mean math score.
 ```{r}
-# Use the table generated in task5.1 to find the counties with the top 5 and bottom 5 poverty rate.
-# Then use dplyr to select the desired rows and columns 
+# Create a temporary table with the mean reading score and mean math score for each county
+tmp <- county_school %>%
+        group_by(county_name) %>%
+        summarise(mean_ela = mean(mean_ela_score, na.rm = T),
+                  mean_math = mean(mean_math_score, na.rm = T))
 
+# Merge the temporary table with the summary1 table in the previous task
+summary2 <- merge(summary1, tmp, by = c("county_name"))
+
+# Select the counties with the top5 and bottom5 poverty rate by removing 
+summary2 <- summary2[order(-summary2$per_poverty),]
+tmp <- summary2[1:5,]
+tmp2 <- summary2[-1:-57,]
+
+# Combine tmp and tmp2 together
+summary2 <- rbind(tmp, tmp2)
+
+# Select the required columns of summary2
+summary2 <- summary2 %>% select(-sum_enroll)
+summary2
 ```
 
 # Task 6: Data Visualization
 1. The relationship between access to free/reduced price lunch and test performance, at the school level.
+```{r}
+# Use the schools dataframe and 
+```
 
 2. Average test performance across counties with high, low, and medium poverty.
 
