@@ -161,6 +161,33 @@ ggplot(data = schools) +
 ```
 
 2. Average test performance across counties with high, low, and medium poverty.
+```{r}
+# ELA test performance across counties with high, low, and medium poverty
+county_school %>%
+  group_by(year, poverty_level) %>%
+  summarise(mean_z_score_ela = mean(z_score_ela, na.rm = T)) %>%
+  ggplot() +
+  geom_line(aes(x = year, y = mean_z_score_ela, group = poverty_level, col = poverty_level)) +
+  labs(title = "Relationship between poverty level and ela score across years", x = "year", y = "ELA z-score") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+```{r}
+# Math test performance across counties with high, low, and medium poverty
+county_school %>%
+  group_by(year, poverty_level) %>%
+  summarise(mean_z_score_math = mean(z_score_math, na.rm = T)) %>%
+  ggplot() +
+  geom_line(aes(x = year, y = mean_z_score_math, group = poverty_level, col = poverty_level)) +
+  labs(title = "Relationship between poverty level and math score across years", x = "year", y = "Math z-score") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
 
 # Task 7: Answering questions
 What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+Answer:
+The data tells us that the lower the poverty level, the better the test performance in New York public schools. This
+relationship hasn't changed over time. This relationship is not seemed to be moderated by access to free/reduced price
+lunch because the gap in performances between different poverty levels grew during the past few years.
