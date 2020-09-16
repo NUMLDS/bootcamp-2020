@@ -1,0 +1,203 @@
+---
+title: "Final Exercise"
+author: "Martin Pan"
+date: "9/15/2020"
+output: html_document
+---
+
+## Load Library and Data
+
+```{r}
+library(plm)
+library(tidyverse)
+```
+
+```{r}
+nys_school <- read_csv('../data/nys_schools.csv')
+nys_acs <- read_csv('../data/nys_acs.csv')
+```
+
+## Explore Data
+
+### nys_school
+```{r}
+head(nys_school)
+```
+
+
+```{r}
+str(nys_school)
+```
+
+```{r}
+summary(nys_school)
+```
+
+```{r}
+sapply(nys_school, function(x) sum(is.na(x)))
+```
+
+### nys_acs
+```{r}
+head(nys_acs)
+```
+```{r}
+str(nys_acs)
+```
+
+```{r}
+summary(nys_acs)
+```
+
+```{r}
+sapply(nys_acs, function(x) sum(is.na(x)))
+```
+
+## Variable Manipulation
+
+### Deal With Missing Variable
+
+```{r}
+sapply(nys_acs, function(x) sum(x==-99))
+```
+
+
+```{r}
+sapply(nys_school, function(x) sum(x==-99))
+```
+
+We are going to drop those rows with missing values
+```{r}
+nys_school_select <- filter(nys_school, county_name != -99, mean_math_score != -99, 
+                            mean_ela_score !=-99, per_free_lunch != -99)
+```
+
+```{r}
+sapply(nys_school_select, function(x) sum(x==-99))
+```
+We will ignore the issue of missing variables for distrct_name for now.
+
+### Create Categorical Group
+We will group 25 percentile and below for county_per poverty to low, 25 percentile to 75 percentile as medium, and the rest as high.
+
+```{r}
+threshold <- quantile(nys_acs$county_per_poverty, c(0.25, 0.75))
+
+mean_poverty_rates <- nys_acs %>%
+  group_by(county_name) %>%
+  summarise(mean_pov = mean(county_per_poverty)) %>%
+  mutate(poverty_group = case_when(
+    mean_pov < threshold['25%'] ~ 'low',
+    mean_pov > threshold['75%'] ~ 'high',
+    (mean_pov > threshold['25%']) & (mean_pov < threshold['75%']) ~"medium"
+  )) %>%
+  select(!mean_pov)
+
+nys_acs <- left_join(nys_acs, mean_poverty_rates, by="county_name")
+```
+```{r}
+head(nys_acs)
+```
+
+### Scale Test Score
+```{r}
+nys_school_select <- nys_school_select %>%
+  group_by(year) %>%
+  mutate(scale_math_score = scale(mean_math_score), 
+         scale_ela_score = scale(mean_ela_score))
+```
+
+```{r}
+names(nys_school_select)
+```
+
+## Merge Datasets
+We are going to take the mean for each county for school information.
+```{r}
+county_school <- nys_school_select %>%
+  group_by(county_name, year) %>%
+  summarise_if(is.numeric, mean)
+```
+
+```{r}
+head(county_school)
+```
+Now, we will inner join county and acs dataset by county and year.
+```{r}
+merge_county <- inner_join(county_school, nys_acs, by = c('county_name', 'year'))
+```
+
+```{r}
+head(merge_county)
+```
+## Create summary tables
+
+### For Each County
+```{r}
+county_info <- merge_county %>% 
+  group_by(county_name) %>%
+  summarise(total_enrollment = sum(total_enroll),
+            free_lunch_percent = mean(per_free_lunch),
+            poverty_percent = mean(county_per_poverty),
+            mean_reading_score = mean(mean_ela_score),
+            mean_math_score = mean(mean_math_score))
+```
+```{r}
+county_info
+```
+### Top 5 and Bottom 5
+```{r}
+county_info_sort <- arrange(county_info, poverty_percent)
+head(county_info_sort)
+```
+```{r}
+tail(county_info_sort)
+```
+
+## Data Visualization
+
+### Lunch and Test
+```{r}
+nys_school_select %>%
+  mutate(access_to_lunch = per_free_lunch + per_reduced_lunch,
+         test_score = scale_ela_score + scale_math_score) %>%
+  ggplot() + 
+  geom_point(aes(x = access_to_lunch, y= test_score)) +
+  labs(title="relationship between free/reduced price lunch and test performance at school level")
+```
+### Test Performance Across Countys
+```{r}
+ggplot(data=merge_county) +
+  geom_point(aes(x=scale_math_score, y=scale_ela_score, color=poverty_group)) + 
+  labs(title='Comparison of Test Score betwen Different Poverty Group')
+```
+
+
+## Answering Questions
+
+We are going to run a regular ols and fixed effect model to explore the relationship.
+
+```{r}
+merge_county <- mutate(merge_county, total_scale_score = scale_ela_score + scale_math_score)
+head(merge_county)
+```
+
+```{r}
+mod <- lm(total_scale_score ~ county_per_poverty + per_free_lunch, data=merge_county)
+summary(mod)
+```
+Let's preprocess the data to run the fixed effect model. 
+```{r}
+id_df <- as.data.frame(cbind(unique(merge_county$county_name), 1:length(unique(merge_county$county_name))))
+names(id_df) <- c('county_name', 'id')
+merge_county <- left_join(merge_county, id_df, by='county_name')
+```
+
+Now we can run the model.
+```{r}
+panel_merge_county <- pdata.frame(merge_county, index = c("id","year"))
+mod_fixed <- plm(total_scale_score ~ county_per_poverty + per_free_lunch, data=panel_merge_county, model="within")
+summary(mod_fixed)
+```
+
+We think that the poverty rate of each county does not have statistically significant effect on test score.
