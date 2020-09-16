@@ -18,8 +18,8 @@ library(data.table)
 
 ```{r}
 #Reading in the data
-acs <- read.csv(here::here("data/nys_acs.csv"))
-schools <- read.csv(here::here("data/nys_schools.csv"))
+acs <- fread("../data/nys_acs.csv")
+schools <- fread("../data/nys_schools.csv")
 ```
 
 ## Exploring the data
@@ -38,7 +38,7 @@ acs <- acs %>% mutate(across(.fns = naconvert))
 
 We will add a categorical variable poverty_level
 ```{r}
-##pov_cutoff = quantile(acs$median_household_income, c(0.33, 0.66))
+pov_cutoff = quantile(acs$median_household_income, c(0.33, 0.66))
 ##acs %>% filter(median_household_income < pov_cutoff[1]) %>% mutate(poverty_level = "high")
 ##acs %>% filter(median_household_income >= pov_cutoff[1] & median_household_income < pov_cutoff[2] ) %>% mutate(poverty_level = "medium")
 ##acs %>% filter(median_household_income >= pov_cutoff[2]) %>% mutate(poverty_level = "low")
@@ -51,12 +51,50 @@ acs[median_household_income >= pov_cutoff[2], poverty_level := "low"]
 
 ```{r}
 setDT(schools)
-schools[, z_ela_score := scale(mean_ela_score)]
-schools[, z_math_score := scale(mean_math_score)]
+schools[, z_ela_score := scale(mean_ela_score), by=year]
+schools[, z_math_score := scale(mean_math_score), by=year]
 ```
 
 ```{r}
 merged_schools <- merge(schools, acs, all.x = TRUE)
+merged_schools06 <- merged_schools[year=="2016"]
+```
+
+```{r}
+merged_schools06[, lunch_subsidy := (per_free_lunch + per_reduced_lunch)*total_enroll]
+merged_schools06[,.(total_enrollment = sum(total_enroll, na.rm=T), per_lunch_subsidy = sum(lunch_subsidy, na.rm=T)/sum(total_enroll, na.rm=T), per_poverty = mean(county_per_poverty, na.rm=T)), by = county_name]
+```
+```{r}
+# topcounties <- acs %>% 
+#   filter(year==2016) %>% 
+#   arrange(county_per_poverty) %>% 
+#   head(5) %>% 
+#   select(county_name)
+# 
+# bottomcounties <- acs %>% 
+#   filter(year==2016) %>% 
+#   arrange(-county_per_poverty) %>% 
+#   head(5) %>% 
+#   select(county_name)
+
+topcounties <- acs[year==2016][order(county_per_poverty)][1:5, county_name]
+bottomcounties <- acs[year==2016][order(-county_per_poverty)][1:5, county_name]
+```
+
+```{r}
+merged_schools06[county_name %in% topcounties,.(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
+
+merged_schools06[county_name %in% bottomcounties, .(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
+```
+
+```{r}
+merged_schools06[, per_lunch_subsidy := lunch_subsidy/total_enroll]
+
+merged_schools06[, .(per_lunch_subsidy = per_lunch_subsidy, z_ela_score = z_ela_score, z_math_score = z_math_score)] %>% 
+  ggplot() + 
+  geom_point(mapping = aes(per_lunch_subsidy, z_ela_score), color = "red") + 
+  geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color = "blue") + 
+  geom_smooth(mapping = aes(per_lunch_subsidy, z_ela_score), color = "red", method = "lm")
 ```
 
 
