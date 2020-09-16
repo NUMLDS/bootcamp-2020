@@ -1,5 +1,5 @@
 ---
-title: "Exercises Day 2"
+title: "Exercises Day 4"
 author: "Allen Xu"
 date: "`r Sys.Date()`"
 output: html_document
@@ -50,6 +50,13 @@ if(x > 0){
 
 ```{r}
 year<-2002
+if(any(gapminder$year == year)){
+   print(paste("Record(s) for the year",year,"found."))
+} else {
+  print(paste("No records for year",year))
+}
+
+year<-2012
 if(any(gapminder$year == year)){
    print(paste("Record(s) for the year",year,"found."))
 } else {

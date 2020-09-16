@@ -1,0 +1,152 @@
+---
+title: "Final Exercise Report"
+author: "Allen Xu"
+date: "9/16/2020"
+output: rmdformats::readthedown
+---
+
+## Analysis on how economic level determines the performance of middle school students
+
+<br><br>
+*In this report, I conduct data analysis on testing performance of middle school students in New York and its connection with each county's economic index*
+<br><br>
+*A disclaimer of this report is that New York state scale the testing performance of each grade differently every year. Our result here only represent the relative performance of each school within that academic year.*
+<br><br>
+*If anyone wants to conduct a more exhaustive research on comparing the time serie testing performance. You can check out their links at http://www.p12.nysed.gov/irs/ela-math/*
+<br><br>
+
+## session I. data import & cleaning
+<br><br>
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+
+acs = read_csv("data/nys_acs.csv") %>%
+  clean_names()
+
+school = read_csv("data/nys_schools.csv") %>%
+  clean_names()
+
+#str(acs)
+#str(school)
+
+sum(is.na(acs))
+sum(is.na(school))
+```
+
+<br><br>
+*By looking at the data, we can see that there are na values in school dataset. Besides that, there are also lots of -99 which appearently does not pass the sanity check.* 
+<br><br>
+*So my next step is to conduct a cleaning that removes values that are appearently mannual error*
+<br><br>
+```{r message=FALSE, warning=FALSE}
+school$district_name[school$district_name == -99] <- NA
+school$per_free_lunch[school$per_free_lunch > 1 | school$per_free_lunch < 0] <- NA
+school$per_lep[school$per_lep > 1 | school$per_lep < 0] <- NA
+school$per_reduced_lunch[school$per_reduced_lunch > 1 | school$per_reduced_lunch < 0] <- NA
+school$mean_ela_score[school$mean_ela_score < 100 | school$mean_ela_score > 800] <- NA
+school$mean_math_score[school$mean_math_score < 100 | school$mean_math_score > 800] <- NA
+
+school2 <- na.omit(school)
+```
+<br><br>
+*The last step of my set up is to create a categorical variable that classifies the schools into poor, medium and rich divisions based on the proportion of students who are accepting subsidies.*
+<br><br>
+```{r}
+school2 <- school2 %>%
+  mutate(total = per_free_lunch + per_reduced_lunch) 
+
+quantile(school2$total, c(0.33,0.66))
+
+school2 <- school2 %>%
+  mutate(poverty = ifelse(total < 0.34, "Low", ifelse(total > 0.7, "High", "Medium"))) 
+
+school2 <- school2 %>%
+  group_by(year) %>%
+  mutate(scaled_math = scale(mean_math_score),
+         scaled_eng = scale(mean_ela_score)) 
+
+```
+
+# session II. data merging
+<br><br>
+*In this section, I aim to merge the data from school level to county level to see if there is a connection between the region and individual school's performance.*
+<br><br>
+```{r message=FALSE, warning=FALSE}
+school3 <- school2 %>%
+  left_join(acs, by = c("county_name", "year"))
+
+school3 <- school3[complete.cases(school3), ]
+
+county1 <- school3 %>%
+  group_by(county_name, year) %>%
+  summarise(total_attendence = sum(total_enroll),
+            total_freelunch = sum(total_enroll * per_free_lunch),
+           total_reducelunch = sum(total_enroll * per_reduced_lunch),
+             total_lep = sum(total_enroll * per_lep),
+            math = mean(scaled_math),
+            english = mean(scaled_eng),
+           income = mean(na.omit(median_household_income)),
+            bach = mean(na.omit(county_per_bach)),
+           county_poverty = mean(county_per_poverty))
+
+county1 <- county1 %>%
+  mutate(school_poverty = (total_freelunch + total_reducelunch)/total_attendence,
+                            education = math + english)
+
+```
+<br><br>
+*Next I extract the top examples of both rich and poor regions, comparing how their performance varies.*
+```{r message=FALSE}
+county1 %>%
+  group_by(county_name) %>%
+  summarise(poverty = mean(county_poverty),
+            school_qualification = mean(school_poverty),
+            math = mean(math),
+            english = mean(english)) %>%
+  arrange(desc(poverty)) %>%
+  head(5)
+
+
+county1 %>%
+  group_by(county_name) %>%
+  summarise(poverty = mean(county_poverty),
+            school_qualification = mean(school_poverty),
+            math = mean(math),
+            english = mean(english)) %>%
+  arrange(poverty) %>%
+  head(5)
+```
+
+
+# III. data visualization
+<br><br>
+*In this final section, I plot out the performance based on school level and county level to see how testing performance of the school varies based on economic level*
+
+```{r}
+plot1 <- school3 %>%
+  group_by(school_cd) %>%
+  summarise(per_lunch = mean(per_free_lunch) + mean(per_reduced_lunch),
+            english = mean(scaled_eng),
+            math = mean(scaled_math))
+
+plot1 <- pivot_longer(plot1, cols = c("english", "math"), names_to = "subject", values_to = "test_score")
+
+ggplot(plot1, aes(per_lunch, test_score, color = subject)) + geom_point(alpha = 0.35) + geom_smooth(se = FALSE)
+
+plot2 <- county1 %>%
+  group_by(county_name) %>%
+  summarise(county_poverty2 = mean(county_poverty),
+            english = mean(english),
+            math = mean(math))
+quantile(plot2$county_poverty2, c(0.33, 0.66))
+plot2$county_poverty2 <- ifelse(plot2$county_poverty2 < 0.11664, "Rich", ifelse(plot2$county_poverty2 > 0.1405, "Poor", "Medium"))
+plot2 <- pivot_longer(plot2, cols = c("english", "math"), names_to = "subject", values_to = "test_score")
+
+plot2$county_poverty2 <- as.factor(plot2$county_poverty2)
+levels(plot2$county_poverty2) <- c("Poor", "Medium", "Rich")
+
+ggplot(plot2, aes(county_poverty2, test_score, fill = subject)) + geom_boxplot()
+
+```
+
