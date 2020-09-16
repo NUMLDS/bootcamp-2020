@@ -1,12 +1,16 @@
 ---
-title: "UygarSozer_finalbootcampex"
+title: "A socioeconomic study of standardized test scores in New York State schools"
 author: "Uygar Sozer"
 date: "9/15/2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
 ```
 
 ```{r}
@@ -36,32 +40,46 @@ schools <- schools %>% mutate(across(.fns = naconvert))
 acs <- acs %>% mutate(across(.fns = naconvert))
 ```
 
-We will add a categorical variable poverty_level
+We will add a categorical variable poverty_level that categorizes counties based on median household income, with cutoffs 0.33 and 0.66 quantiles for low, medium, and high, respectively.
 ```{r}
+#Define the cutoffs for each category
 pov_cutoff = quantile(acs$median_household_income, c(0.33, 0.66))
+
 ##acs %>% filter(median_household_income < pov_cutoff[1]) %>% mutate(poverty_level = "high")
 ##acs %>% filter(median_household_income >= pov_cutoff[1] & median_household_income < pov_cutoff[2] ) %>% mutate(poverty_level = "medium")
 ##acs %>% filter(median_household_income >= pov_cutoff[2]) %>% mutate(poverty_level = "low")
 
-setDT(acs)
+#Assign each category
 acs[median_household_income < pov_cutoff[1], poverty_level := "high"]
 acs[median_household_income >= pov_cutoff[1] & median_household_income < pov_cutoff[2], poverty_level :="medium"]
 acs[median_household_income >= pov_cutoff[2], poverty_level := "low"]
 ```
 
+We will introduce scaled/normalized variables for mean reading and math scores per school, based on the population mean and SD each year.
+
 ```{r}
-setDT(schools)
+#Normalizes reading and math scores
 schools[, z_ela_score := scale(mean_ela_score), by=year]
 schools[, z_math_score := scale(mean_math_score), by=year]
 ```
 
+##Analysis for 2016
+
+For this section, we will be looking the most recent data from 2016.
+
 ```{r}
+#Merge data.tables, create a new data.table restricted to 2016
 merged_schools <- merge(schools, acs, all.x = TRUE)
 merged_schools06 <- merged_schools[year=="2016"]
 ```
 
+Data from NYS does not provide the exact number of students receiving lunch subsidy, but we have access to the percentages. Based on this, we can calculate the percentage of students on lunch subsidy in each county, weighted by student population per school.
+
 ```{r}
+#Add a new variable denoting appx. number of students that receive free or reduced-price lunch
 merged_schools06[, lunch_subsidy := (per_free_lunch + per_reduced_lunch)*total_enroll]
+
+#Return a summary table per county
 merged_schools06[,.(total_enrollment = sum(total_enroll, na.rm=T), per_lunch_subsidy = sum(lunch_subsidy, na.rm=T)/sum(total_enroll, na.rm=T), per_poverty = mean(county_per_poverty, na.rm=T)), by = county_name]
 ```
 ```{r}
@@ -77,11 +95,14 @@ merged_schools06[,.(total_enrollment = sum(total_enroll, na.rm=T), per_lunch_sub
 #   head(5) %>% 
 #   select(county_name)
 
-topcounties <- acs[year==2016][order(county_per_poverty)][1:5, county_name]
-bottomcounties <- acs[year==2016][order(-county_per_poverty)][1:5, county_name]
+
 ```
 
 ```{r}
+#Top counties - 
+topcounties <- acs[year==2016][order(county_per_poverty)][1:5, county_name]
+bottomcounties <- acs[year==2016][order(-county_per_poverty)][1:5, county_name]
+
 merged_schools06[county_name %in% topcounties,.(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
 
 merged_schools06[county_name %in% bottomcounties, .(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
@@ -90,11 +111,14 @@ merged_schools06[county_name %in% bottomcounties, .(per_poverty = mean(county_pe
 ```{r}
 merged_schools06[, per_lunch_subsidy := lunch_subsidy/total_enroll]
 
-merged_schools06[, .(per_lunch_subsidy = per_lunch_subsidy, z_ela_score = z_ela_score, z_math_score = z_math_score)] %>% 
-  ggplot() + 
-  geom_point(mapping = aes(per_lunch_subsidy, z_ela_score), color = "red") + 
-  geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color = "blue") + 
-  geom_smooth(mapping = aes(per_lunch_subsidy, z_ela_score), color = "red", method = "lm")
+subsidyplot <- merged_schools06[, .(per_lunch_subsidy = per_lunch_subsidy, z_ela_score = z_ela_score, z_math_score = z_math_score)] %>% ggplot() + theme_minimal()
+
+subsidyplot + geom_point(mapping = aes(per_lunch_subsidy, z_ela_score), color = "blue", size= 0.5) +   geom_smooth(mapping = aes(per_lunch_subsidy, z_ela_score), color = "black", method = "lm") + labs(title = "Effects of subsidized lunch to standardized test score in reading", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized reading test score", caption = "Source: New York State Department of Education")
+  
+subsidyplot + geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color = "red", size = 0.5) + geom_smooth(mapping = aes(per_lunch_subsidy, z_math_score), color = "black", method = "lm") + labs(title = "Effects of subsidized lunch to standardized test score in math", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized math test score", caption = "Source: New York State Department of Education")
 ```
 
+```{r}
+# merged_schools06[ ,.(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), acs[county_name == county_name, poverty_level, by=county_name]), by=.(county_name)]
+```
 
