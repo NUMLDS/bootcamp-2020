@@ -120,7 +120,44 @@ summary2
 # Task 6: Data Visualization
 1. The relationship between access to free/reduced price lunch and test performance, at the school level.
 ```{r}
-# Use the schools dataframe and 
+# Use the schools dataframe
+# Relationship between free price lunch and ela score
+ggplot(data = schools) +
+  geom_point(aes(x = per_free_lunch, y = z_score_ela)) +
+  labs(title = "Relationship between percentage of free lunch and ela score", x = "Percentage of free lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5))
+```
+
+```{r}
+# Relationship between free price lunch and math score
+ggplot(data = schools) +
+  geom_point(aes(x = per_free_lunch, y = z_score_math)) +
+  labs(title = "Relationship between percentage of free lunch and math score", x = "Percentage of free lunch", 
+       y = "z-score of math") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5))
+```
+
+```{r}
+# Relationship between reduced price lunch and ela score
+ggplot(data = schools) +
+  geom_point(aes(x = per_reduced_lunch, y = z_score_ela)) +
+  labs(title = "Relationship between percentage of reduced lunch and ela score", x = "Percentage of reduced lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5))
+```
+
+```{r}
+# Relationship between reduced price lunch and math score
+ggplot(data = schools) +
+  geom_point(aes(x = per_reduced_lunch, y = z_score_math)) +
+  labs(title = "Relationship between percentage of reduced lunch and math score", x = "Percentage of reduced lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5))
 ```
 
 2. Average test performance across counties with high, low, and medium poverty.
