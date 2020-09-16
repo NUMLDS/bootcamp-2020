@@ -1,0 +1,136 @@
+---
+title: "Day8Exercise"
+author: "Nicholas Nigro"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+# Exercise 8
+I know the markdown is messy, but I was trying to focus mostly on the code rather than the formatting. I will keep in mind formatting in future projects.
+
+## 1. Load data
+```{r load_data}
+schools <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_schools.csv"), stringsAsFactors=FALSE)
+counties <- read.csv(here::here("Northwestern_Work/R_Bootcamp/MSIA Bootcamp/data/nys_acs.csv"), stringsAsFactors=FALSE)
+```
+
+## 2. Exploring Data
+
+```{r explore}
+
+#quick look at the structure of each dataset
+head(schools)
+head(counties)
+
+#see the number of rows and columns we have total
+dim(schools)
+dim(counties)
+
+#see all column data types
+str(schools)
+str(counties)
+
+#see descriptive statistics
+summary(schools)
+summary(counties)
+```
+It appears all text columns are "chr", whereas all numerical columns are "num" or "int" which is what we want when looking at the column data types. It also appears there is some missing data since there are "-99" values in all of the numerical columns somewhere in the schools dataset when looking at summary statistics of the columns. -99 does not make sense as a percentage, math score, etc. so it must be being used as a missing value holder.
+
+It also seems there's a wide variety of sizes on enrolled students and mean math scores across the different schools. Percentage of students qualifying for free lunch is much higher across the board that students qualifying for reduced price lunch. County statistics vary widely as well.
+
+## 3. Recoding Data
+```{r recode}
+
+#remove rows with missing values
+schools = schools[schools$total_enroll != -99,]
+schools = schools[schools$mean_ela_score != -99,]
+schools = schools[schools$mean_math_score != -99,]
+summary(schools)
+
+#create data tables
+library(data.table)
+schools_dt <- data.table(schools)
+counties_dt <- data.table(counties)
+
+#create poverty group column using quartiles
+counties_dt[, poverty_level := ifelse(county_per_poverty <= .10903, "Low",
+                                ifelse(county_per_poverty <= .14929, "Medium",
+                                ifelse(county_per_poverty > .14929, "High", NA)))]
+  
+head(counties_dt)
+str(counties_dt)
+
+#Scale math and reading scores within each year for all schools
+schools_dt[, scaled_ela_score := scale(mean_ela_score), by=c("county_name", "year")]
+schools_dt[, scaled_math_score := scale(mean_math_score), by=c("county_name", "year")]
+```
+A categorical poverty variable was created for each country where the bottom quartile of counties in percent poverty were considered to have a "Low" poverty level, the middle two quartiles were considered "Medium", and the highest quartile considered "High" poverty counties.
+
+## 4. Merge Datasets
+
+```{r merge}
+#group schools at the county level and get a rough estimate of county aggregations
+group_schools <- schools_dt[, .(sum(total_enroll), median(per_free_lunch), median(per_reduced_lunch), median(per_lep), median(scaled_ela_score), median(scaled_math_score)), by = c("county_name", "year")]
+setnames(group_schools, c("county_name", "year", "total_enrolled", "median_per_free_lunch", "median_per_reduced_lunch", "median_per_lep", "median_ela_score", "median_math_score"))
+head(group_schools)
+
+#merge county and school information into one dataset
+merged_dt = group_schools[counties_dt, on = c("county_name", "year")]
+head(merged_dt)
+```
+## 5. Create Summary Tables
+```{r summary}
+#create a table that shows percentage of students qualifying for free/reduced lunch and poverty percentage per county in the most recent year, 2016
+county_summary2016 <- merged_dt[year == 2016,.(county_name, year, median_per_free_lunch+median_per_reduced_lunch,county_per_poverty)]
+setnames(county_summary2016, "V3", "per_free/reduced_lunch")
+head(county_summary2016)
+
+#counties with top and bottom 5 poverty rate
+county_pov_worst2016 <- merged_dt[year == 2016,.(county_name, year, median_per_free_lunch+median_per_reduced_lunch, county_per_poverty, median_ela_score, median_math_score)]
+setnames(county_pov_worst2016, "V3", "per_free/reduced_lunch")
+ordered_county <- county_pov_worst2016[order(county_per_poverty)]
+#lowest 5 county poverty levels
+head(ordered_county[1:5,])
+#highest 5 county poverty levels
+head(ordered_county[(nrow(ordered_county)-4):nrow(ordered_county),])
+```
+
+## 6. Data Visualization
+
+```{R visualization}
+library(ggplot2)
+
+#Free/reduced price lunch vs. test scores graphs
+ggplot(schools_dt[year=="2016"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_ela_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled ELA Score by NY Schools in 2016", x="Fraction of Students With Reduced Lunch Price", y="Normalized ELA Score")
+ggplot(schools_dt[year=="2016"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_math_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled Math Score by NY Schools in 2016", x="Fraction of Students With Reduced Lunch Price", y="Normalized Math Score")
+
+#test scores across counties by poverty level
+ggplot(merged_dt[year=="2016"]) + geom_boxplot(aes(poverty_level, median_ela_score)) + labs(title = "Poverty Level vs. Scaled ELA Score by NY Counties in 2016", x="Poverty Level of County", y="Normalized ELA Score")
+ggplot(merged_dt[year=="2016"]) + geom_boxplot(aes(poverty_level, median_math_score)) + labs(title = "Poverty Level vs. Scaled Math Score by NY Counties in 2016", x="Poverty Level of County", y="Normalized Math Score")
+
+#Free/reduced price lunch vs. test scores graphs
+ggplot(schools_dt[year=="2009"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_ela_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled ELA Score by NY Schools in 2009", x="Fraction of Students With Reduced Lunch Price", y="Normalized ELA Score")
+ggplot(schools_dt[year=="2009"]) + geom_point(aes(per_free_lunch+per_reduced_lunch, scaled_math_score)) + labs(title = "Students With Reduced/Free Lunch vs. Scaled Math Score by NY Schools in 2009", x="Fraction of Students With Reduced Lunch Price", y="Normalized Math Score")
+
+#test scores across counties by poverty level
+ggplot(merged_dt[year=="2009"]) + geom_boxplot(aes(poverty_level, median_ela_score)) + labs(title = "Poverty Level vs. Scaled ELA Score by NY Counties in 2009", x="Poverty Level of County", y="Normalized ELA Score")
+ggplot(merged_dt[year=="2009"]) + geom_boxplot(aes(poverty_level, median_math_score)) + labs(title = "Poverty Level vs. Scaled Math Score by NY Counties in 2009", x="Poverty Level of County", y="Normalized Math Score")
+```
+
+
+## 7. Final Questions
+1. What is the relationship between poverty and test performance in New York public schools?
+
+There appears to be a relationship between poverty and test performance in New York schools. Specifically, for math scores, the boxplots above shows a lower average score in both 2009 and 2016 for high poverty counties compared to low poverty counties. Medium poverty areas have math scores fall in the middle of the two, showing there is a negative correlation between county poverty level and math test scores. A similar trend can be seen for English-Language Arts (ELA) test scores in 2009. But, what is interesting is the test scores for ELA are similar across the board in 2016. High poverty areas have a wider range of outcomes and medium poverty areas may be slightly better than the other two groups, but it is worth more analysis to see why low poverty areas have similar ELA scores in this year. 
+
+2. Does access do reduced price lunch impact test scores in any way?
+The scatter plots above show the relationship between the fraction of students with reduced lunch prices vs. math and ELA test scores in both 2009 and 2016. All of these relationships show a negative correlation between access to reduced lunch prices and test scores no matter the year nor test subject. This does not mean that giving students access to cheap lunch makes them worse at test taking, but is more likely an indication of the poverty level at the respective schools with more students requiring free lunch in high poverty areas. This conclusion aligns with the findings from the first research question above. Further analysis should be done to isolate high poverty schools that have access to reduced price lunch and compare their test scores to high poverty schools without access to reduced price lunch to see if there is a difference between groups. This would be a better indicator of whether reducing lunch price improves test scores for children in poverty.
+
+
+3. Has this relationship between poverty and test scores changed over time?
+It appears this relationship has changed over time. Looking again at the boxplots, we can see both the median math and ELA test score in 2009 for high poverty counties was below average (below 0.0). In 2016, the median for both test scores has jumped to above average for high poverty areas, essentially getting closer to evening the playing field between schools in high and low poverty areas. This is a promising trend. The reasons for this could be related to greater access to free lunches, but further analysis would need to be completed to paint a clear picture of the trend over time as well as the drivers of increased test scores.
