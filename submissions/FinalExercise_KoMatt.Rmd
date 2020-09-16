@@ -1,0 +1,167 @@
+---
+title: "FinalRExercise_KoMatt"
+author: "Matt Ko"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Necessary Libraries and Data Sources
+
+```{r data}
+library(tidyverse) 
+library(data.table)
+data_file <- here::here("data", "nys_acs.csv")
+dt_acs <- fread(data_file)
+data_file2 <- here::here("data", "nys_schools.csv")
+dt_schools <- fread(data_file2)
+```
+
+## TASK 2: Explore the Datasets
+
+```{r}
+str(dt_schools)
+str(dt_acs)
+```
+```{r}
+dt_schools[!complete.cases(dt_schools)]
+```
+```{r}
+dt_acs[!complete.cases(dt_acs)]
+```
+
+No NA values in either dataset, but could be encoded to a value instead. 
+
+```{r}
+View(dt_schools)
+```
+
+```{r}
+View(dt_acs)
+```
+
+
+```{r}
+anyDuplicated(dt_schools)
+```
+```{r}
+dt_schools <- unique(dt_schools)
+```
+
+```{r}
+anyDuplicated(dt_acs)
+```
+
+-99 might be encoded as a missing variable in the schools dataset
+There are also no 1 duplicate row in dt_schools
+
+## TASK 3: Variable manipulation
+
+```{r}
+
+dt_schools[dt_schools==-99] <- NA
+View(dt_schools)
+
+```
+
+```{r}
+dt_schools[per_free_lunch>=0.50, poverty:='high']
+dt_schools[per_free_lunch<0.50, poverty:='medium']
+dt_schools[per_free_lunch<0.20, poverty:='low']
+```
+
+```{r}
+
+dt_schools[,zmath:=scale(mean_math_score),by=year]
+dt_schools[,zeng:=scale(mean_ela_score),by=year]
+```
+
+##TASK 4: Merge
+```{r}
+
+dt_merge <- merge.data.table(dt_schools,dt_acs)
+dt_merge
+```
+
+## TASK 5: Summary Tables
+
+```{r}
+dt_merge[,.(total_enrolled=sum(total_enroll), per_reduced_or_free = mean(per_reduced_lunch + per_free_lunch),poverty_in_county=mean(county_per_poverty)),
+         by = .(county_name,year)]
+```
+```{r}
+d_temp<-dt_merge[,.(total_enrolled=sum(total_enroll), per_reduced_or_free = mean(per_reduced_lunch +              per_free_lunch),poverty_in_county=mean(county_per_poverty),mean_math=mean(mean_math_score),
+            mean_ela=mean(mean_ela_score)),
+            by = .(county_name,year)]
+d_temp
+```
+```{r}
+
+d_sort <- data.table(d_temp,key='poverty_in_county')
+d_sort
+
+```
+```{r}
+d_sort1 <- d_sort[1:5,] 
+d_sort2 <- d_sort[492:496]
+d_sort1
+d_sort2
+```
+
+## TASK 6: Data Visualization
+
+```{r}
+
+dt_merge[,.(free_or_reduced=per_reduced_lunch+per_free_lunch,mean_test=mean_ela_score+mean_math_score)]%>%
+  ggplot(aes(free_or_reduced, mean_test)) +
+    geom_point(size = 0.3)+
+  xlim(0,1)
+
+```
+
+```{r}
+dt_plot2 <- dt_merge[,.(per_reduced_or_free = mean(per_reduced_lunch + per_free_lunch), avg_test = mean(mean_ela_score+mean_math_score)),
+         by = .(county_name,year)]
+dt_plot2[per_reduced_or_free>=0.48, poverty:='high']
+dt_plot2[per_reduced_or_free<0.48, poverty:='medium']
+dt_plot2[per_reduced_or_free<0.40, poverty:='low']
+
+dt_plot2 
+```
+```{r}
+na.omit(dt_plot2[,.(mean_test=avg_test),by=poverty])%>%
+  ggplot(aes(x=poverty, y=mean_test)) +
+    geom_bar(stat = 'identity')
+  
+```
+
+## TASK 7:
+
+What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+```{r}
+dt_merge[,per_reduced_or_free := (per_reduced_lunch + per_free_lunch)/2]
+dt_merge[,avg_test := (mean_ela_score+mean_math_score)/2]
+```
+
+```{r}
+cor(dt_merge[,avg_test],dt_merge[,per_reduced_or_free], use = 'pairwise.complete.obs')
+cor(dt_merge[,avg_test],dt_merge[,county_per_poverty], use = 'pairwise.complete.obs')
+
+```
+
+Generally, as average test score increases, the county poverty rate is lower since it has a negative correlation in both measures. 
+
+```{r}
+model <- lm(
+  avg_test ~ year + county_per_poverty + county_per_bach, data = dt_merge
+)
+print(model)
+
+
+```
+
+Controlling for year and education and looking at the coefficients of this linear model, we can see that as the poverty rate increases, the average test score decreases dramatically. With more time, I would like to one-hot encode the schools to control for their unique situation and isolate the changes. 
