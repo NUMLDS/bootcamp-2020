@@ -1,0 +1,213 @@
+---
+title: "MSIABootCampFinal"
+author: "Michael Faulkner"
+date: "9/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Day 8 Final Exercise
+
+#### Step 1: Importing Data
+
+```{r importing}
+
+#Decided to opt for dplyr over data.table 
+library(tidyverse)
+
+#Reads the two files into data frames
+schools = read_csv(here::here('data/nys_schools.csv'))
+counties = read_csv(here::here('data/nys_acs.csv'))
+
+```
+
+#### Step 2: Exploring Data
+
+```{r Exploring}
+#Looked at the summary for each set of data to see column names and the corresponding values for each.
+summary(schools)
+summary(counties)
+
+#Used to count the amount of missing values in each of the data frame's columns
+sum(is.na(schools$district_name))
+```
+
+The types of variables encountered in both data sets are of type num and chr.  
+
+Looking through the two data sets I can see that there is a possibility of joining them together. Either on county name or year, depending on what the data set looks like in the future. Also a lot of the columns have values of -99 which will need to be addressed before continuing. The schools data set also has some missing values in the column 'district name'. This was shown by counting the amount of 'NA' values present in the column. This could be due to some schools not being apart of a school district if they are a private/religious school.
+
+
+#### Step 3: Recoding and Variable Manipulation
+
+```{r Recoding}
+
+#When any column has a -99 it will be filtered out from the data set that we will be using.
+cleaned_schools = filter(schools, county_name != -99, total_enroll != -99,  per_free_lunch!= -99,     per_reduced_lunch != -99,     per_lep   != -99,       mean_ela_score!= -99,  mean_math_score!= -99)
+
+#Adding the percentage free lunch and percentage reduced lunch together to get the total percentage of students receiving a discounted lunch for later use
+cleaned_schools$total_lunch = cleaned_schools$per_free_lunch + cleaned_schools$per_reduced_lunch
+
+#In order to classify each of the counties by poverty I grouped the counties data set by county and found the mean poverty percentage in each. 
+poverty_rates = counties %>%
+                  group_by(county_name) %>%
+                  summarise(avg_pov = mean(county_per_poverty))
+
+
+poverty_rates = as.data.frame(poverty_rates)
+
+#Setting up column to contain the classification
+poverty_rates$poverty_class = ''
+
+#With the average poverty percentage I used quantiles to create cutoffs for each class. This way 25% of counties will be labeled as low, 50% as medium and 25% high. 
+low_cutoff = quantile(poverty_rates$avg_pov)[2] 
+high_cutoff = quantile(poverty_rates$avg_pov)[4]
+
+
+
+#Goes through each county and assigns it a classification based on the average percentage poverty.
+obs = 1:nrow(poverty_rates)
+for (i in obs){
+  if (poverty_rates[i,'avg_pov'] < low_cutoff ){
+    poverty_rates[i,'poverty_class'] = 'low'
+  } else if (poverty_rates[i,'avg_pov'] < high_cutoff ){
+    poverty_rates[i,'poverty_class'] = 'medium'
+  } else{
+    poverty_rates[i,'poverty_class'] = 'high'
+    }
+}
+
+#groups data by year and adds a column containing the z-scores for the math and ELA tests. 
+cleaned_schools = cleaned_schools %>%
+  group_by(year) %>%
+  mutate(z_ela = scale(mean_ela_score), z_math = scale(mean_math_score))
+
+
+
+```
+
+
+The first portion of this section deals with the -99's that are present in the data set. I decided to completely remove observations that contained a -99 for two reasons: the amount of data available and the multiple -99's in a single observation. After filtering there are 33,444 observations which I believe is sufficient to reach meaningful conclusions. Also when exploring the data I noticed that many of the observations with a -99 contained more -99's in other columns. With many values that are of no use, I made the decision to remove them rather than trying to assume what the data points could have been. Here is a small table to demonstrate the multiple 99's
+
+```{r, echo = FALSE}
+filter(schools, total_enroll == -99)[,5:12]
+```
+
+
+The second part was assigning clases to the counties based on poverty rate. I decided to group the counties data set by county and calculated the average poverty percentage for each. I then used the 25% and 75% quantile as my cutoffs for the low and high class. I felt this would give a good distribution because if we treat this study as a random sampling, most of the observations should lie towards the 50% mark. This leaves the more significantly different observations to be classed as either high or low. Finally, since the exams taken vary year to year the data was grouped by year and the z-scores for each school  were found for the math and ela tests. This was done to standardize the scores and allow comparison accross different years.  
+
+#### Step 4: Merging
+
+```{r Merging}
+#Merging the schools and counties data sets together by joining on county name and year
+all_data = left_join(cleaned_schools, counties, by = c('county_name' = 'county_name', 'year' = 'year'))
+#Merging the poverty rates data frame with the previously merged data set so the poverty classification is included. 
+all_data = left_join(all_data, poverty_rates, by = c('county_name' = 'county_name'))
+```
+
+Left joins were used to preserve the data where the county/district were missing. These data points can still be useful in the future when comparing lunch data with test scores. The second join is used to add the poverty classification onto each of the counties.
+
+
+
+#### Step 5: Tables
+
+```{r Tables}
+
+#Grouping by county and year to create a table that shows the total enrollment, the percentage of student receiving a discounted lunch and the percentage of the county in poverty. 
+all_data %>%
+  filter(year != 2008, year != 2017) %>%
+  group_by(county_name, year) %>%
+  summarise(total_count = sum(total_enroll), per_discount_lunch = mean(total_lunch), per_poverty = mean(county_per_poverty))
+
+#Calculating the average poverty rate by county over the 10 year period and then ordering them from lowest percentage of poverty to highest.
+county_df= counties %>%
+  group_by(county_name) %>%
+  summarise(avg_pov = mean(county_per_poverty)) %>%
+  as.data.frame()
+sorted_counties = county_df[order(county_df$avg_pov),]
+
+#Assigning the top 5 highest and lowest counties to be used to create the next tables.
+lowest_pov = head(sorted_counties$county_name,5)
+highest_pov = tail(sorted_counties$county_name, 5)
+
+#Data table for the highest poverty percentages
+all_data %>%
+  filter(county_name %in% highest_pov) %>%
+  group_by(county_name) %>%
+  summarise(avg_poverty = mean(county_per_poverty, na.rm = TRUE), per_lunch_reduction = mean(total_lunch), mean_reading = mean(z_ela), mean_math = mean(z_math))
+  
+#Data table for the lowest poverty percentages
+
+all_data %>%
+  filter(county_name %in% lowest_pov) %>%
+  group_by(county_name) %>%
+  summarise(avg_poverty = mean(county_per_poverty, na.rm = TRUE), per_lunch_reduction = mean(total_lunch), mean_reading = mean(z_ela), mean_math = mean(z_math))
+
+```
+
+First, a table was made for total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty by county. Years 2008 and 2017 were excluded because there is no poverty data available for those years. A new data frame was created and sorted in order to find the counties with the highest and lowest poverty rates. An average was taken across the 8 year range in order to determine the ranking. Finally two tables were created, both displaying the percentage poverty for that county, percentage of students receiving a lunch price reduction and their test scores. The first table contains values for the highest poverty rates, and the second table contains values for the lowest poverty rates. 
+
+#### Step 6: Graphs
+
+```{r Graphs, echo = FALSE}
+
+#Creates a scatter plot with the x-axis being the percentage of students receiving a discounted lunch and the y-axis being the average test score for math and ELA
+all_data %>%
+  group_by(school_name) %>%
+  transmute(avg_lunch = mean(total_lunch), avg_test_score = mean(z_math + z_ela)) %>%
+  ggplot() +
+  geom_point(aes(x = avg_lunch, y = avg_test_score)) +
+  labs(title = 'Relationship between percentage of students receiving a discounted lunch vs test score by school', x = 'The percentage of students receiving a discounted/free lunch', y = 'Average of combined test scores') + theme_classic()
+
+#Creates a boxplot to show the difference in test score across the different classifications of poverty
+all_data %>%
+  group_by(county_name) %>%
+  transmute(avg_test_score = mean(z_math + z_ela), poverty_class = poverty_class) %>%
+  ggplot() +
+  geom_boxplot(aes(x = reorder(poverty_class,avg_test_score), y = avg_test_score, fill = poverty_class)) +
+  theme_classic() +
+  labs(title = 'Relationship between Average Test Scores and Class of Poverty',subtitle = 'Data reported at county level', x = 'Class of Poverty', y = 'Average Test Scores')
+  
+```
+
+The first graph shows the relationship between the percentage of students receiving a discounted lunch versus the average test scores at that school. As we can see from the graph there is a slight negative correlation between the two variables. As the percentage of students receiving a discounted lunch goes up, the average test scores drop. The second graph is a boxplot that shows the relationship between the poverty class we assigned earlier and the average test scores. I chose a boxplot because it is very easy to tell the relationship between the two variables from it. The less amount of poverty present in a county, the higher the test scores are. I'll point out possible explanations in the next section. 
+
+#### Step 7: Answering Questions
+
+```{r Finishing Up}
+#Creates a scatterplot that is color coded by year. The plot attempts to identify any massive differences in discounted lunches and test score across the sample years. 
+all_data %>%
+  group_by(county_name, year) %>%
+  transmute(avg_test_score = mean(z_math + z_ela), avg_poverty = mean(county_per_poverty), year = year) %>%
+  ggplot(aes(x = avg_poverty, y = avg_test_score, col = year)) +
+  geom_point() +
+  labs(title = 'Relationship between Reduced Lunch and Test Scores by Year', x = 'The percentage of kids receiving a discounted lunch', y = 'Average of combined test scores') 
+
+#Separates out the above data so each year has its own graph as the above one is very cluttered. 
+all_data %>%
+  filter(year != 2008, year != 2017) %>%
+  group_by(county_name, year) %>%
+  transmute(avg_test_score = mean(z_math + z_ela), avg_poverty = mean(county_per_poverty), year = year) %>%
+  ggplot(aes(x = avg_poverty, y = avg_test_score)) +
+  geom_point() +
+  facet_wrap(~year)+
+  theme_bw() + 
+  labs(title = 'Relationship between Reduced Lunch and Test Scores by Year', x = 'The percentage of students receiving a discounted lunch', y = 'Average of combined test scores') 
+
+```
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+Looking at the box plot that was made in the earlier section the relationship between poverty and test performance is pretty noticeable, especially between the high poverty and low poverty groups. There is an inverse correlation between poverty rate and test performance. As the poverty rate increases, the test performance of students decreases. For the second question, the two plots made in section 7 help show how the relationship changes over time. Looking at the scatterplot with students receiving discounted lunches against test scores that is colored by year. There is no apparent change in test performance against discounted lunch, but let's look at all the years separately. Seeing the faceted version of the graph we can see that the variance in test scores is increasing as the data points are more spread out. However, it does not seem like having access to a free/reduced price lunch has a significant impact because the percentage of students receiving this discount remains roughly the same, but test scores are becoming more spread out. One of the possible explanations for the trends we see in this data are that student who are in a lower poverty class have to spend more time helping out the family. That could be anything from working around the house to having a part time job after school. This results in students having less time to study which would lead to lower test scores.
+
+
+
+
+
+
+
+
+
+
