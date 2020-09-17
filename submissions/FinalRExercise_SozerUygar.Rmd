@@ -42,6 +42,7 @@ acs <- acs %>% mutate(across(.fns = naconvert))
 ```
 
 We will add a categorical variable poverty_level that categorizes counties based on median household income, with cutoffs 0.33 and 0.66 quantiles for low, medium, and high, respectively.
+
 ```{r}
 #Define the cutoffs for each category
 pov_cutoff = quantile(acs$median_household_income, c(0.33, 0.66))
@@ -143,11 +144,16 @@ ggplot(povtable) +
 
 ## Discussion
 
+The following graphs represent a time-series comparison of mean reading and math scores (normalized for each year), segregated into socioeconomic class.
+
 ```{r}
+#Construct a new data.table containing mean reading and math scores of schools, first grouped by county and year, then grouped by poverty level and year
 yeartable <- merged_schools[county_name != "NA" & poverty_level != "NA", .(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), poverty_level = unique(poverty_level)), by = .(county_name, year)][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=.(poverty_level, year)]
 
+#Reshape table to be taller (This analysis and the one below strongly resemble the one above. A better practice would definitely be to create a function that will do this for me)
 yeartable <- melt(yeartable, id.vars = c("poverty_level", "year") , variable.name = "test_type", value.name = "score")
 
+#Line graph that shows evolution of math scores over years for each poverty level
 yeartable[test_type == "math_score"] %>% 
 ggplot() + 
   geom_line(mapping = aes(x=year, y=score, group=poverty_level, col=poverty_level)) +
@@ -155,7 +161,8 @@ ggplot() +
   theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
   scale_color_discrete(name = "Poverty level") +
   labs(title = "Mean math scores for socioeconomic classes", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
-  
+
+#Very similar graph to one above, for reading scores
 yeartable[test_type == "reading_score"] %>% 
 ggplot() + geom_line(mapping = aes(x=year, y=score, group=poverty_level, col=poverty_level)) +
   theme_minimal() +
@@ -163,7 +170,50 @@ ggplot() + geom_line(mapping = aes(x=year, y=score, group=poverty_level, col=pov
   scale_color_discrete(name = "Poverty level") +
   labs(title = "Mean reading scores for socioeconomic classes", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
 ```
+As shown, poverty level is negatively correlated with mean math and reading scores for each and every year analyzed: schools situated in socioeconomically higher counties get significantly higher scores in tests.
+
+We will do a similar analysis for the percentage of students receiving free or reduced-price lunch, and divide schools up by levels of density.
+
 ```{r}
+#Add a new variable that shows percentage of students receiving free or reduced price lunch
+merged_schools[, per_lunch_subsidy := (per_free_lunch + per_reduced_lunch)]
 
+#Define cutoffs for student population that receive federally assisted lunch, from low density to high
+lunch_cutoff = quantile(merged_schools$per_lunch_subsidy, c(0.33, 0.66), na.rm=T)
+
+#Apply cutoffs to a new variable
+merged_schools[per_lunch_subsidy < lunch_cutoff[1], subsidy_level := "low"]
+merged_schools[per_lunch_subsidy >= lunch_cutoff[1] & per_lunch_subsidy < lunch_cutoff[2], subsidy_level :="medium"]
+merged_schools[per_lunch_subsidy >= lunch_cutoff[2], subsidy_level := "high"]
+
+#Change variable to a factor
+merged_schools[, subsidy_level := factor(subsidy_level, levels = c("low", "medium", "high"))]
+
+#Create a new data.table containing mean test scores, grouped by first year and county, then year and subsidy level
+lunchtable <- merged_schools[county_name != "NA" & subsidy_level != "NA", .(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), subsidy_level = unique(subsidy_level)), by = .(county_name, year)][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=.(subsidy_level, year)]
+
+#Reshape table
+lunchtable <- melt(lunchtable, id.vars = c("subsidy_level", "year") , variable.name = "test_type", value.name = "score")
+
+#Line graph for reading scores
+lunchtable[test_type == "reading_score"] %>% 
+ggplot() + 
+  geom_line(mapping = aes(x=year, y=score, group=subsidy_level, col=subsidy_level)) +
+  theme_minimal() +
+  theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
+  scale_color_discrete(name = "Subsidy level") +
+  labs(title = "Mean reading scores for schools, by density of federally-assisted lunch availability", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
+
+#Line graph for math scores
+lunchtable[test_type == "math_score"] %>% 
+ggplot() + 
+  geom_line(mapping = aes(x=year, y=score, group=subsidy_level, col=subsidy_level)) +
+  theme_minimal() +
+  theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
+  scale_color_discrete(name = "Subsidy level") +
+  labs(title = "Mean math scores for schools, by density of federally-assisted lunch availability", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
 ```
+These graphs do not reveal much - since lunch subsidy is correlated with poverty level, it is not surprising to see low subsidy -- low poverty -- higher test scores.
+Also we can see that the normalized score does not add up to 0 for each year, probably due to gaps in score reporting.
 
+Further study of this subject may include a further statistical analysis that looks at how lunch subsidy affects test scores, **controlled for** level of poverty. This analysis could be approximated by only looking within each poverty level and compare percent of students on subsidized lunch, but that doesn't account for variations of income within poverty levels.
