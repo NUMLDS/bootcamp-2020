@@ -28,12 +28,13 @@ schools <- fread("../data/nys_schools.csv")
 
 ## Exploring the data
 acs dataset contains no missing variables.
-schools dataset does contain missing variables, coded in various ways. ("NA", "-99", "N/A" etc.)
+schools dataset does contain missing variables, coded in various ways. We will apply cleaning function to both datasets.
 
 ```{r}
 #Converts all -99 values to NA, input: vector, output: vector with NA
 naconvert <- function(x) {
   x = na_if(x, -99)
+  x = na_if(x, "")
 }
 #Mutate datasets with respect to -99 values
 schools <- schools %>% mutate(across(.fns = naconvert))
@@ -63,13 +64,18 @@ schools[, z_ela_score := scale(mean_ela_score), by=year]
 schools[, z_math_score := scale(mean_math_score), by=year]
 ```
 
-##Analysis for 2016
+## Analysis for 2016
 
 For this section, we will be looking the most recent data from 2016.
 
 ```{r}
 #Merge data.tables, create a new data.table restricted to 2016
 merged_schools <- merge(schools, acs, all.x = TRUE)
+
+#Adjust poverty_level variable to be a factor (instead of character)
+merged_schools[,poverty_level := factor(poverty_level, levels = c("low", "medium", "high"))]
+
+#New data.table restricted to 2016
 merged_schools06 <- merged_schools[year=="2016"]
 ```
 
@@ -82,46 +88,82 @@ merged_schools06[, lunch_subsidy := (per_free_lunch + per_reduced_lunch)*total_e
 #Return a summary table per county
 merged_schools06[,.(total_enrollment = sum(total_enroll, na.rm=T), per_lunch_subsidy = sum(lunch_subsidy, na.rm=T)/sum(total_enroll, na.rm=T), per_poverty = mean(county_per_poverty, na.rm=T)), by = county_name]
 ```
-```{r}
-# topcounties <- acs %>% 
-#   filter(year==2016) %>% 
-#   arrange(county_per_poverty) %>% 
-#   head(5) %>% 
-#   select(county_name)
-# 
-# bottomcounties <- acs %>% 
-#   filter(year==2016) %>% 
-#   arrange(-county_per_poverty) %>% 
-#   head(5) %>% 
-#   select(county_name)
 
-
-```
+When we look at the highest and lowest-earning counties in NYS by percentage of population under poverty line, we observe that most test scores for high-earning counties were above state average in both math and reading; the opposite is true for the low-earning counties.
 
 ```{r}
-#Top counties - 
+#Define top 5 and bottom 5 counties ordered by percent poverty
 topcounties <- acs[year==2016][order(county_per_poverty)][1:5, county_name]
 bottomcounties <- acs[year==2016][order(-county_per_poverty)][1:5, county_name]
 
+#Return two table percent poverty, mean math and reading scores, grouped by county
 merged_schools06[county_name %in% topcounties,.(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
 
 merged_schools06[county_name %in% bottomcounties, .(per_poverty = mean(county_per_poverty), per_lunch_subsidy = sum(lunch_subsidy)/sum(total_enroll), mean_ela = mean(z_ela_score, na.rm=T), mean_math = mean(z_math_score, na.rm=T)),by=county_name]
 ```
+## Visualizing test performance
+
+We can look at how test performance is correlated with federally-assisted school lunch and socioeconomic class. (high, medium, low poverty levels)
 
 ```{r}
+#Add variable for the percentage of students that receive subsidized lunch 
 merged_schools06[, per_lunch_subsidy := lunch_subsidy/total_enroll]
 
+#Initialize graph comparing test scores and percentage of students on lunch subsidy
 subsidyplot <- merged_schools06[, .(per_lunch_subsidy = per_lunch_subsidy, z_ela_score = z_ela_score, z_math_score = z_math_score)] %>% ggplot() + theme_minimal()
 
-subsidyplot + geom_point(mapping = aes(per_lunch_subsidy, z_ela_score), color = "blue", size= 0.5) +   geom_smooth(mapping = aes(per_lunch_subsidy, z_ela_score), color = "black", method = "lm") + labs(title = "Effects of subsidized lunch to standardized test score in reading", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized reading test score", caption = "Source: New York State Department of Education")
-  
-subsidyplot + geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color = "red", size = 0.5) + geom_smooth(mapping = aes(per_lunch_subsidy, z_math_score), color = "black", method = "lm") + labs(title = "Effects of subsidized lunch to standardized test score in math", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized math test score", caption = "Source: New York State Department of Education")
+#Scatterplot for reading scores
+subsidyplot + 
+  geom_point(mapping = aes(per_lunch_subsidy, z_ela_score), color = "blue", size= 0.5) + 
+  geom_smooth(mapping = aes(per_lunch_subsidy, z_ela_score), color = "black", method = "lm") + 
+  labs(title = "Effects of subsidized lunch to standardized test score in reading", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized reading test score", caption = "Source: New York State Department of Education")
+
+#Scatterplot for math scores
+subsidyplot + 
+  geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color = "red", size = 0.5) + 
+  geom_smooth(mapping = aes(per_lunch_subsidy, z_math_score), color = "black", method = "lm") + labs(title = "Effects of subsidized lunch to standardized test score in math", subtitle = "Mean scores per school in 2016", x="Percentage of students receiving free or reduced price lunch", y="Normalized math test score", caption = "Source: New York State Department of Education")
 ```
 
-```{r}
-newtable <- merged_schools06[ ,.(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), poverty_level = unique(poverty_level)), by=county_name][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=poverty_level]
+Now we compare mean test scores in each poverty level.
 
-newtable <- melt(newtable, id_vars = poverty_level, variable.name = "test_type", value.name = "score")
-ggplot(newtable) + geom_col(mapping=aes(x=poverty_level, y=score, group=test_type, fill=test_type), position = "dodge")
+```{r}
+#Create a new data.table that first groups the 2016 dataset by county, and then by poverty level. DT contains mean test scores
+povtable <- merged_schools06[ ,.(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), poverty_level = unique(poverty_level)), by=county_name][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=poverty_level]
+
+#Reshape table to be taller
+povtable <- melt(povtable, id_vars = poverty_level, variable.name = "test_type", value.name = "score")
+
+#Create a side-by-side bar chart for poverty level vs. test scores
+ggplot(povtable) + 
+  geom_col(mapping=aes(x=poverty_level, y=score, group=test_type, fill=test_type), position = "dodge") +
+  theme_minimal() + theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
+  scale_fill_discrete(name="Standardized test", labels = c("Reading", "Math")) + 
+  labs(title = "Mean test scores for socioeconomic classes", subtitle = "New York State, 2016", x = "Poverty level", y="Normalized score", caption = "Source: NYS Department of Education")
+```
+
+## Discussion
+
+```{r}
+yeartable <- merged_schools[county_name != "NA" & poverty_level != "NA", .(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), poverty_level = unique(poverty_level)), by = .(county_name, year)][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=.(poverty_level, year)]
+
+yeartable <- melt(yeartable, id.vars = c("poverty_level", "year") , variable.name = "test_type", value.name = "score")
+
+yeartable[test_type == "math_score"] %>% 
+ggplot() + 
+  geom_line(mapping = aes(x=year, y=score, group=poverty_level, col=poverty_level)) +
+  theme_minimal() +
+  theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
+  scale_color_discrete(name = "Poverty level") +
+  labs(title = "Mean math scores for socioeconomic classes", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
+  
+yeartable[test_type == "reading_score"] %>% 
+ggplot() + geom_line(mapping = aes(x=year, y=score, group=poverty_level, col=poverty_level)) +
+  theme_minimal() +
+  theme(axis.line.y.left = element_line()) + geom_hline(yintercept = 0) +
+  scale_color_discrete(name = "Poverty level") +
+  labs(title = "Mean reading scores for socioeconomic classes", subtitle = "New York State, 2009-2016", x = "Year", y = "Normalized score", caption = "Source: NYS Department of Education")
+```
+```{r}
+
 ```
 
