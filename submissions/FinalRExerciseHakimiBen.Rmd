@@ -1,0 +1,245 @@
+---
+title: "Final Exercise"
+author: "Ben Hakimi"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Please make sure that you have downloaded both tidyverse and data.table
+Both will be needed in this project and are loaded in here
+```{r library}
+library(tidyverse)
+library(data.table)
+```
+
+Import New York Data Sets and save them for use in the project
+```{r import data}
+data_file1 <- here::here("data", "nys_schools.csv")
+data_file2 <- here::here("data", "nys_acs.csv")
+
+nys_schoolsdt <- fread(data_file1)
+
+nys_acsdt <- fread(data_file2)
+
+```
+
+
+There are some missing values in the data which are currently coded in as 
+"-99"
+This will show us how many missing values are in each of our two data tables
+``` {r null count}
+
+sum(nys_schoolsdt == -99)
+
+sum(nys_acsdt == -99)
+
+```
+
+Now that we know how we have missing values, we will remove the observations that have any missing values
+```{r remove null}
+
+nys_schoolsdt <- nys_schoolsdt[school_cd != -99 & 
+                                school_name != -99 &
+                                district_name != -99 &
+                                county_name != -99 &
+                                region != -99 &
+                                year != -99 &
+                                total_enroll != -99 &
+                                per_free_lunch != -99 &
+                                per_reduced_lunch != -99 &
+                                per_lep != -99 &
+                                mean_ela_score != -99 &
+                                mean_math_score!= -99]
+
+```
+
+The variable "per_free_lunch" is a proportion and should only have values between 0 and 1.
+Looking through the data however, I saw that there were some values greater than 1 for this variable 
+so this command removes all observations with an "invalid" proportion for free lunch
+```{r remove invalid}
+nys_schoolsdt <- nys_schoolsdt[per_free_lunch <= 1]
+```
+
+This command splits the schools into 3 different poverty levels based on proportion
+of students whi recieve a free lunch. by splitting the groups into
+
+High: 55% - 100%
+Med: 25% - 55%
+Low: 0% - 25%
+
+I found that it gives 3 fairly evenly sized groups that still sum up the data well
+```{r new poverty variable}
+
+nys_schoolsdt[per_free_lunch <= 1 & per_free_lunch >.55, pov_level := "high"]
+nys_schoolsdt[per_free_lunch <= .55 & per_free_lunch >.25, pov_level := "med"]
+nys_schoolsdt[per_free_lunch <= .25 & per_free_lunch >=0, pov_level := "low"]
+
+```
+
+Because the standardized tests vary year to year, this command breaks down the test scores into
+standardized z-scores for each year of the data
+``` {r create z score}
+nys_schoolsdt[year == 2008, ela_z := (scale(nys_schoolsdt[year == 2008, mean_ela_score]))]
+nys_schoolsdt[year == 2008, math_z := (scale(nys_schoolsdt[year == 2008, mean_math_score]))]
+
+nys_schoolsdt[year == 2009, ela_z := (scale(nys_schoolsdt[year == 2009, mean_ela_score]))]
+nys_schoolsdt[year == 2009, math_z := (scale(nys_schoolsdt[year == 2009, mean_math_score]))]
+
+nys_schoolsdt[year == 2010, ela_z := (scale(nys_schoolsdt[year == 2010, mean_ela_score]))]
+nys_schoolsdt[year == 2010, math_z := (scale(nys_schoolsdt[year == 2010, mean_math_score]))]
+
+nys_schoolsdt[year == 2011, ela_z := (scale(nys_schoolsdt[year == 2011, mean_ela_score]))]
+nys_schoolsdt[year == 2011, math_z := (scale(nys_schoolsdt[year == 2011, mean_math_score]))]
+
+nys_schoolsdt[year == 2012, ela_z := (scale(nys_schoolsdt[year == 2012, mean_ela_score]))]
+nys_schoolsdt[year == 2012, math_z := (scale(nys_schoolsdt[year == 2012, mean_math_score]))]
+
+nys_schoolsdt[year == 2013, ela_z := (scale(nys_schoolsdt[year == 2013, mean_ela_score]))]
+nys_schoolsdt[year == 2013, math_z := (scale(nys_schoolsdt[year == 2013, mean_math_score]))]
+
+nys_schoolsdt[year == 2014, ela_z := (scale(nys_schoolsdt[year == 2014, mean_ela_score]))]
+nys_schoolsdt[year == 2014, math_z := (scale(nys_schoolsdt[year == 2014, mean_math_score]))]
+
+nys_schoolsdt[year == 2015, ela_z := (scale(nys_schoolsdt[year == 2015, mean_ela_score]))]
+nys_schoolsdt[year == 2015, math_z := (scale(nys_schoolsdt[year == 2015, mean_math_score]))]
+
+nys_schoolsdt[year == 2016, ela_z := (scale(nys_schoolsdt[year == 2016, mean_ela_score]))]
+nys_schoolsdt[year == 2016, math_z := (scale(nys_schoolsdt[year == 2016, mean_math_score]))]
+
+nys_schoolsdt[year == 2017, ela_z := (scale(nys_schoolsdt[year == 2017, mean_ela_score]))]
+nys_schoolsdt[year == 2017, math_z := (scale(nys_schoolsdt[year == 2017, mean_math_score]))]
+```
+
+This merges the two data sets to get statistics per school and counties as a whole
+```{r merge data}
+county_data <- merge(nys_schoolsdt, nys_acsdt, by = c("county_name", "year"))
+```
+
+This command gives shows the total student enrollment, proportion of students recieveing
+reduced/free lunch and the poverrty rate for each county over the time of the data
+```{r county summary}
+
+counties <- matrix(c(unique(county_data$county_name)))
+
+for (i in counties){
+countysummary <- county_data[county_name == i, .(enrollment = sum(total_enroll), 
+                                      qualify = sum((per_free_lunch * total_enroll) +                                       (per_reduced_lunch * total_enroll)),                                                 percent_poverty = mean(county_per_poverty))]
+  print(paste0("County: ", i))
+  print(paste0("Total Enrollment   Qualifiers          Poverty Rate"))
+  print(paste0(countysummary))
+}    
+```
+
+This command singles out the poverty levels in 2016 for each county so we can use
+it to break down the top and bottom five counties in terms of poverty levels
+```{r sort poverty levels}
+lowpovsort <- matrix(c(sort(nys_acsdt[year == 2016, county_per_poverty])))
+highpovsort <- matrix(c(sort(nys_acsdt[year == 2016, county_per_poverty], decreasing = TRUE)))
+```
+
+This command singles out the top 5 and bottom 5 values of poverty rate in 2016
+```{r get top and bottom 5 values}
+lowsort5 <- matrix(c(lowpovsort[1:5,]))
+highsort5 <- matrix(c(highpovsort[1:5,]))
+```
+
+This command pulls out the county names for the poverty levels obtained in the previous command.
+This will allow us to pull out all necessary data for selected county
+```{r get 5 names}
+lowsortnames <- matrix(c(nys_acsdt[county_per_poverty %in% lowsort5, county_name]))
+highsortnames <- matrix(c(nys_acsdt[county_per_poverty %in% highsort5, county_name]))
+```
+
+This command creates tables showing the Percent in Poverty, Proportion of county students 
+that qualify for free/reduced price lunch, and average test scores across each county in 2016
+for the top 5 and bottom five counties in terms of poverty percentage
+```{r create top and bottom 5 tables}
+
+low5data <- county_data[county_name %in% lowsortnames & year == 2016, .(Percent_in_Poverty = mean(county_per_poverty), Qualify = mean(per_free_lunch + per_reduced_lunch), Math_Score = mean(mean_math_score), ELA_Score = mean(mean_ela_score)), by = .(County = county_name)]
+
+high5data <- county_data[county_name %in% highsortnames & year == 2016, .(Percent_in_Poverty = mean(county_per_poverty), Qualify = mean(per_free_lunch + per_reduced_lunch), Math_Score = mean(mean_math_score), ELA_Score = mean(mean_ela_score)), by = .(County = county_name)]
+
+```
+
+This command prints the tables we just created
+```{r print tables}
+
+low5data
+
+high5data
+
+```
+
+This creates a scatterplot, with a point for each school, showing the relationship between 
+reduced/free luch qualification rate and math test scores in 2017.
+
+It shows that there is a clear negative relationship between the two meaning as 
+qualification rate goes up, test scores apear to be lower.
+
+Because higher qualification rate is associated with a higher poverty percentage this gives insight into 
+test scores in lower income schools
+```{r scores v lunch scatterplot}
+
+nys_schoolsdt[year == 2017, .(qualify = per_free_lunch + per_reduced_lunch, score = mean_math_score)] %>% 
+ggplot() + 
+geom_point(mapping = aes(x=qualify, y = score)) +
+labs(title = "Free/Reduced Lunch Qualification vs. Math Test Scores",
+     subtitle = "In the year 2017",
+     x = "Qualification Rate",
+     y = "Test Score")
+
+```
+
+This again splits up poverty levels into 3 categories this time using the 
+county percentage in poverty rate instead of school lunch data
+```{r create level data}
+
+county_data[county_per_poverty <= .3 & county_per_poverty >.16, pov_level2 := "high"]
+county_data[county_per_poverty <= .16 & county_per_poverty >.12, pov_level2 := "med"]
+county_data[county_per_poverty <= .12 & county_per_poverty >=0, pov_level2 := "low"]
+
+```
+
+This creates a boxplot for county test score split up into the high, medium, 
+and low catergories we just created
+```{r create boxplots}
+
+unique(county_data[year == 2016, .(score = mean(mean_math_score), level = pov_level2), by = .(county = county_name)]) %>% 
+ggplot() +
+geom_boxplot(aes(x=level, y=score)) + 
+labs(title = "Math Test Scores by Poverty Level",
+     subtitle = "In the year 2016",
+     x = "Poverty Level",
+     y = "Test Score")
+
+```
+
+This creates a linear regression showing the rlationship between mean math test scores
+and total enrolment in schools + county poverty level
+
+This allows us to asses the impact on larger school size as well as poverty on test scores
+```{r create regression}
+mod = lm(mean_math_score ~ total_enroll + county_per_poverty, data = county_data)
+summary(mod)
+```
+
+This creates a scaterplot, with a point for each county, showing the relationship between 
+reduced/free luch qualification rate and math test scores in 2017
+
+The data is the color coated to split the points up between high, medium, and low poverty levels
+```{r county pov level scatterplot}
+
+nys_schoolsdt[year == 2017, .(qualify = mean(per_free_lunch + per_reduced_lunch), score = mean(mean_math_score), Poverty_Level = pov_level), by = county_name] %>% 
+ggplot() + 
+geom_point(mapping = aes(x=qualify, y = score, col = Poverty_Level)) +
+labs(title = "Free/Reduced Lunch Qualification vs. Math Test Scores",
+     subtitle = "By County / In the year 2017",
+     x = "Qualification Rate",
+     y = "Test Score")
+
+```
+
+
