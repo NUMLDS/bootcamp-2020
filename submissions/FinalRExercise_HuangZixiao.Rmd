@@ -1,0 +1,211 @@
+---
+title: "FinalRExercise_HuangZixiao.Rmd"
+author: "Zixiao Huang"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(tidyverse) 
+library(data.table)
+```
+
+# Task 1: Import your data (nys_schools.csv and nys_acs.csv)
+```{r}
+# Read the data of schools
+schools <- read.csv(here::here("Desktop/Northwestern/Bootcamp/bootcamp-2020/data/nys_schools.csv"))
+
+# Read the data of counties
+counties <- read.csv(here::here("Desktop/Northwestern/Bootcamp/bootcamp-2020/data/nys_acs.csv"))
+```
+
+# Task 2: Explore your data
+```{r}
+summary(schools)
+summary(counties)
+```
+
+Answer:
+There are many different types of variable in this dataset, such as character and numerical
+variable (integer/double). There are missing data because some of the variables have a minimum
+value of -99 and missing values are currently encoded as -99. The time ranges of these two datasets
+are different. The schools data frame has a time range from 2008 to 2017, while that of counties
+is 2009 to 2016. Therefore, if we want to merge these two data frames together, some entries in
+the schools data frame might be dropped to facilitate our analysis.
+
+# Task 3: Recoding and Variable Manipulation
+1. Deal with missing values, which are currently encoded as -99
+```{r}
+# Set all missing values to NA since later in our calculations and analysis, 
+# we can just ignore them.
+schools <- replace(schools, schools == -99, NA)
+counties <- replace(counties, counties == -99, NA)
+```
+
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
+```{r}
+# Group counties into three different poverty groups by using the median_household_income column
+# Set the counties with lowest 25% median household income (first quartile) as "high" poverty group (income <= 46347)
+# Set the counties with highest 25% median household income (fourth quartile) as "low" poverty group (income > 56448)
+# Set the middle 50% as "medium" poverty group (46347 < income <= 56448)
+
+# Start by creating a new variable with all missing values
+counties$poverty_level <- NA
+# Replace lowest 25% value with "high"
+counties$poverty_level[counties$median_household_income <= 46347] <- "high"
+# Replace middle 50% value with "medium"
+counties$poverty_level[counties$median_household_income <= 56448 & counties$median_household_income > 46347] <- "medium"
+# Replace highest 25% value with "low"
+counties$poverty_level[counties$median_household_income > 56448] <- "low" 
+```
+
+3. Create a new variable that is the standardized z-score for math and English Language Arts (ELA)
+for each year.
+```{r}
+# First group by year, then use the scale() function
+schools <- schools %>%
+            group_by(year) %>%
+            mutate(z_score_math = scale(mean_math_score),
+            z_score_ela = scale(mean_ela_score))
+```
+
+# Task 4: Merge datasets
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset.
+```{r}
+county_school <- merge(schools, counties, by = c("county_name", "year"))
+```
+
+# Task 5: Generate summary tables
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of 
+population in poverty. 
+```{r}
+summary1 <- county_school %>%
+              # Calculate the total number of students with free/reduced lunch over the period
+              mutate(free_lunch = total_enroll * per_free_lunch, reduced_lunch = total_enroll * per_reduced_lunch) %>%
+              group_by(county_name) %>%
+              summarise(sum_enroll = sum(total_enroll, na.rm = T),
+                  per_free_lunch = sum(total_enroll, na.rm = T) / sum(free_lunch, na.rm = T),
+                  per_reduced_lunch = sum(total_enroll, na.rm = T) / sum(reduced_lunch, na.rm = T),
+                  # Calculate the poverty rate by calculating the average over years
+                  per_poverty = mean(county_per_poverty)) 
+
+summary1
+```
+
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students 
+qualifying for free or reduced price lunch, mean reading score, and mean math score.
+```{r}
+# Create a temporary table with the mean reading score and mean math score for each county
+tmp <- county_school %>%
+        group_by(county_name) %>%
+        summarise(mean_ela = mean(mean_ela_score, na.rm = T),
+                  mean_math = mean(mean_math_score, na.rm = T))
+
+# Merge the temporary table with the summary1 table in the previous task
+summary2 <- merge(summary1, tmp, by = c("county_name"))
+
+# Select the counties with the top5 and bottom5 poverty rate by removing 
+summary2 <- summary2[order(-summary2$per_poverty),]
+tmp <- summary2[1:5,]
+tmp2 <- summary2[-1:-57,]
+
+# Combine tmp and tmp2 together
+summary2 <- rbind(tmp, tmp2)
+
+# Select the required columns of summary2
+summary2 <- summary2 %>% select(-sum_enroll)
+summary2
+```
+
+# Task 6: Data Visualization
+1. The relationship between access to free/reduced price lunch and test performance, at the school level.
+```{r}
+# Use the schools dataframe
+# Relationship between free price lunch and ela score
+ggplot(data = schools) +
+  geom_point(aes(x = per_free_lunch, y = z_score_ela)) +
+  labs(title = "Relationship between percentage of free lunch and ela score", x = "Percentage of free lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+# Relationship between free price lunch and math score
+ggplot(data = schools) +
+  geom_point(aes(x = per_free_lunch, y = z_score_math)) +
+  labs(title = "Relationship between percentage of free lunch and math score", x = "Percentage of free lunch", 
+       y = "z-score of math") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+# Relationship between reduced price lunch and ela score
+ggplot(data = schools) +
+  geom_point(aes(x = per_reduced_lunch, y = z_score_ela)) +
+  labs(title = "Relationship between percentage of reduced lunch and ela score", x = "Percentage of reduced lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+```{r}
+# Relationship between reduced price lunch and math score
+ggplot(data = schools) +
+  geom_point(aes(x = per_reduced_lunch, y = z_score_math)) +
+  labs(title = "Relationship between percentage of reduced lunch and math score", x = "Percentage of reduced lunch", 
+       y = "z-score of ELA") +
+  scale_x_continuous(limits = c(0,1)) +
+  scale_y_continuous(limits = c(-5,5)) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+2. Average test performance across counties with high, low, and medium poverty.
+```{r}
+# ELA test performance across counties with high, low, and medium poverty
+county_school %>%
+  group_by(year, poverty_level) %>%
+  summarise(mean_z_score_ela = mean(z_score_ela, na.rm = T)) %>%
+  ggplot() +
+  geom_line(aes(x = year, y = mean_z_score_ela, group = poverty_level, col = poverty_level)) +
+  labs(title = "Relationship between poverty level and ela score across years", x = "year", y = "ELA z-score") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+```{r}
+# Math test performance across counties with high, low, and medium poverty
+county_school %>%
+  group_by(year, poverty_level) %>%
+  summarise(mean_z_score_math = mean(z_score_math, na.rm = T)) %>%
+  ggplot() +
+  geom_line(aes(x = year, y = mean_z_score_math, group = poverty_level, col = poverty_level)) +
+  labs(title = "Relationship between poverty level and math score across years", x = "year", y = "Math z-score") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"), panel.border = element_blank())
+```
+
+# Task 7: Answering questions
+What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+Answer:
+The data tells us that the lower the poverty level, the better the test performance in New York public schools. This
+relationship hasn't changed over time. This relationship is not seemed to be moderated by access to free/reduced price
+lunch because the gap in performances between different poverty levels grew during the past few years.
