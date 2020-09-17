@@ -1,0 +1,228 @@
+---
+title: "Junpeng Jiang 2020 Bootcamp Submission"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+# Task 1 
+```{r}
+school <- read.csv(here::here("data/nys_schools.csv"))
+acs <- read.csv(here::here("data/nys_acs.csv"))
+```
+
+# Task 2
+```{r}
+str(school)
+str(acs)
+summary(school)
+summary(acs)
+```
+
+- Check for data types
+- There missing values in school dataset are labeled as -99, all categorical variables (plus school_cd) are complete.
+
+
+# Task 3
+### Dealing with Missing values
+
+- Deal with -99, first count how many missing values there are.
+
+```{r}
+num_of_na <- rep(NA,6)
+for (i in 7:12) {
+  num_of_na[i-6] <- sum(school[,i] == -99)
+}
+num_of_na
+dim(school)
+```
+
+- Remember that there are 35663 rows in the school dataset, so taking out 2200 rows should not affect the entire dataset considerably.
+
+```{r}
+new_school <- school
+new_school[new_school == -99] <- NA
+new_school <- na.omit(new_school)
+dim(new_school)
+```
+
+- This way we take out all rows with missing values, and the remaining dataset new_school has 33437 observations.
+
+### Create poverty level.
+
+```{r}
+county_avg_median <- acs %>% 
+  group_by(county_name) %>% 
+  summarise(n = mean(median_household_income))
+county_avg_median <- as.data.frame(county_avg_median)
+hist(county_avg_median$n)
+```
+
+- Compute average median income of each county across the years and plot a hisgram of the averages.
+
+```{r}
+summary(county_avg_median$n)
+```
+
+- By looking at the quantiles, I decide to split the groups as follows:
+- < 46731 : low
+- between 46731 and 56768: medium
+- larger than 56768:high
+
+```{r}
+county_avg_median$group <- rep(NA,dim(county_avg_median)[1])
+for (i in 1:dim(county_avg_median)[1]) {
+  if(county_avg_median[i,'n'] < 46731){
+      county_avg_median[i,'group'] <- "low"
+  } else if(county_avg_median[i,'n'] >= 46731 && county_avg_median[i,'n'] <= 56768){
+    county_avg_median[i,'group'] <- "medium"
+  } else if(county_avg_median[i,'n'] > 56768){
+    county_avg_median[i,'group'] <- "high"
+  }
+}
+head(county_avg_median)
+```
+
+- This dataframe indexes each county with a group of low/medium/high.
+- Then append the group variable back to the county dataset.
+
+```{r}
+acs$group <- rep(NA,dim(acs)[1])
+
+for (i in 1:dim(acs)[1]) {
+  rnum <- which(acs$county_name[i] == county_avg_median$county_name)
+  acs[i,"group"] <- county_avg_median[rnum,"group"]
+}
+head(acs,15)
+```
+
+- The group variable is created as stated.
+
+### Create Z-Score
+```{r}
+z_dt <- new_school %>% group_by(year) %>% summarise(n = scale(mean_ela_score), m = scale(mean_math_score))
+
+new_school$z_ela <- z_dt$n
+new_school$z_math <- z_dt$m
+head(new_school)
+```
+
+# Task 4
+```{r}
+total_dt <- merge(school,acs,by = c("county_name","year"))
+head(total_dt)
+```
+
+# Task 5
+
+- 1
+
+```{r}
+tb1 <- total_dt %>% 
+  group_by(county_name) %>% 
+  summarise(total_erm = sum(total_enroll),
+            q_for_lunch = sum(total_enroll*per_free_lunch)+sum(total_enroll*per_reduced_lunch),
+            per_poverty = mean(county_per_poverty))
+
+tb1 <- as.data.frame(tb1)
+tb1$q_for_lunch <- tb1$q_for_lunch/tb1$total_erm
+head(tb1)
+```
+
+- 2
+```{r}
+
+for_names <- tb1 %>% arrange(per_poverty)
+c_names <- for_names$county_name[c(1:5,58:62)]
+c_names# These are the counties has top5 and bottom5 poverty rate.
+
+tb2 <- total_dt %>% 
+  filter(county_name %in% c_names) %>% 
+  group_by(county_name) %>% 
+  summarise(q_for_lunch = sum(total_enroll*per_free_lunch)+sum(total_enroll*per_reduced_lunch),
+            per_poverty = mean(county_per_poverty),
+            avg_read = mean(mean_ela_score),
+            avg_math = mean(mean_math_score),
+            total_erm = sum(total_enroll))
+tb2 <- as.data.frame(tb2)
+tb2$q_for_lunch <- tb2$q_for_lunch/tb2$total_erm
+tb2$total_erm <- NULL
+head(tb2)
+```
+
+# Task 6
+```{r}
+length(unique(school$school_name))
+plt1 <- new_school %>% 
+  filter(year == 2008) %>% 
+  group_by(school_name) %>% 
+  summarise(access = per_free_lunch+per_reduced_lunch,
+            total_mean_score = mean_ela_score+mean_math_score)
+plt1 %>% ggplot() +
+  geom_point(aes(x=access,y = total_mean_score))
+
+plt2 <- new_school %>% 
+  filter(year == 2009) %>% 
+  group_by(school_name) %>% 
+  summarise(access = per_free_lunch+per_reduced_lunch,
+            total_mean_score = mean_ela_score+mean_math_score)
+plt2 %>% ggplot() +
+  geom_point(aes(x=access,y = total_mean_score))
+
+plt3 <- new_school %>% 
+  filter(year == 2010) %>% 
+  group_by(school_name) %>% 
+  summarise(access = per_free_lunch+per_reduced_lunch,
+            total_mean_score = mean_ela_score+mean_math_score)
+plt3 %>% ggplot() +
+  geom_point(aes(x=access,y = total_mean_score))
+```
+
+- By subsetting data from 2008-2010, I plotted the scatter plot of the total percentage of access to free/reduced price lunch versus the total mean scores of each school.
+
+- Through the plot we can see a negative linear trend: for schools from which students have more access to free/reduced price lunch, these students tend to have lower total scores on both ELA and math exams.
+
+```{r}
+plt22 <- total_dt %>% 
+  group_by(group,year) %>%
+  summarise(mean_score = (mean(mean_ela_score) + mean(mean_math_score))/2)
+
+plt22 <- as.data.frame(plt22)
+plt22 %>% ggplot +
+  geom_line(aes(x = year,y = mean_score,group = group,col = group))
+```
+
+- This plot shows the average scores of each poverty level group across the years.
+- If we take averages across all counties with their group labels (high/low/medium), the differences between each group's mean score are not as considerable.
+
+# Task 7
+
+```{r}
+t7 <- total_dt %>% 
+  group_by(county_name) %>% 
+  summarise(mean_score = mean(mean_ela_score+mean_math_score),
+            total_per = mean(per_free_lunch+per_reduced_lunch),
+            group = group[1])
+t7 <- as.data.frame(t7)
+
+t7 %>% ggplot() +
+  geom_point(aes(x = mean_score,y = total_per,group = group,col = group))
+
+```
+
+- In the plot, each point represents a county, and the colors represent their poverty labels. 
+
+- From the plot we cannot see clear relationship between each counties poverty level(measured by the total percentage of students allowed for free/reduced price lunch) and their students' test performances.
+
+- However, this plot is using data that is county-level, which means that the test scores and lunch data are averaged across all schools within one county. If we go back to the plot 1 in Task 6, we do see that the schools with lowers average scores often allow more students to access free/less expensive lunch.
+
+- Also, this trend has been consistend across the years, as illustrated by the three plots in Task 6.
+
+
