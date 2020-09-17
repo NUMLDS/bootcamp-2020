@@ -119,6 +119,9 @@ subsidyplot + geom_point(mapping = aes(per_lunch_subsidy, z_math_score), color =
 ```
 
 ```{r}
-# merged_schools06[ ,.(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), acs[county_name == county_name, poverty_level, by=county_name]), by=.(county_name)]
+newtable <- merged_schools06[ ,.(reading_score = mean(z_ela_score, na.rm=T), math_score = mean(z_math_score, na.rm = T), poverty_level = unique(poverty_level)), by=county_name][,.(reading_score = mean(reading_score, na.rm=T), math_score = mean(math_score, na.rm = T)), by=poverty_level]
+
+newtable <- melt(newtable, id_vars = poverty_level, variable.name = "test_type", value.name = "score")
+ggplot(newtable) + geom_col(mapping=aes(x=poverty_level, y=score, group=test_type, fill=test_type), position = "dodge")
 ```
 
