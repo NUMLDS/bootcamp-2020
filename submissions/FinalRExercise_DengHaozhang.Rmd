@@ -138,7 +138,7 @@ Using the skills you have learned in the past three days, tackle the following q
 > What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
 
 
-# From both the tables and the plots, we can claim that schools in counties with lower poverty rate achieved higher test scores. And the effect of access to free/reduced price lunch on improving test scores is not significant.
+#### From both the tables and the plots, we can claim that schools in counties with lower poverty rate achieved higher test scores. And the effect of access to free/reduced price lunch on improving test scores is not significant.
 
 
 
