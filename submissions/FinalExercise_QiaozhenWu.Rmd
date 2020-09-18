@@ -1,0 +1,93 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+## Import data
+```{r}
+school<-read.csv("~/planet/bootcamp-2020/data/nys_schools.csv")
+acs<-read.csv("~/planet/bootcamp-2020/data/nys_acs.csv")
+```
+
+## Recoding
+
+### dealing with NA data
+```{r}
+library(dplyr) #Import library 
+school <- school%>% mutate_all(as.character) %>% replace(.=="-99", NA) #replace all -99 with NA after converting all to character 
+
+#convert certain numrtic columns back to numeric 
+school$year<-as.numeric(school$year)
+school$total_enroll<-as.numeric(school$total_enroll)
+school$per_free_lunch<-as.numeric(school$per_free_lunch)
+school$per_reduced_lunch<-as.numeric(school$per_reduced_lunch)
+school$per_lep<-as.numeric(school$per_lep)
+school$mean_ela_score<-as.numeric(school$mean_ela_score)
+school$mean_math_score<-as.numeric(school$mean_math_score)  
+```
+
+### divide counties into high, low , median income
+``` {r}
+
+#create a list that includes only conty name and its division 
+list <- acs %>% group_by(county_name)%>%summarise(mean_median_income= mean(median_household_income))
+list <- mutate(list,income_div= case_when(mean_median_income<=45000 ~ "low" , mean_median_income>45000 & mean_median_income<=60000 ~ "median", mean_median_income>60000 ~ "high"))  
+
+#merge in with the acs table 
+acs_div <- merge(acs, list, by ="county_name")
+acs_div <- subset(acs_div, select= -mean_median_income)
+```
+
+### create a table of school data with z values
+``` {r}
+school_z <- school %>% group_by(year)%>%mutate(., ela_z_score = scale(mean_ela_score,center = TRUE, scale = TRUE))
+school_z <- school_z %>% group_by(year)%>%mutate(., math_z_score = scale(mean_math_score,center = TRUE, scale = TRUE))
+```
+
+## Create summary table 
+``` {r}
+
+#convery all NA value to 0 to prevent NA values after calculation 
+school_pre_merge <- school%>% mutate_all(as.character) %>% replace(is.na(.), 0) 
+school_pre_merge$year<-as.numeric(school_pre_merge$year)
+school_pre_merge$total_enroll<-as.numeric(school_pre_merge$total_enroll)
+school_pre_merge$per_free_lunch<-as.numeric(school_pre_merge$per_free_lunch)
+school_pre_merge$per_reduced_lunch<-as.numeric(school_pre_merge$per_reduced_lunch)
+school_pre_merge$per_lep<-as.numeric(school_pre_merge$per_lep)
+school_pre_merge$mean_ela_score<-as.numeric(school_pre_merge$mean_ela_score)
+school_pre_merge$mean_math_score<-as.numeric(school_pre_merge$mean_math_score)
+
+#group by county name and year to create a table based on county name and summarise all the data in schools in the same county 
+school_merge <- school_pre_merge %>% group_by(county_name, year) %>% summarise(total_s_enroll= sum(total_enroll),per_free_lunch = sum(per_free_lunch*total_enroll)/ sum(total_enroll), per_reduced_lunch = sum(per_reduced_lunch*total_enroll)/ sum(total_enroll), per_lep = sum(per_lep*total_enroll)/ sum(total_enroll), mean_math_score = mean(mean_math_score),mean_ela_score = mean(mean_ela_score))
+school_merge <- school_merge %>% group_by(year)%>%mutate(., ela_z_score = scale(mean_ela_score,center = TRUE, scale = TRUE))
+school_merge <- school_merge %>% group_by(year)%>%mutate(., math_z_score = scale(mean_math_score,center = TRUE, scale = TRUE))
+
+#merge the table with the acs table to create a summary table of all the information based on county name
+merge_school_acs <- merge(acs_div, school_merge , by =  c("county_name","year"))
+
+#select from the summary table to create table 1
+table_all_county <- select (merge_school_acs, county_name, year, total_s_enroll, per_free_lunch, per_reduced_lunch, per_lep)
+
+#creat a list of the top and bottom 5 counties according to income to choose from in the summary table 
+poverty_list_county <- merge_school_acs %>% group_by(county_name) %>%  summarise(mean_lep = mean(per_lep)) %>% arrange(.,mean_lep) 
+poverty_list_county <- poverty_list_county [!(is.na(poverty_list_county$mean_lep)),]
+poverty_list <- rbind (head(poverty_list_county, 5), tail(poverty_list_county, 5))
+
+#select from the summary table to create table 2 through chooding from the poverty list 
+table_5_county <- merge_school_acs[merge_school_acs$county_name %in% poverty_list$county_name, ]
+table_5_county <-  select(table_5_county, county_name, year, total_s_enroll, per_free_lunch, per_reduced_lunch, per_lep, mean_math_score, mean_ela_score)
+```
+
+## Plotting 
+``` {r }
+
+#plot the first graph 
+school_group <- school %>% group_by(school_name)%>% summarise(., per_free_lunch= mean(per_free_lunch),per_reduced_lunch=mean(per_reduced_lunch), mean_math_score= mean(mean_math_score))
+library(tidyverse)
+ggplot(school_group, aes(x=per_reduced_lunch*100+per_free_lunch*100, y=mean_math_score))+ geom_point() + xlim(0,100)
+
+#plot the second graph  
+merge_group <- merge_school_acs %>% group_by(county_name) %>% summarise(., math_z_score= mean(math_z_score), ela_z_score=mean(ela_z_score), income_div = income_div )
+ggplot(merge_group, aes(x=county_name, y=ela_z_score, fill = income_div))+ geom_bar(stat= "identity") 
+ggplot(merge_group, aes(x=county_name, y=math_z_score, fill = income_div))+ geom_bar(stat= "identity") 
+```
