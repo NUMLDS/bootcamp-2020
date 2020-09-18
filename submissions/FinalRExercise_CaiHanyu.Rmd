@@ -1,0 +1,170 @@
+---
+title: "bootcamp-finalexercise-hanyu"
+author: "Hanyu Cai"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+##Task 1: Import your data
+```{r}
+library(data.table)
+library(lubridate)
+schools <- fread(here::here("data/nys_schools.csv"))
+acs <- fread(here::here("data/nys_acs.csv"))
+```
+
+##Task 3: Recoding and variable manipulation
+1.Deal with missing values, which are currently coded as -99.
+Ans:I just replace all missing values(-99) with NA.
+```{r}
+#check missing data 
+library(dplyr) 
+schools <- na_if(schools, -99)
+```
+
+2.Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision.
+Ans: Categorize based on quantiles -- high: the top 33%, medium: the 33%-66%, low: the last 33% of counties
+```{r}
+library(arules)
+acs$poverty_level <- discretize(acs$county_per_poverty,breaks=3,quantile=false,labels=c("low","medium","high"))
+```
+
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+```{r}
+schools[,zscore_ela := scale(mean_ela_score,center=TRUE, scale=TRUE), by = year]
+schools[,zscore_math := scale(mean_math_score,center=TRUE, scale=TRUE), by = year]
+```
+
+## Task 4: Merge datasets
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+Ans:merge schools and acs based on county and year, which retain all schools data.
+```{r}
+sum <- merge(schools, acs, by = c("county_name","year"),all.x=TRUE)
+```
+
+## Task 5: Create summary tables
+
+Generate tables showing the following:
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+Ans:since each year the data varies, I choose year 2016 for the summary table, which is the most recent year that both "schools" and "acs" tables contain.
+```{r}
+summary_county = sum[year== '2016',.(county_enrollment = sum(total_enroll,na.rm=T),
+       per_free = sum(total_enroll*per_free_lunch,na.rm=T)/sum(total_enroll,na.rm=T),
+       per_reduced = sum(total_enroll*per_reduced_lunch,na.rm=T)/sum(total_enroll,na.rm=T),
+       county_per_poverty = mean(county_per_poverty)
+       ),by=county_name]
+
+summary_county
+
+```
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r}
+
+library(tidyverse)
+
+top5 <- summary_county %>% top_n(5,county_per_poverty)
+top5$county_name
+bottom5 <- summary_county %>% top_n(-5,county_per_poverty)
+bottom5$county_name
+
+temp_testscore <- sum[year== '2016',
+                       .(mean_reading=mean(mean_ela_score),
+                        mean_math=mean(mean_math_score)
+                                      ),by=county_name]
+
+summary_county2 <- merge(rbind(top5,bottom5),temp_testscore,by='county_name',all.x=T)
+
+```
+
+
+#### Task 6: Data visualization
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+```{r}
+schools %>%
+  filter(year==2016) %>%
+  ggplot(mapping = aes(x=per_free_lunch,y=mean_math_score)) +
+  geom_point() +
+  geom_smooth() + 
+  labs( x="FREE LUNCH %", y="AVG MATH SCORE")
+
+schools %>%
+  filter(year==2016) %>%
+  ggplot(mapping = aes(x=per_free_lunch,y=mean_ela_score)) +
+  geom_point() +
+  geom_smooth() +
+  labs( x="FREE LUNCH %", y="AVG READING SCORE")
+```
+
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+avg_test <-
+  sum %>%
+  filter(year==2016) %>%
+  group_by(county_name) %>%
+  summarize(avg_math = mean(mean_math_score),
+            avg_read = mean(mean_ela_score))
+
+merge(avg_test,acs[year==2016,],by='county_name',all.x=T) %>%
+  ggplot() +
+  geom_boxplot(aes(x=poverty_level,y=avg_read,col=poverty_level), size=0.8) +
+  labs(x='poverty level',y='average math score',title='boxplot of poverty level & average math score')
+
+merge(avg_test,acs[year==2016,],by='county_name',all.x=T) %>%
+  ggplot() +
+  geom_boxplot(aes(x=poverty_level,y=avg_math,col=poverty_level), size=0.8) +
+  labs(x='poverty level',y='average reading score',title='boxplot of poverty level & average reading score')
+```
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+```{r}
+library(data.table)
+library(ggplot2)
+sum %>%
+  filter(county_name=='NEW YORK') %>%
+  ggplot() +
+  geom_point(aes(y=mean_ela_score, x=per_free_lunch, group=year,col=year)) +
+  labs(x='free lunch%',y='mean reading score')
+
+sum %>%
+  filter(county_name=='NEW YORK') %>%
+  ggplot() +
+  geom_point(aes(y=mean_math_score, x=per_free_lunch, group=year,col=year)) +
+  labs(x='free lunch%',y='mean math score')
+```
+
+**as we can see from the graph, the average reading and math score of students in NY areas changed over time -- in more recent years, their mean test scores have grown substantially**
+
+
+```{r}
+sum %>%
+  filter(county_name=='NEW YORK') %>%
+  ggplot() +
+  geom_point(aes(y=zscore_ela, x=per_free_lunch, group=year,col=year)) +
+  geom_smooth(aes(y=zscore_ela, x=per_free_lunch))+
+  labs(x='free lunch%',y='mean reading score')
+
+sum %>%
+  filter(county_name=='NEW YORK') %>%
+  ggplot() +
+  geom_point(aes(y=zscore_math, x=per_free_lunch, group=year,col=year)) +
+  geom_smooth(aes(y=zscore_math, x=per_free_lunch))+
+  labs(x='free lunch%',y='mean math score')
+
+```
+
+**After use normalization to elminate the influence of years, we can see that increasing percent of free lunch actually lead to descresing test score**
+
