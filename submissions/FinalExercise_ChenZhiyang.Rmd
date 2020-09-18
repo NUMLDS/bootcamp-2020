@@ -1,0 +1,287 @@
+---
+title: "Untitled"
+author: "Zhiyang (iris) Chen"
+date: "9/15/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# MSIA Boot Camp - Final R exercise
+
+You've learned quite a lot about R in a short time. Congratulations! This exercise is designed to give you some additional practice on the material we have discussed this week while the lectures are still fresh in your mind, and to integrate different tools and skills that you have learned.
+
+## Instructions
+
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggplot2)
+
+#import data
+nyu_schools<-read.csv(here::here("data/nys_schools.csv"), stringsAsFactors = F)
+nys_acs<-read.csv(here::here("data/nys_acs.csv"), stringsAsFactors = F)
+
+```
+
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+
+```{r}
+#types of data
+str(nyu_schools)
+str(nys_acs)
+
+#missing data
+summary(nyu_schools)
+sum(is.na(nyu_schools))
+summary(nys_acs)
+sum(is.na(nys_acs))
+#no missing data as NA for both datasets, but there exists empty strings, only for nyu_schools:
+sum(nyu_schools == "")
+sum(nys_acs == "")
+#however, for nyu_schools, there seems to have some variables with unreasonable numbers (e.g. negative total_enroll, which may actually be missing value)
+has_negative<-c("total_enroll", "per_free_lunch", "per_reduced_lunch", "per_lep", "mean_ela_score", "mean_math_score")
+
+for (i in has_negative){
+  print(paste0("variable: ", i))
+  print(sum(nyu_schools[i]<0))
+  print("table")
+  print(table(nyu_schools[nyu_schools[i]<0,i]))
+}
+
+#all of the negative values are -99, which can indicate a missing value
+#-99 also appears for char variables
+sum(nyu_schools$county_name == "-99")
+
+#Additionally, there are value in percent of free or reduced lunch that are outliers and probably are errors.
+nyu_schools$per_free_lunch[nyu_schools$per_free_lunch > 1]
+nyu_schools$per_reduced_lunch[nyu_schools$per_reduced_lunch > 1]
+
+```
+
+
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+
+```{r}
+
+#1. deal missing: keep but set to NA
+for (i in 1:ncol(nyu_schools)){
+  nyu_schools[nyu_schools[i] == -99 | nyu_schools[i] == "-99"| nyu_schools[i] == "", i] <- NA  
+}
+
+#loop doesn't seem to be a good idea when dealing with larger dataset, but I'm not sure about other ways to change the values.
+
+
+#2. poverty levels
+#first check the overall situation, consider the average % poverty
+poverty<- nys_acs %>% 
+  group_by(county_name) %>% 
+  summarise(avg_pov = mean(county_per_poverty, na.rm = T)) 
+  
+summary(poverty)
+hist(poverty$avg_pov, breaks = 10)
+
+#most fall under 0.2, with few outliers. Mean & median around 0.13
+#set high poverty as greater than 0.2, medium as greater than 0.1, low as less than 0.1
+#there may be counties that is considered as high for a year and then become medium, etc.
+nys_acs$poverty_level <- NA
+
+nys_acs$poverty_level[nys_acs$county_per_poverty < 0.1] <- "Low"
+nys_acs$poverty_level[nys_acs$county_per_poverty >= 0.1 & nys_acs$county_per_poverty < 0.2 ] <- "Medium"
+nys_acs$poverty_level[nys_acs$county_per_poverty > 0.2] <- "High"
+
+nys_acs$poverty_level <- factor(nys_acs$poverty_level, levels = c("Low", "Medium", "High"))
+table(nys_acs$poverty_level)
+
+#3. scale
+
+nyu_schools <- nyu_schools %>% 
+  group_by(year) %>% 
+  mutate(math_z_score = scale(mean_math_score)) %>% 
+  mutate(ela_z_score = scale(mean_ela_score))
+
+```
+
+
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+
+```{r}
+#take means for all meaningful vars of nyu_schools, drop others. 
+#Keep data from both dataset and keep years. Thus for years like 2008, 2017 exist in nyu_schools, data are missing from nys_acs dataset
+#there are data in nyu_schools that have no county name and thus are removed
+merged_school_acs <- nyu_schools %>% 
+  filter(!is.na(county_name)) %>% 
+  group_by(county_name, year) %>% 
+  summarise(avg_total_enroll = mean(total_enroll, na.rm = T), avg_per_free_lunch = mean(per_free_lunch, na.rm = T), avg_per_reduced_lunch = mean(per_reduced_lunch, na.rm = T), avg_per_lep = mean(per_lep, na.rm = T), avg_ela_score = mean(mean_ela_score, na.rm = T), avg_math_score = mean(mean_math_score, na.rm = T)) %>% 
+  merge(nys_acs, by = c("county_name", "year"), all = T)
+
+#resulting dataset: 620 obs, 12 vars
+
+```
+
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r}
+#1. county summary table 
+county_summary_table<-merged_school_acs %>% 
+  group_by(county_name) %>% 
+  summarise(total_enroll = mean(avg_total_enroll, na.rm = T), per_FR_lunch = mean(avg_per_free_lunch + avg_per_reduced_lunch, na.rm = T), mean_county_per_poverty = mean(county_per_poverty, na.rm = T))
+county_summary_table
+
+
+#2. top 5 bottom 5
+topbottom <- rbind(county_summary_table[order(county_summary_table$mean_county_per_poverty, decreasing=T),][1:5,1],
+                   county_summary_table[order(county_summary_table$mean_county_per_poverty, decreasing=F),][1:5,1])
+topbottom
+
+merged_school_acs %>% 
+  filter(county_name %in% topbottom$county_name) %>% 
+  group_by(county_name) %>% 
+  summarise(mean_county_per_poverty = mean(county_per_poverty, na.rm = T), per_FR_lunch = mean(avg_per_free_lunch + avg_per_reduced_lunch, na.rm = T), mean_ela_score = mean(avg_ela_score, na.rm = T), mean_math_score = mean(avg_math_score, na.rm = T))
+```
+
+
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+# 1.school level plot
+# Filter out the ones that the sum of reduced & free lunch is greater than 1, and the max value for per Free or reduced lunch is 1.
+lunch_performance <- nyu_schools %>% 
+  filter(per_free_lunch <= 1 & per_reduced_lunch <= 1) %>% 
+  mutate(per_FR_lunch = if_else(per_reduced_lunch + per_free_lunch <= 1, per_reduced_lunch + per_free_lunch, 1)) 
+
+#ELA 
+  ggplot(lunch_performance) + geom_point(aes(x = per_FR_lunch, y = mean_ela_score)) + labs(title = "Free/Reduced Price Lunch and ELA Test Performance", x = "Percentage of Free/Reduced Price Lunch")
+  
+#MATH
+  ggplot(lunch_performance) + geom_point(aes(x = per_FR_lunch, y = mean_math_score)) + labs(title = "Free/Reduced Price Lunch and Math Test Performance", x = "Percentage of Free/Reduced Price Lunch")
+  
+#The mean test performance for schools is bimodal and can fall into two groups, one with high test score (600~800) one with low test scores (200~400). This is caused by the change in the test scale throughout years:
+
+#free/reduced price lunch
+ggplot(lunch_performance) + geom_point(aes(x = per_FR_lunch, y = mean_ela_score)) + labs(title = "Free/Reduced Price Lunch and ELA Test Performance, by year", x = "Percentage of Free/Reduced Price Lunch") + facet_wrap(~year)
+
+ggplot(lunch_performance) + geom_point(aes(x = per_FR_lunch, y = mean_math_score)) + labs(title = "Free/Reduced Price Lunch and Math Test Performance, by year", x = "Percentage of Free/Reduced Price Lunch") + facet_wrap(~year)
+
+#As the graphs show, the test scale changes on 2013.
+```
+
+```{r}  
+# 2. counties level plot
+#drop ones with no poverty level
+# ELA
+merged_school_acs %>% 
+  filter(!is.na(poverty_level)) %>% 
+  ggplot() + geom_histogram(aes(avg_ela_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average ELA Score Distribution across Counties with Different Poverty Level")
+
+#Math
+merged_school_acs %>% 
+  filter(!is.na(poverty_level)) %>% 
+  ggplot() + geom_histogram(aes(avg_math_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average Math Score Distribution across Counties with Different Poverty Level")
+
+
+# The graphs are not so clear, and it's better to check before and after 2013.
+# ELA before 2013
+merged_school_acs %>% 
+  filter(!is.na(poverty_level) & year < 2013) %>% 
+  ggplot() + geom_histogram(aes(avg_ela_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average ELA Score Distribution across Counties with Different Poverty Level, \n before 2013")
+
+# ELA after 2013
+merged_school_acs %>% 
+  filter(!is.na(poverty_level) & year >= 2013) %>% 
+  ggplot() + geom_histogram(aes(avg_ela_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average ELA Score Distribution across Counties with Different Poverty Level, \n after 2013")
+
+
+
+# Math before 2013
+merged_school_acs %>% 
+  filter(!is.na(poverty_level) & year < 2013) %>% 
+  ggplot() + geom_histogram(aes(avg_math_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average Math Score Distribution across Counties with Different Poverty Level, \n before 2013")
+
+# Math after 2013
+merged_school_acs %>% 
+  filter(!is.na(poverty_level) & year >= 2013) %>% 
+  ggplot() + geom_histogram(aes(avg_math_score)) + facet_wrap(~poverty_level, ncol = 1) + labs(title = "Average Math Score Distribution across Counties with Different Poverty Level, \n after 2013")
+
+```
+
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
+
+```{r}
+# for relationship between poverty and test performance in NY public schools, the graphs seems to present that higher poverty is correlated with lower average scores for both tests. It happens for both the onces before 2013 and after 2013.
+
+
+#additionally, the scatterplot presents that higher percentage of free/reduced price lunch is moderately correlated with lower mean test score (for both types of tests). 
+
+#to see the relationship between poverty & test performance using linear model
+merged_lunch<- merged_school_acs %>% 
+  filter(avg_per_free_lunch <= 1 & avg_per_reduced_lunch <= 1) %>% 
+  mutate(avg_per_FR_lunch = if_else(avg_per_reduced_lunch + avg_per_free_lunch <= 1, avg_per_reduced_lunch + avg_per_free_lunch, 1)) %>% 
+    mutate(test_change = if_else(year <2013, 0 ,1)) %>% 
+  mutate(year = as.factor(year))
+
+summary(lm(avg_math_score~county_per_poverty + test_change, merged_lunch))
+summary(lm(avg_ela_score~county_per_poverty + test_change, merged_lunch))
+
+summary(lm(avg_math_score~county_per_poverty + test_change + year, merged_lunch))
+summary(lm(avg_ela_score~county_per_poverty + test_change + year, merged_lunch))
+
+# rhw negative relationship exists and doesn't change much throughout years.
+
+lm_model_math <- lm(avg_math_score ~ county_per_poverty + test_change + year + avg_per_FR_lunch, merged_lunch)
+lm_model_ela <- lm(avg_ela_score ~ county_per_poverty + test_change + year + avg_per_FR_lunch, merged_lunch)
+
+summary(lm_model_math)
+summary(lm_model_ela)
+
+#Free/Reduced lunch does mitigate the negative relationship since the coef for county_per_poverty increases.
+
+
+```
+
+
+## Github submission
+
+When you have completed the exercise, save your Markdown file in the `submissions` folder of your forked repo using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`. Commit changes periodically, and push commits when you are done.
+
+You can optionally create a pull request to submit this file (and other exercise files from the bootcamp sessions) to the base repo that lives in the MSiA organization. If you would like to do this, make sure that all new files you have created are in the `submissions` folder, and then create a pull request that asks to merge changes from your forked repo to the base repo. 
+
+## Reminders
+
+- Remember to **load necessary packages**.
+- Remember to **comment extensively** in your code. Since you will be working in an RMarkdown file, you can describe your workflow in the text section. But you should also comment within all of your code chunks.
+- Attempt to knit your Markdown file into HTML format before committing it to Github. Troubleshoot any errors with the knit process by checking the lines referred to in the error messages.
