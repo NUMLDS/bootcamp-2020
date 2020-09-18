@@ -1,0 +1,429 @@
+---
+title: "NY Schools: Poverty, Lunch, and Test Scores"
+author: "Brian Lewis"
+date: "9/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r header, include=FALSE}
+# Header ------------------------------------------------------------------
+rm(list = ls())
+data   <- file.path('~/git/bootcamp-2020/data')
+export <- file.path('~/git/bootcamp-2020/export/') 
+
+# Libraries
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+library(ggplot2)
+library(glue)
+library(purrr)
+library(broom)
+library(knitr)
+library(rmarkdown)
+library(summarytools)
+
+# Function to calculate mode of categorical variable
+cat_mode <- function(x) {
+  uniqx <- unique(na.omit(x))
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+```
+
+## Task 1: Import
+
+This is done using the `readr` function `read_csv`:
+
+```{r import, message=FALSE}
+nys_schools <- read_csv(file.path(data, 'nys_schools.csv'))
+nys_acs <- read_csv(file.path(data, 'nys_acs.csv'))
+```
+
+## Task 2: Exploratory Data Analysis (EDA)
+
+Let's take a look at the first few rows of each dataset to get a sense for the structure:
+&nbsp;
+
+### `nys_schools`
+
+```{r eda, echo = FALSE, results = 'asis', layout="l-body-outset"}
+paged_table(nys_schools %>% head())
+```
+
+&nbsp;
+
+### `nys_acs`
+
+```{r eda2, echo = FALSE, results = 'asis', layout="l-body-outset"}
+paged_table(nys_acs %>% head())
+```
+
+&nbsp;
+
+It looks like from a quick glance that the `county_name` and `year` variables will provide convenient keys with which to join these two datasets together.   
+
+&nbsp;
+
+Let's take a look at summary stats for both datasets:  
+
+### Summary statistics: `nys_schools`
+
+```{r eda3, echo = FALSE, results = 'asis', message=FALSE}
+descr(nys_schools, stats = c("min", "mean", "max", "sd", "n.valid", "pct.valid"), transpose = TRUE, headings = FALSE)
+```
+
+### Summary statistics: `nys_acs`
+
+```{r eda4, echo = FALSE, results = 'asis', message=FALSE}
+descr(nys_acs, stats = c("min", "mean", "max", "sd", "n.valid", "pct.valid"), transpose = TRUE, headings = FALSE)
+```
+
+&nbsp;
+
+## Task 3: Recoding and Variable Manipulation
+
+In this section, we'll deal with a few issues in the underlying data:
+
+1.  Within the `nys_schools` dataset, values coded as `-99` are actually missing values. Those will need to be recoded.
+2.  We'll need to create categorical variables bucketing poverty groups into "low", "medium" and "high".
+3.  We'll need to standardize NY Department of Education scores across years, as the scale scores changed somewhat from year-to-year.
+&nbsp;
+
+```{r, echo = TRUE}
+# Resolve '-99' values and standardize scores
+sch <- nys_schools %>% 
+  na_if(-99) %>% 
+  group_by(year) %>% 
+  mutate(ela_z_score  = scale(mean_ela_score),
+         math_z_score = scale(mean_math_score)) %>% 
+  # Filter out school observations with no data on enrollment. 
+  # This allows for proper weighted-averages calculations later on.
+  filter(!is.na(total_enroll))
+```
+&nbsp;
+Now we'll need to sort levels of poverty into categorical groups. The distribution of poverty levels can be seen here: 
+```{r, echo = TRUE}
+quantile(nys_acs$county_per_poverty)
+```
+It seems reasonable then to group poverty levels according to the following groups:
+
+*  First 25% of Distribution: **"Low" (<=10%**)
+*  Middle 50% of Distribution: **"Medium" (10-15%**)
+*  Last 25% of Distribution: **"High" (>15%**)
+
+**NOTE:** This distribution and subsequent categorization is only representative of **New York** and may not represent broader categories of poverty across the United States.
+
+```{r}
+# Categorize poverty groups based on distribution of poverty levels within ACS data on NY state. 
+acs <- nys_acs %>% 
+  mutate(poverty_level = case_when(county_per_poverty <= .1 ~ "Low",
+                                   county_per_poverty >  .1  & county_per_poverty <= .15 ~ "Medium",
+                                   county_per_poverty >  .15 ~ "High"))
+```
+&nbsp;
+
+## Task 4: Merging datasets
+
+Now we can create a county-level dataset, joining on `county_name` and `year` as alluded to above:
+```{r}
+merged <- full_join(acs, sch, by = c("county_name", "year"))
+```
+&nbsp;
+
+## Task 5: Create summary tables
+
+Moving on to generate tables showing the following:
+
+1.  **For each county**: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2.  **For the counties with the top 5 and bottom 5 poverty rate**: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+&nbsp;
+
+We'll start by assembling helpful county-level data, then restrict to the outliers for Table 2:
+```{r}
+county_sum <- merged %>% 
+  # Summarizing data by county and year since enrollment is rolling; 
+  # Many of the observations are the same students year-to-year.
+  group_by(county_name, year) %>% 
+  summarise(total_enrollment       = sum(total_enroll,                              na.rm = T),
+            perc_free_lunch        = weighted.mean(per_free_lunch,    total_enroll, na.rm = T),
+            perc_red_lunch         = weighted.mean(per_reduced_lunch, total_enroll, na.rm = T),
+            # Because it's "OR" and these are mutually exclusive, we'll sum them for the full set.
+            perc_free_or_red_lunch = sum(perc_free_lunch, perc_red_lunch),
+            perc_poverty           = mean(county_per_poverty),
+            mean_ela_z_score       = weighted.mean(ela_z_score,       total_enroll, na.rm = T),
+            mean_math_z_score      = weighted.mean(math_z_score,      total_enroll, na.rm = T)) %>% 
+  ungroup()
+
+county_metrics <- county_sum %>% 
+  select(-perc_free_lunch, -perc_red_lunch, -mean_ela_z_score, -mean_math_z_score) 
+```
+
+### Task 5, Table 1: `county_metrics`
+
+```{r, echo = FALSE, results = 'asis', layout="l-body-outset"}
+paged_table(county_metrics)
+```
+
+&nbsp;
+
+Next we'll restrict to the outlier conditions specified in the point #2 from above:
+
+```{r}
+county_outliers <- county_sum %>% 
+  select(county_name, year, perc_poverty, perc_free_or_red_lunch, 
+         mean_ela_z_score, mean_math_z_score) %>% 
+  group_by(year) %>% 
+  mutate(outlier = case_when(quantile(perc_poverty, 0.95, na.rm = TRUE) <= perc_poverty ~ 
+                              "Highest 5th Percentile in Poverty",
+                             quantile(perc_poverty, 0.05, na.rm = TRUE) >= perc_poverty ~ 
+                               "Lowest 5th Percentile in Poverty",
+                             TRUE ~ 
+                               NA_character_)) %>% 
+  filter(!is.na(outlier)) %>% 
+  arrange(year, desc(perc_poverty)) %>% 
+  ungroup()
+```
+
+&nbsp;
+
+### Task 5, Table 2: `county_outliers`
+
+```{r, echo = FALSE, results = 'asis', layout="l-body-outset"}
+paged_table(county_outliers, list(rows.print = 8))
+```
+
+## Task 6: Data visualization
+
+And finally for the fun part--data viz! Let's take a look at the following:
+
+1.  The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2.  Average test performance across *counties* with high, low, and medium poverty.
+
+&nbsp;
+
+### Viz 1: Relationship between free/reduced lunch and test performance, by school
+
+&nbsp;
+
+We'll start by building a school-level dataset:
+
+```{r}
+# School-level chart dataset:
+school_level <- merged %>% 
+  group_by(school_name) %>% 
+  summarise(perc_free_lunch        = weighted.mean(per_free_lunch, total_enroll, na.rm = T),
+            perc_red_lunch         = weighted.mean(per_reduced_lunch, total_enroll, na.rm = T),
+            # Because it's "OR" and these are mutually exclusive, sum them for full set.
+            perc_free_or_red_lunch = sum(perc_free_lunch, perc_red_lunch),
+            mean_ela_z_score       = weighted.mean(ela_z_score, total_enroll, na.rm = T),
+            mean_math_z_score      = weighted.mean(math_z_score, total_enroll, na.rm = T)) %>% 
+  select(-perc_free_lunch, -perc_red_lunch) %>% 
+  ungroup()
+```
+
+&nbsp;
+
+We'll follow this up by building out a charting function to execute the visualization. Instead of duplicating code for both ELA and Math test scores, we can build a handy function and then utilize the `pmap` function to loop through this function (while taking advantage of the more optimal 'vectorized' approach). See below:
+
+&nbsp;
+
+```{r, warning=FALSE, message=FALSE, results=FALSE}
+# School-level: Build charting function, map through both test types
+school_charting <- function(score_var, score_text, save_name) {
+
+  score_var  <- ensym(score_var)
+    
+  plot <- ggplot(school_level,
+         aes(x = perc_free_or_red_lunch,
+             y = !!score_var)) +
+    scale_y_continuous(breaks = seq(-2.5, 2.5, 0.5),
+                       limits = c(-2.5, 2.5)) +
+    geom_point(shape = 20) +
+    geom_smooth(method = lm) +
+    scale_x_continuous(labels = function(x) paste0(x*100, "%"),
+                       limits = c(0,1)) +
+    labs(title    = 
+           glue("Mean Scaled {score_text} Scores v. \n % of Students Receiving Free/Reduced Lunch"),
+         subtitle = "By School",
+         y        = glue("Mean Scaled {score_text} Scores (Z-Score)"),
+         x        = "Students Receiving Free/Reduced Lunch (%)") +
+    theme(plot.title    = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
+          plot.subtitle = element_text(color = "black", size = 11, hjust = 0.5))
+}
+
+args <- list(c("mean_ela_z_score", "mean_math_z_score"),
+             c("ELA", "Math"),
+             c("ela_score", "math_score"))
+
+pmap(args, school_charting)
+```
+
+&nbsp;
+
+### Viz 2: Average test performance across poverty levels, by county
+
+&nbsp;
+
+We'll start by building a county-level dataset:
+
+```{r}
+# County-level charts:
+county_level <- merged %>% 
+  group_by(county_name) %>% 
+  summarise(poverty_level     = cat_mode(poverty_level),
+            poverty_perc      = mean(county_per_poverty,                  na.rm = T),
+            mean_ela_z_score  = weighted.mean(ela_z_score,  total_enroll, na.rm = T),
+            mean_math_z_score = weighted.mean(math_z_score, total_enroll, na.rm = T)
+            ) %>% 
+  ungroup() %>% 
+  filter(!is.na(poverty_level))
+```
+
+&nbsp;
+
+And just like before, we'll loop through the charting function we build. See below:
+
+&nbsp;
+
+```{r, warning=FALSE, message=FALSE, results=FALSE}
+# County-level: Build charting function, map through both test types
+county_charting <- function(score_var, score_text, save_name) {
+  
+  score_var  <- ensym(score_var)
+  
+  plot <- ggplot(county_level,
+                 aes(x    = !!score_var,
+                     fill = poverty_level)) +
+    xlim(-1, 1) +
+    geom_density(alpha = 0.5) +
+    labs(title    = glue("Mean Scaled {score_text} Scores by Poverty Level"),
+         subtitle = "By County",
+         x        = glue("Mean Scaled {score_text} Scores (Z-Score)"),
+         y        = "Score Density",
+         fill     = "Poverty Level"
+         ) +
+    theme(plot.title    = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
+          plot.subtitle = element_text(color = "black", size = 11, hjust = 0.5),
+          plot.caption  = element_text(color = "black", size = 10))
+}
+
+args <- list(c("mean_ela_z_score", "mean_math_z_score"),
+             c("ELA", "Math"),
+             c("county_ela_score", "county_math_score"))
+
+pmap(args, county_charting)
+```
+
+## Task 7: Answering Questions
+
+For our last task, we'll be trying to find answers to the following questions:
+
+1.  What can the data tell us about the relationship between poverty and test performance in New York public schools?
+2.  Has this relationship changed over time?
+3.  Is this relationship at all moderated by access to free/reduced price lunch?
+
+&nbsp;
+
+### Q1: Poverty and test performance
+
+This seemed like a question that could be better understood by using some simple linear regression:
+
+```{r}
+# ELA test scores
+lm(mean_ela_z_score   ~ poverty_perc, data = county_level) %>% 
+  tidy() %>% 
+  kable()
+
+# Math test scores
+lm(mean_math_z_score  ~ poverty_perc, data = county_level) %>% 
+  tidy() %>% 
+  kable()
+```
+
+&nbsp;
+
+At first glance with a simple bivariate model, it appears that there is a pretty negative and statistically significant relationship between the level of poverty and test performance. **NOTE:** Given how simplistic this model is, it is very plausibe -- and probable -- that there is omitted variable bias in this model. That said, there are reasonable explanations for why this relationship exists. While the magnitude would likely change with a more robust model, the negative and statistically significant relationship between these two variables would probably persist.
+
+&nbsp;
+
+### Q2: Has the relationship between poverty and test performance changed over time?
+
+Let's start by expanding on our linear model, but now incorporating the element of time to see how things have changed each year:
+
+```{r}
+ela_by_year <- merged %>%
+  # Filter out years for which data isn't fully available in both datasets
+  filter(year > 2008,
+         year < 2017) %>% 
+  group_by(year) %>% 
+  do(model = tidy(lm(ela_z_score ~ county_per_poverty, data = .))) %>% 
+  unnest(model) %>% 
+  filter(term == "county_per_poverty")
+
+math_by_year <- merged %>%
+  # Filter out years for which data isn't fully available in both datasets
+  filter(year > 2008,
+         year < 2017) %>% 
+  group_by(year) %>% 
+  do(model = tidy(lm(math_z_score ~ county_per_poverty, data = .))) %>% 
+  unnest(model) %>% 
+  filter(term == "county_per_poverty")
+```
+
+As the results show, it does appear that things have improved through time, especially for ELA test performance:
+
+### Task 7, Question 2: `ela_by_year`
+```{r, echo=FALSE}
+paged_table(ela_by_year)
+```
+
+### Task 7, Question 2: `math_by_year`
+```{r, echo=FALSE}
+paged_table(math_by_year)
+```
+
+&nbsp;
+
+### Q3: Is this relationship at all moderated by access to free/reduced price lunch?
+
+This question was a little more difficult to determine. I hypothesized that the best way to measure this was to add free/reduced lunch as one of the inputs to the earlier linear regression model to see if the signs of the poverty and lunch variables were opposite to one another (indicating the free/reduced lunch had a mitigating effect). It appears that this ends up being the case, as shown below:
+
+```{r}
+ela_by_year_lunch <- merged %>%
+  filter(year > 2008,
+         year < 2017) %>% 
+  group_by(year) %>% 
+  do(model = 
+       tidy(lm(ela_z_score ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data = .))) %>% 
+  unnest(model)
+
+math_by_year_lunch <- merged %>%
+  filter(year > 2008,
+         year < 2017) %>% 
+  group_by(year) %>% 
+  do(model = 
+       tidy(lm(math_z_score ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data = .))) %>% 
+  unnest(model)
+```
+
+### Task 7, Question 3: `ela_by_year_lunch`
+```{r, echo=FALSE}
+paged_table(ela_by_year_lunch)
+```
+
+### Task 7, Question 3: `math_by_year_lunch`
+```{r, echo=FALSE}
+paged_table(math_by_year_lunch)
+```
+
+&nbsp;
+
+### Conclusion:
+
+Seeing how the estimates of free/reduced lunch access then moved in different directions than the poverty variable is encouraging! Free/reduced lunch access has merit for many reasons (e.g. proper human development, public health, etc.), and to be able to obtain some kind of quantifiable relationship between access to this intervention and improvement in test scores is heartening. Hopefully this kind of relationship bears out across other state education data as well!
