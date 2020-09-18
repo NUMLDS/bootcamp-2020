@@ -1,0 +1,125 @@
+---
+title: "FinalRExercise_SeokhyunKim"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: Import your data
+
+```{r}
+
+# use the here command to read the data files.
+library(here)
+here()
+nys_schools <- read.csv(here::here("data", "nys_schools.csv"))
+nys_acs <- read.csv(here::here("data", "nys_acs.csv"))
+
+```
+
+## Task 2: Explore your data
+
+```{r}
+
+head(nys_schools) # to see the head rows of dataframe
+summary(nys_schools) # to see statistics of dataframe
+# something is wrong with the data in nys_schools. Variables like total_enroll or per_free_lunch should be over 0 but the minimum value of them which I can see in summary(nys_schools) is -99. I'm not still sure is it missing value or sth.
+
+str(nys_schools) # to see structure of dataframe (types of variables, how many obs are there... etc)
+sum(is.na(nys_schools$district_name)) # to check is there any NA data -> result of the code is 0 (which means there is no NA data)
+
+# apply equally to nys_acs
+head(nys_acs)
+summary(nys_acs)
+str(nys_acs)
+sum(is.na(nys_acs))
+
+```
+
+## Task 3: Recoding and variable manipulation
+
+```{r}
+
+library(tidyverse)
+library(data.table)
+# check if the number of missing values is significant or not (I guess there's better way to find it out other than using nrow like below..)
+nrow(nys_schools[nys_schools$total_enroll == -99,])
+nrow(nys_schools[nys_schools$per_free_lunch == -99,])
+nrow(nys_schools[nys_schools$mean_ela_score == -99,])
+nrow(nys_schools[nys_schools$mean_math_score == -99,])
+
+# I decided to remove the missing values because it can cause significant error in the future result and also, it doesn't take up significant portion in nys_schools.
+tmp <- filter(nys_schools, total_enroll != -99, per_free_lunch != -99, per_reduced_lunch != -99, per_lep != -99, mean_ela_score != -99, mean_math_score != -99) 
+nrow(tmp)
+nys_schools <- tmp
+
+# check if all the missing values are removed
+summary(nys_schools)
+
+# to split up the groups, I found out the mean value of county_per_poverty by each county and use the 25, 75% percentile value as boundary for each group.
+pov_grouping <- nys_acs %>% 
+  group_by(county_name) %>% 
+  summarize(mean_poverty = mean(county_per_poverty, na.rm = T))
+pov_grouping$pov_group <- ifelse(pov_grouping$mean_poverty >= quantile(pov_grouping$mean_poverty, 0.75), "high", ifelse(pov_grouping$mean_poverty >= quantile(pov_grouping$mean_poverty, 0.25), "medium", "low"))
+nys_acs <- merge(nys_acs, pov_grouping, by = "county_name")
+
+# Create Z-Score (group by year)
+nys_schools <- as.data.table(nys_schools)
+nys_acs <- as.data.table(nys_acs)
+
+nys_schools[, z_ela := scale(mean_ela_score), by = year]
+nys_schools[, z_math := scale(mean_math_score), by = year]
+
+```
+
+#### Task 4: Merge datasets
+
+```{r}
+
+# to make nys_schools and nys_acs into same level, I decided to summarize schools data by simply calculating mean of each columns by year, county.
+summ_schools <- nys_schools[, .(total_enroll = mean(total_enroll), per_free_lunch = mean(per_free_lunch), per_reduced_lunch = mean(per_reduced_lunch), per_lep = mean(per_lep), mean_ela_score = mean(mean_ela_score), mean_math_score = mean(mean_math_score)), by = .(county_name, year)]
+
+# merge into one table
+merged <- merge(summ_schools, nys_acs, by = c("county_name", "year"))
+
+```
+
+#### Task 5: Create summary tables
+
+```{r}
+
+# I think I already made the first task in merged table
+merged[, .(county_name, total_enroll, per_free_lunch, per_reduced_lunch, county_per_poverty)]
+
+# sort it and get top5, bottom5
+merged[order(county_per_poverty), .(county_per_poverty, per_free_lunch, per_reduced_lunch, mean_ela_score, mean_math_score)][1:5]
+merged[order(-county_per_poverty), .(county_per_poverty, per_free_lunch, per_reduced_lunch, mean_ela_score, mean_math_score)][1:5]
+
+```
+
+#### Task 6: Data visualization
+
+```{r}
+ 
+# extract the data needed from school table
+rel_schools <- nys_schools[, .(price_effect = (mean(per_free_lunch) + mean(per_reduced_lunch))/2, test_per = (mean(mean_ela_score) + mean(mean_math_score))/2), by = .(school_name)]
+
+rel_schools %>% 
+  ggplot() + geom_point(aes(x = price_effect, y = test_per))
+
+# make the table to visualize task2
+pov_grouping
+nys_schools
+test_county <- nys_schools[, .(test = (mean(mean_ela_score) + mean(mean_math_score))/2), by = county_name]
+test_county <- merge(test_county, pov_grouping, by = "county_name")
+
+test_county %>% 
+  ggplot() + geom_point(aes(x = county_name, y = test, col = pov_group))
+  
+```
+
+#### Task 7: Answering questions
+
+It seems test performance is low in "high" poverty group and there is decreasing shape in free/reduced price lunch graph according to task6.
