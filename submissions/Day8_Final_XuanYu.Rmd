@@ -1,0 +1,235 @@
+---
+title: "Day 8 final excercise"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Task 1: Import your data 
+```{r, message=FALSE}
+library(here)
+library(tidyverse)
+here()
+
+
+schools <- read.csv(here::here("data/nys_schools.csv"), 
+                          stringsAsFactors = F)
+survey <- read.csv(here::here("data/nys_acs.csv"), 
+                       stringsAsFactors = F)
+```
+
+
+### Task 2: Explore your data
+```{r}
+str(schools)
+str(survey)
+```
+
+#### Check missing values (NA) in both data frames
+```{r}
+sum(is.na(schools$region))
+sum(is.na(survey))  
+```
+
+There is no missing value as NA.
+
+#### Summary statistics
+```{r}
+summary(schools) # we have -99 for many variables
+summary(survey)
+```
+
+#### School data 
+```{r}
+# number of schools in each region
+table(schools$region)  # "-99" has 19 values indicating missing info.
+
+#regional lunch
+schools %>%
+  filter(region!="-99")%>%
+  group_by(region) %>%
+  summarise(ave_free_lunch = mean(per_free_lunch), ave_reduced_lunch = mean(per_reduced_lunch))
+```
+
+#### Survey data
+```{r}
+# Poverty rate in each year
+survey %>%
+  group_by(year) %>%
+  summarise(max_poverty=max(county_per_poverty), min_poverty=min(county_per_poverty), ave_poverty=mean(county_per_poverty))
+```
+
+
+### Task 3: Recoding and variable manipulation
+#### 1. Deal with missing values
+```{r}
+# Where are missing values?
+library(tidyverse)
+
+tmp1 <- filter(schools, per_free_lunch==-99 | per_reduced_lunch ==-99 | per_lep==-99| mean_ela_score==-99| mean_math_score==-99)
+tmp2 <- filter(schools, region=="-99"|per_free_lunch==-99 | per_reduced_lunch ==-99 | per_lep==-99)
+nrow(tmp1)
+nrow(tmp2)
+rm(tmp1,tmp2)
+```
+
+
+It seems that most missing value comes from scores. I decide to only remove other columns with missing values and change -99 in scores to NA (try to keep more data points).
+
+
+```{r}
+# Change missing score data to NA
+schools$mean_ela_score[schools$mean_ela_score == -99] <- NA
+schools$mean_math_score[schools$mean_math_score == -99] <- NA
+
+# Drop rows in other columns containing missing value
+schools <- schools[schools$region !="-99" & schools$per_free_lunch!=-99 & schools$per_reduced_lunch !=-99 & schools$per_lep !=-99,]
+
+# Check summary statistics again
+summary(schools)
+```
+
+#### 2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
+```{r}
+hist(survey$county_per_poverty) 
+```
+
+```{r}
+summary(survey$county_per_poverty)
+sd(survey$county_per_poverty)
+```
+
+
+The histogram is bell-shape and right-skewed. Median poverty has the largest number of people, which is also true in reality. I decided to take the 1 sd. away from the median as lower and upper thresholds.  
+
+
+```{r}
+lower_threshold <- 0.12884-0.031741
+upper_threshold <- 0.12884+0.031741
+
+for (i in 1:nrow(survey)){
+  if (survey$county_per_poverty[i]<=lower_threshold){
+    survey[i, "poverty_group"] <- "Low"
+  }
+  else if (survey$county_per_poverty[i]>=upper_threshold){
+    survey[i, "poverty_group"] <- "High"
+  }
+  else{
+    survey[i, "poverty_group"] <- "Medium"
+  }
+}
+
+table(survey$poverty_group) # follow the bell-shape
+
+boxplot(county_per_poverty~poverty_group,survey)
+```
+
+#### 3. Standardize score for math and english
+```{r}
+schools_new <- schools %>%
+                group_by(year) %>%
+                mutate(mean_ela_score_std = scale(mean_ela_score),
+                       mean_math_score_std = scale(mean_math_score))
+```
+
+
+### Task 4: Merge datasets
+```{r}
+school_county <- merge(schools_new, survey, by = c("county_name","year"), all = F)
+dim(school_county)
+```
+
+
+### Task 5: Create summary tables
+#### 1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+```{r}
+school_county %>%
+  mutate(free_reduced = per_free_lunch + per_reduced_lunch) %>%
+  group_by(county_name) %>%
+  summarize(mean_lunch = mean(free_reduced), poverty=mean(county_per_poverty))
+  
+```
+
+#### 2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading scores and mean math score.
+```{r}
+school_county %>%
+  mutate(free_reduced = per_free_lunch + per_reduced_lunch) %>%  # addition to get total
+  group_by(county_name) %>%
+  summarize(mean_lunch = mean(free_reduced), poverty=mean(county_per_poverty),
+            ela_score=mean(mean_ela_score, na.rm = T), 
+            math_score=mean(mean_math_score, na.rm=T)) %>%
+  arrange(desc(poverty)) %>%
+  filter(row_number()<=5|row_number()>=max(row_number())-5)
+  
+```
+
+### Task 6: Data visualization
+#### 1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+```{r}
+school_county %>% 
+  mutate(free_reduced = per_free_lunch + per_reduced_lunch) %>%
+  ggplot() + 
+  geom_point(aes(x=free_reduced, y=mean_ela_score_std),na.rm = T, size=0.5) +
+  xlim(0,1)+
+  ylim(-5,5)+
+  labs(title="Free/reduced price lunch and ela test performance", 
+       x="Free/reduced lunch", y="Standardized ela score")
+
+school_county %>% 
+  mutate(free_reduced = per_free_lunch + per_reduced_lunch) %>%
+  ggplot() + 
+  geom_point(aes(x=free_reduced, y=mean_math_score_std),na.rm = T, size=0.5) +
+  xlim(0,1)+
+  ylim(-5,5)+
+  labs(title="Free/reduced price lunch and math test performance", 
+       x="Free/reduced lunch", y="Standardized math score")
+```
+
+
+In both graph, we can clearly notice there is a negative relationship between test performance and percentage of free/reduced price lunch. I think larger percentage of free/reduced lunch indicates the school might be located at a region with higher poverty rate thus relatively poor academic performance. 
+
+
+#### 2. Average test performance across *counties* with high, low, and medium poverty.
+```{r}
+positions <- c("High", "Medium", "Low")
+
+school_county %>%
+  group_by(poverty_group)%>%
+  summarize(mean_math_score = mean(mean_math_score_std, na.rm=T), mean_ela_score = mean(mean_ela_score_std, na.rm=T))%>%
+  gather(key = subject, value = scaled_score, -poverty_group) %>%
+  ggplot() + 
+  geom_col(aes(x = poverty_group, y = scaled_score, group = subject, fill = subject), position = "dodge") + 
+  scale_x_discrete(limits = positions) +
+  labs(title ="Standardized test score of different poverty group", x = "Poverty group", y = "Standardized score")
+```
+
+
+### Task 7: Answering questions
+#### What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+```{r}
+# Relationship between poverty and ela score
+year <- unique(school_county$year)
+
+for (i in year){
+  result <- lm(mean_ela_score_std ~ county_per_poverty,school_county[school_county$year == i,])
+  print(paste0(i,": "))
+  print(result$coefficients)
+} 
+```
+
+```{r}
+# Relationship between poverty and math score
+year <- unique(school_county$year)
+
+for (i in year){
+  result <- lm(mean_math_score_std ~ county_per_poverty,school_county[school_county$year == i,])
+  print(paste0(i,": "))
+  print(result$coefficients)
+} 
+```
+
+From the linear regression, we can see there is a negative correlation between poverty and score. Also, the effect of poverty on both score generally decreases over time.
+(I'm not sure how to answer the last question..)
