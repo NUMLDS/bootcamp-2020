@@ -10,10 +10,10 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE,
                       cache = FALSE, tidy = FALSE)
 ```
 
-### 1: Import data and packages 
+### Import data and packages 
 
 Import necessary packages.
-```{r}
+```{r results = "hide"}
 library(tidyverse)
 library(data.table)
 ```
@@ -24,7 +24,7 @@ schools <- fread(here::here("data", "nys_schools.csv"))
 counties <- fread(here::here("data", "nys_acs.csv"))
 ```
 
-### 2: Explore data
+### Explore data
 
 ```{r}
 summary(schools)
@@ -36,38 +36,56 @@ Deal with missing values, which are currently coded as `-99`.
 schools <- schools[county_name != -99]
 
 # for remaining columns, convert -99 to NA
-metric_names <- c("total_enroll", "per_free_lunch", "per_reduced_lunch",
-                  "per_lep", "mean_ela_score", "mean_math_score")
+metric_names <- c("total_enroll", "per_free_lunch", "per_reduced_lunch", "per_lep", "mean_ela_score", "mean_math_score")
 schools[, (metric_names) := replace(.SD, .SD == -99, NA)
         , .SDcols = metric_names]
+
+# verify here that there are no -99 in the minimum values
 summary(schools)
 ```
 
-Address percentages (fractions) that are over 1
+Alter percentages (fractions) that are over 1. Since these columns cannot be over 100%, convert numbers above 1 to fractions. If there are remaining columns still over 1, remove those data points.
 ```{r}
 schools[per_free_lunch > 1, per_free_lunch := per_free_lunch / 100]
-
-# if there are remaining columns still over 1, remove those data points
 schools[per_free_lunch > 1, per_free_lunch := NA]
-summary(schools)
+
+schools[per_reduced_lunch > 1, per_reduced_lunch := per_reduced_lunch / 100]
+schools[per_reduced_lunch > 1, per_reduced_lunch := NA]
+
+# verify these variables are no larger than 1
+summary(schools[, per_reduced_lunch])
+summary(schools[, per_free_lunch])
 ```
 
-#### 3: Recoding and variable manipulation
+### Recode `county` poverty variable
 
-Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
+Create a categorical variable `pov_cat` that groups counties into "high", "medium", and "low" poverty groups.
+For each year, designate the 25th percentile as the cutoff for low poverty, and the 75th percentile as the cutoff for high poverty. 
 
+First, obtain the low and high cutoffs for each year.
 ```{r}
-sum_counties <- summary(counties[,county_per_poverty])
-sum_counties["1st Qu."]
-sum_counties["3rd Qu."]
-
-counties[county_per_poverty < sum_counties["1st Qu."],
-         pov_cat := "low"]
-counties[county_per_poverty >= sum_counties["1st Qu."],
-         pov_cat := "medium"]
-counties[county_per_poverty > sum_counties["3rd Qu."],
-         pov_cat := "high"]
+# `poverty_cutoffs` contains the low and high cutoffs for each year in `counties`
+poverty_cutoffs <- counties[ , .(cutoff_low = quantile(county_per_poverty, 0.25), 
+                            cutoff_high = quantile(county_per_poverty, 0.75)), year]
+poverty_cutoffs
 ```
+
+Then use the cutoffs to create `pov_cat`.
+```{r}
+# merge `poverty_cutoffs` with `counties`
+counties <- counties[poverty_cutoffs, on = "year"]
+
+# create the `pov_cat` variable
+counties[, pov_cat := "medium"]
+counties[county_per_poverty < cutoff_low, pov_cat := "low"]
+counties[county_per_poverty > cutoff_high, pov_cat := "high"]
+
+# delete the extra cutoff variables
+counties[, cutoff_low := NULL][, cutoff_high := NULL]
+head(counties)
+```
+
+### Create helpful additional variables in `school`
 
 The tests that the NYS Department of Education administers changes from time to time, so scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year.
 
@@ -76,61 +94,99 @@ schools[, z_mean_ela_score := scale(mean_ela_score), year]
 schools[, z_mean_math_score := scale(mean_math_score), year]
 ```
 
-Create variables that represent the total number of students in free and reduced lunch.
+Create variables `num_free_lunch` and `num_reduced_lunch` that represent the total number of students in free and reduced lunch.
 ```{r}
 schools[ , num_free_lunch := round(total_enroll * per_free_lunch)]
 schools[ , num_reduced_lunch := round(total_enroll * per_reduced_lunch)]
+schools
 ```
 
-#### 4: Merge datasets
+Also, create a variable `per_free_reduced_lunch` that sums the percentages of students in free lunch programs and students in reduced lunch programs
+```{r}
+schools[, per_free_reduced_lunch := per_free_lunch + per_reduced_lunch]
 
-Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. 
+# For some schools, `per_free_reduced_lunch` is greater than 1.
+head(schools[per_free_reduced_lunch > 1, .(per_free_reduced_lunch, per_free_lunch, per_reduced_lunch)])
+
+# it's possible that students in the reduced lunch category here are included in the "free lunch" category.
+# so let's replace `per_free_reduced_lunch` with `per_free_lunch` for these rows. 
+schools[per_free_reduced_lunch > 1, per_free_reduced_lunch := per_free_lunch]
+summary(schools$per_free_reduced_lunch)
+```
+
+### Merge datasets
+
+Create a county-level data set that merges variables from the schools dataset and the ACS dataset. 
 
 ```{r}
 merged <- merge(schools, counties, by = c("county_name", "year"), all.x = TRUE)
 ```
 
 
-#### Task 5: Create summary tables
+### Create summary tables
 
-For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+**For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.**
 
 First, get the number of total students per county enrolled in free or reduced lunch program:
 
 ```{r}
 # mean county poverty across the years for which there is data
-sum_table_1 <- merged[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+sum_table_county <- merged[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
                            tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
                            tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
-                           mean_poverty = mean(county_per_poverty, na.rm = TRUE))
-                       , county_name]
+                           mean_poverty = mean(county_per_poverty, na.rm = TRUE)), county_name]
 ```
 
 Then, convert the total numbers to percentages (fractions)
 
 ```{r}
-sum_table_1[, p_reduced_lunch := tot_reduced_lunch / tot_enroll]
-sum_table_1[, p_free_lunch := tot_free_lunch / tot_enroll]
-sum_table_1[, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
-sum_table_1
+sum_table_county[, p_reduced_lunch := tot_reduced_lunch / tot_enroll]
+sum_table_county[, p_free_lunch := tot_free_lunch / tot_enroll]
+sum_table_county[, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
+head(sum_table_county)
 ```
 
-For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch,mean reading score, and mean math score.
+**For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch,mean reading score, and mean math score.**
 
-NOTE: the max year for counties is 2016, while the max year for schools is 2017
+We'll do this for the most current year with county data, which is 2016
 
+First, select the counties with the top 5 and bottom 5 poverty rates from 2016, the most recent year.
 ```{r}
 # let's get the poverty rates for 2016
 low_pov_counties <- counties[year == max(year)][order(county_per_poverty)] %>% slice(1:5)
 high_pov_counties <- counties[year == max(year)][order(county_per_poverty, decreasing = TRUE)] %>% slice(1:5)
 ```
 
-```{r}
-# scores are not comparable from year to year, but they should be comparable
-# from school to school as long as the years are the same!
-low_pov_schools <- schools[low_pov_counties, on = "county_name"]
+Scores are not comparable from year to year, but they should be comparable from school to school as long as the years are the same!
 
-low_pov_sum <- low_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+Check the data
+
+**Low poverty schools**
+```{r}
+low_pov_schools <- schools[low_pov_counties, on = c("county_name", "year")]
+summary(low_pov_schools$mean_ela_score)
+summary(low_pov_schools$mean_math_score)
+n_distinct(low_pov_schools$school_cd)
+```
+
+**High poverty schools**
+```{r}
+high_pov_schools <- schools[high_pov_counties, on = c("county_name", "year")]
+summary(high_pov_schools$mean_ela_score)
+summary(high_pov_schools$mean_math_score)
+n_distinct(high_pov_schools$school_cd)
+```
+
+From this information, we know that:
+
+* From the bottom 5 low poverty counties, there are 642 schools, of which 67 are missing ELA and math scores.
+* From the top 5 high poverty counties, there are 831 schools, of which 38 are missing ELA and math scores.
+
+It looks like missing score data is not correlated with high poverty levels.
+
+Create a summary table for the schools from low poverty counties and a summary table for the schools from high poverty counties.
+```{r}
+sum_table_low_pov <- low_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
                      tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
                      tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
                      mean_poverty = mean(county_per_poverty, na.rm = TRUE),
@@ -138,9 +194,7 @@ low_pov_sum <- low_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE)
                      mean_ela_score = mean(mean_ela_score, na.rm = TRUE))
                  , county_name][, pov_cat := "low"]
 
-high_pov_schools <- schools[high_pov_counties, on = "county_name"]
-
-high_pov_sum <- high_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
+sum_table_high_pov <- high_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRUE),
                       tot_reduced_lunch = sum(num_reduced_lunch, na.rm = TRUE),
                       tot_free_lunch = sum(num_free_lunch, na.rm = TRUE),
                       mean_poverty = mean(county_per_poverty, na.rm = TRUE),
@@ -148,47 +202,146 @@ high_pov_sum <- high_pov_schools[ , .(tot_enroll = sum(total_enroll, na.rm = TRU
                       mean_ela_score = mean(mean_ela_score, na.rm = TRUE))
                   , county_name][, pov_cat := "high"]
 
-sum_table_2 <- rbind(low_pov_sum, high_pov_sum)
-sum_table_2
+# convert totals to percentages
+sum_table_low_pov[, p_free_reduced_lunch := (tot_reduced_lunch + tot_free_lunch)/ tot_enroll]
+sum_table_high_pov[, p_free_reduced_lunch := (tot_reduced_lunch + tot_free_lunch)/ tot_enroll]
+
+# remove the columns with total student numbers
+sum_table_low_pov[, tot_enroll := NULL][, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
+sum_table_high_pov[, tot_enroll := NULL][, tot_reduced_lunch := NULL][, tot_free_lunch := NULL]
 ```
 
-#### Task 6: Data visualization
+Here are the resulting summary tables:
+```{r}
+sum_table_low_pov
+sum_table_high_pov
+```
 
-The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+### Data visualization and answering questions
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
 
 ```{r}
-ggplot(schools) + 
-  geom_point(mapping = aes(x = per_free_lunch, y = z_mean_ela_score)) + 
-  labs(title = "Percent receiving free lunch v test scores")
+# set all ggplots to the same theme
+theme_set(theme_light())
 ```
 
+**The relationship between access to free/reduced price lunch and test performance for 2016.** Each point corresponds to a school.
+
+```{r}
+# convert percentage to basis points for easy interpretation
+model_data <- schools[year == max(year), .(school_name, school_cd, mean_ela_score, mean_math_score, per_free_reduced_lunch = per_free_reduced_lunch * 100)]
+
+# reshape the data from wide to long for plotting multiple categories
+plot_data <- melt(model_data, id.vars = c("school_name", "school_cd", "per_free_reduced_lunch"))
+# remove all observations with missing values
+plot_data <- plot_data[complete.cases(plot_data), ]
+
+ggplot(plot_data, aes(x = per_free_reduced_lunch, y = value, color = variable)) + 
+  geom_point(size = 0.3, alpha = 0.5) + 
+  geom_smooth(method="lm", size=0.5, se=FALSE) + 
+  scale_color_manual(values = c("blue", "darkred"), labels = c("ela", "math")) +
+  labs(title = "Percent of students receiving free or reduced lunch v test scores - 2016",
+       x = "Percent of students receiving free or reduced lunch",
+       y = "Scores") +
+  theme(legend.title = element_blank())
+```
+Is free/reduced lunch a significant predictor of ELA scores
+
+```{r}
+model = lm(formula = mean_ela_score ~ per_free_reduced_lunch, data = model_data)
+summary(model)
+```
+
+Is free/reduced lunch a significant predictor of math scores
+
+```{r}
+model = lm(formula = mean_math_score ~ per_free_reduced_lunch, data = model_data)
+summary(model)
+```
+
+> In 2016, for every basis point increase in students enrolled in free or reduced lunch, ELA scores decrease by 0.35 points and math scores decrease by 0.45 points.
+
+Of course, this does not mean that free and reduced lunch programs **cause** a decrease in scores; rather students who need the free and reduced lunch programs tend to have lower scores. Does a change in the use of programs help to raise scores?
+
+Let's compare the difference in lunch programs from difference in scores from year to year.
+
+```{r}
+# create a copy of `schools` so that we preserve the original data
+model_data <- schools[, .(year, school_name, school_cd, z_mean_ela_score, z_mean_math_score, per_free_reduced_lunch = per_free_reduced_lunch * 100)]
+
+# order `schools_plot` by school and year before creating difference variables
+# because we are comparing scores year by year, we have to use the z-scores instead of the actual scores
+setorder(model_data, school_cd, year)
+model_data[, diff_lunch := per_free_reduced_lunch - shift(per_free_reduced_lunch), by = school_cd]
+model_data[, diff_ELA_score := z_mean_ela_score - shift(z_mean_ela_score), by = school_cd]
+model_data[, diff_math_score := z_mean_math_score - shift(z_mean_math_score), by = school_cd]
+```
+
+```{r}
+# reshape the data from wide to long for plotting multiple categories
+plot_data <- melt(model_data[, .(school_name, school_cd, year, diff_lunch, diff_ELA_score, diff_math_score)], 
+                  id.vars = c("school_name", "school_cd", "year", "diff_lunch"))
+# remove all observations with missing values
+plot_data <- plot_data[complete.cases(plot_data), ]
+
+ggplot(plot_data, aes(x = diff_lunch, y = value, color = variable)) + 
+  geom_point(size = 0.3, alpha = 0.5) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  scale_color_manual(values = c("blue", "darkred"), labels = c("ela", "math")) +
+  labs(title = "Year-to-year change in test scores and lunch programs", 
+       y = "difference in score", 
+       x = "difference in percent receiving free or reduced lunch") + 
+  theme(legend.title = element_blank())
+```
+
+Is a change in free/reduced lunch a significant predictor a change in ELA scores?
+```{r}
+model = lm(formula = diff_ELA_score ~ diff_lunch, data = model_data)
+summary(model)
+```
+
+Is a change in free/reduced lunch a significant predictor a change in math scores
+```{r}
+model = lm(formula = diff_math_score ~ diff_lunch, data = model_data)
+summary(model)
+```
+
+> For every basis point increase in students enrolled in free or reduced lunch, ELA scores decrease by 0.11 points and math scores decrease by 0.04 points. The effect on ELA scores is significant, but the effect on math scores is not.
+
+There are two possible drivers for the change in program enrollment
+
+1. An increased **access** of the program to students in need. If scenario is true, then our results show that an increase in access does not help to increase test scores
+2. An increased number of students in need. If scenario is true, then our results only show us what we already know from the previous exercise: schools with a large percentage of students in free or reduced lunch programs tend to have lower test scores. Unfortunately this does not tell us whether the accessibility of the lunch program has an effect on test scores.
+
+Unfortunately, without more granular data, we do not know which scenario is more accurate (could be both!).
+
+To diagnose which scenario is more accurate, we would want to know whether the same students are represented in the data from year to year and whether their ability to afford lunch stayed constant from year to year.
+
+In this analysis, we assume an increased access to affordable lunch has an effect on test scores over the same year, however, it may be true that an effect on test scores does not show up until *more* than a year of continued access to affordable lunch for students in need. 
+
+---
 
 Average test performance across *counties* with high, low, and medium poverty.
 
 ```{r}
-sum_table_3 <- merged[ , .(mean_ela = mean(z_mean_ela_score, na.rm = TRUE),
-                           mean_math = mean(z_mean_math_score, na.rm = TRUE))
-                       , pov_cat]
+plot_data <- merged[ , .(mean_ela = mean(z_mean_ela_score, na.rm = TRUE),
+                                mean_math = mean(z_mean_math_score, na.rm = TRUE)), pov_cat]
 
-sum_table_3 <- melt(sum_table_3, id.vars = "pov_cat")
+plot_data <- melt(plot_data, id.vars = "pov_cat")
+plot_data <- plot_data[complete.cases(plot_data), ]
 
-ggplot(sum_table_3[!is.na(pov_cat)]) + 
-  geom_col(aes(x = pov_cat, y = value)) + 
-  facet_wrap(~variable)
-  labs(title = "average ela test scores")
+ggplot(plot_data[!is.na(pov_cat)]) + 
+  geom_col(aes(x = pov_cat, y = value, fill = variable)) + 
+  scale_fill_manual(values = c("blue", "darkred")) +
+  facet_grid( ~variable) + 
+  labs(title = "Average test scores by poverty level", y = "Scores", x = "Poverty") + 
+  theme(strip.background = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x=element_blank(),
+        legend.position = "none")
 ```
-
-#### Task 7: Answering questions
-
-
-Using the skills you have learned in the past three days, tackle the following question: 
-
-> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
-
-You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
-
-Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
-
 
 
 
