@@ -1,0 +1,282 @@
+---
+title: "FinalRExercise_MaZipeng"
+author: "Amy Ma"
+date: "September 14, 2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggpubr)
+library(tidyverse)
+```
+
+Task 1: Import Data
+
+```{r}
+schools <- read.csv("../data/nys_schools.csv")
+acs <- read.csv("../data/nys_acs.csv")
+```
+
+Task 2: Explore your data
+
+To keep everything organized, I will explore the schools dataset first and then explore the ACS dataset.
+
+Schools dataset:
+```{r}
+#dimension
+dim(schools)
+#displaying first few rows of data
+head(schools, 2)
+#summary statistics
+summary(schools)
+#data types of each column
+str(schools)
+```
+* Dimensions: There are 35663 rows and 12 columns in the schools dataset.
+* Through the summary statistics, we can see that the missing values (-99) are present
+
+Looking closer at the missing values:
+```{r}
+#total number of missing values across schools dataset
+school_mv <- sum(schools == -99)
+print(school_mv)
+
+#frequency table of missing values
+```
+There are 4531 missing values in the schools dataset.
+
+ACS dataset:
+```{r}
+#dimension
+dim(acs)
+#displaying first few rows of data
+head(acs, 2)
+#summary statistics
+summary(acs)
+#data types of each column
+str(acs)
+```
+* Dimensions: There are 496 rows and 5 columns in the schools dataset.
+* Through the summary statistics, we can see that missing values (-99) are not present
+
+Confirming absence of missing values in ACS dataset:
+```{r}
+sum(acs == -99,na.rm = FALSE)
+```
+There are no missing values in the ACS dataset.
+
+Task 3: Recoding and variable manipulation
+```{r}
+schools[schools=="-99"]<-NA
+```
+
+```{r}
+#Compute the average of the median household income across all time for each county
+
+#countyincome <- acs %>%
+  #group_by(county_name) %>%
+  #summarize(avg = mean(median_household_income)) %>%
+  #arrange(avg)
+
+#summary(countyincome$avg)
+
+#Find out the standard deviation for income
+#incomesd <- sd(countyincome$avg)
+#lowerbd <- mean(countyincome$avg) - incomesd
+#upperbd <- mean(countyincome$avg) + incomesd
+
+```
+
+I want to see the average poverty rate of each county, regardless of time. This will help seperate the counties into different poverty levels.
+```{r}
+#order counties from low to high in terms of mean county per poverty rate
+acs_agg <- acs %>%
+  group_by(county_name) %>%
+  summarise(avgcpp = mean(county_per_poverty),
+            avgincome = mean(median_household_income),
+            avgcountybach = mean(county_per_bach)) %>%
+  arrange(avgcpp)
+
+#head(acs_agg)
+```
+
+After computing the average poverty rate, I want to get a better understanding of the distribution and summary statistics of the poverty rates across counties.
+```{R}
+#summary statistics for average county per poverty
+summary(acs_agg$avgcpp)
+
+#distribution of average county per poverty
+ggplot(acs_agg, aes(x = avgcpp)) + 
+  geom_histogram(fill = "light blue",
+                 bins = 30) +
+  labs(title = "Distribution of Average Poverty Rate Per County",
+       x = "Average Poverty Rate")
+
+ggqqplot(acs_agg$avgcpp)
+```
+This is roughly a normal distribution.
+
+I want to assign poverty levels to counties based on the average poverty rates computed earlier. Those within one standard deviation (SD) of the median will be counted as medium poverty level. The majority (roughly 68%) of the counties will fall within one SD. So it would make sense to use SD to determine which counties are medium level. Those above one SD will be high poverty level. Those below one SD will be low poverty level. 
+
+```{r}
+#median of poverty rate
+povertymed <- median(acs_agg$avgcpp)
+povertymed
+
+#standard deviation of poverty rate
+povertysd <- sd(acs_agg$avgcpp)
+povertysd
+
+#the upper and lower boundaries of poverty rate within one SD
+upper <- povertymed + povertysd
+lower <- povertymed - povertysd
+```
+
+```{r}
+#create new factor variable povgroup to classify counties into different poverty groups
+ acs_agg_pov <- acs_agg %>%
+  mutate(povgroup = case_when(
+    avgcpp < lower ~ "low",
+    avgcpp > lower & avgcpp < upper ~ "medium",
+    avgcpp > upper ~ "high"))
+
+
+```
+
+
+Create new variable that is the standardized Z-score for math and English Language Arts each year.
+```{r}
+schools1 <- schools %>%
+  group_by(year) %>%
+  mutate(mathscale = scale(mean_math_score),
+         elascale = scale(mean_ela_score))
+```
+
+Task 4: Merge datasets
+
+Create county-level dataset that merges variables from schools dataset and ACS dataset.
+```{r}
+schools_agg <- schools1 %>%
+  group_by(county_name) %>%
+  drop_na() %>%
+  summarize(avgenroll = mean(total_enroll),
+            avgfreelunch = mean(per_free_lunch),
+            avgreducedlunch = mean(per_reduced_lunch),
+            avglep = mean(per_lep),
+            avgELA = mean(mean_ela_score),
+            avgMathScore = mean(mean_math_score),
+            avgmathscale = mean(mathscale),
+            avgelascale = mean(elascale))
+
+
+merged_school_acs <- merge(acs_agg_pov, schools_agg, by = "county_name")
+head(merged_school_acs)
+```
+
+Task 5:Create summary tables
+
+```{r}
+#for each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+sumtable1 <- merged_school_acs %>%
+  mutate(freereducedlunch = avgfreelunch+avgreducedlunch) %>%
+  select(county_name, avgenroll, freereducedlunch, avgcpp)
+head(sumtable1)
+```
+
+```{r}
+#create summary table for counties with top 5 and bottom 5 poverty rate
+merged_school_acs %>%
+  arrange(avgcpp) %>%
+  top_n(5)
+```
+
+Task 6:
+Relationship between access to free/reduced price lunch and test performance at the school level
+```{r}
+#create a data frame at the school level
+
+schools2 <- schools1 %>%
+  group_by(school_name) %>%
+  select(school_name, per_free_lunch, per_reduced_lunch, mean_ela_score, mean_math_score) %>%
+  mutate(freereducedlunch = (per_free_lunch + per_reduced_lunch)/2) %>%
+  summarize(avgfreelunch = mean(per_free_lunch),
+            avgreducedlunch = mean(per_reduced_lunch),
+            avg_ela = mean(mean_ela_score),
+            avg_math = mean(mean_math_score),
+            avglunch = mean(freereducedlunch),
+            avgtest = (avg_ela + avg_math)/2)
+
+#plot out relationship between access to lunch and test performance
+ggplot(schools2, aes(x= avglunch, y = avgtest)) + geom_point() + xlim(0, 1)
+
+
+```
+I decided to take the average of the ELA test and math test to visualize test performance because I wanted to combine both the ELA and math scores. There is no correlation between access to free or reduced fee lunch and test performance.
+
+```{r}
+#Average test performance across counties with high, low, medium poverty
+merged_school_acs %>%
+  group_by(povgroup) %>%
+  summarize(avgELA = mean(avgELA),
+            avgMathScore = mean(avgMathScore)) %>%
+  ggplot(aes(x=povgroup, y = avgMathScore)) + geom_point()
+
+merged_school_acs %>%
+  group_by(povgroup) %>%
+  summarize(avgELA = mean(avgELA),
+            avgMathScore = mean(avgMathScore)) %>%
+  ggplot(aes(x=povgroup, y = avgELA)) + geom_point()
+```
+For both math score and ELA score, there is an inverse relationship between poverty and test performance.
+
+Task 7
+```{r}
+#relationship between poverty and test performance in NY public schools
+head(merged_school_acs)
+
+ggplot(merged_school_acs, aes(x = avgcpp, y = avgELA)) + geom_point()
+cor(merged_school_acs$avgcpp, merged_school_acs$avgELA)
+
+ggplot(merged_school_acs, aes(x = avgcpp, y = avgMathScore)) + geom_point()
+cor(merged_school_acs$avgcpp, merged_school_acs$avgMathScore)
+```
+As expected, There is a negative relationship between poverty and test performance. The higher the poverty, the lower the test performance.
+
+Has this relationship changed over time?
+```{r}
+#Create a merged dataset that includes year info
+merge_withyear <- left_join(schools, acs, by = c("year", "county_name"))
+
+```
+
+```{r}
+correlate <- merge_withyear %>%
+  drop_na() %>%
+  group_by(year) %>%
+  summarize(r = cor(county_per_poverty, mean_math_score)) %>%
+  ggplot(aes(as.factor(year), r)) + geom_point()
+
+correlate
+```
+
+This inverse relationship is generally becoming less strong as time passes. This is good news!
+
+```{r}
+lm <- lm(mean_math_score~county_per_poverty, data = merge_withyear)
+summary(lm)
+
+lm1 <- lm(mean_math_score ~ county_per_poverty + per_free_lunch + county_per_poverty:per_free_lunch, data = merge_withyear)
+summary(lm1)
+
+lm2 <- lm(mean_math_score ~ county_per_poverty + per_reduced_lunch + county_per_poverty:per_reduced_lunch, data = merge_withyear)
+summary(lm2)
+```
+Yes, this relationship between poverty and test performance is moderated by access to free/reduced price lunch.
+
+
