@@ -1,0 +1,494 @@
+---
+title: "MSIA Boot Camp - Final R exercise"
+author: "Cheng Hao Ke"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+---
+
+<br><br>
+```{r setup, message = FALSE, warning=FALSE}
+library(htmltools)
+library(rmarkdown)
+library(knitr)
+library(kableExtra)
+library(pander)
+library(glue)
+library(gtable)
+library(grid)
+library(gridExtra)
+library(nnet)
+library(sjPlot)
+library(data.table)
+library(tidyverse)
+
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+```
+
+```{r htmlTemplate, echo=FALSE}
+img <- htmltools::img(src = "msia.png", 
+               alt = 'logo', 
+               style = 'position:absolute; top:10px; right:1%; padding:10px;z-index:200;',
+               width="300px")
+htmlhead <- paste0('
+<script>
+document.write(\'<div class="logos">',img,'</div>\')
+</script>
+')
+readr::write_lines(htmlhead, path = "header.html")
+```
+<br><br>
+
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
+
+```{r read1, message = FALSE, warning=FALSE}
+# read in data
+school0 <- read_csv('../data/nys_schools.csv')
+county0 <- read_csv('../data/nys_acs.csv')
+```
+<br><br>
+
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+<br><br>
+```{r eda1, message = FALSE, warning=FALSE}
+# function to obtain data type of each column
+cltype <- function(df) {
+    colt0 <- as.data.table(lapply(df, class))
+    colt0$No <- 1
+    colmelt <- names(colt0[, !c('No'), with = FALSE])
+    colt1 <- melt(colt0, id.vars = c("No"), measure.vars = colmelt, 
+                  variable.name = 'Columns', value.name = 'DataType')
+    colt1$No <- rownames(colt1)
+    return(colt1)
+  }
+
+schcol <- cltype(school0)
+ctycol <- cltype(county0)
+
+# combine both data type dfs for kable
+addcol <- dim(schcol)[1] - dim(ctycol)[1]
+ctycol <- rbind(ctycol, as.data.table(matrix('--', ncol = dim(ctycol)[2], nrow = addcol)), 
+                use.names=FALSE)
+allcol <- cbind(schcol, ctycol)
+```
+<br><br>
+**Table 1. Data Types**
+```{r table1, message = FALSE, results='asis'}
+kable(allcol, caption = "Data types for school and county files",
+      booktabs = T, longtable = T) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed", "responsive"),
+                full_width = T, position = "left") %>%
+  add_header_above(c("Schools" = 3, "Countries" = 3))
+```
+
+```{r eda2, message = FALSE, warning=FALSE}
+missingf <- function(df) {
+  # count number of missing values of each type
+  mis1 <- list()
+  for (i in c(1:length(df))) {
+    j <- names(df)[i]
+    mis0 <- df %>% 
+      filter(.data[[j]] %in% c('-99', -99) | is.na(.data[[j]])) %>%
+      count(.data[[j]])
+    mis1[[i]] <- mis0
+  }
+  mis2 <- as.data.table(mis1)
+  # get columns for melt
+  col0 <- names(mis2)
+  
+  # first melt
+  nam0 <- grep('[.]', col0, value = TRUE, invert = TRUE)
+  nam0 <- nam0[!nam0 == 'n']
+  mis3a <- melt(mis2[, ..nam0], measure.vars = nam0, 
+                variable.name = 'Columns', value.name = 'Missing')
+  # second melt
+  nam1 <- col0[!(col0 %in% nam0)]
+  mis3b <- melt(mis2[, ..nam1], measure.vars = nam1, 
+                variable.name = 'Columns', value.name = 'Amount')
+  # combine
+  mis4 <- cbind(mis3a, mis3b)
+  # drop col
+  mis4 <- mis4[, c(1, 2, 4)]
+  # remove duplicate
+  mis5 <- unique(mis4)
+  # recode values for better looking table
+  mis5$Missing[is.na(mis5$Missing)] <- 'NA'
+  mis5$Amount[is.na(mis5$Amount)] <- '' 
+  
+  return(mis5)
+}
+
+mschool <- missingf(school0)
+mcounty <- missingf(county0)
+
+miall <- rbind(mschool, mcounty)
+```
+
+<br><br>
+As shown in the table below there are quite a number of missing values. Missing values are especially prevalent for math and reading scores. It also seems that there were various data insertion errors present for percentage of students with free and reduced price lunch. These entries were all excluded in subsequent analyses.
+
+**Table 2. Missing Values**
+```{r table2, message = FALSE, results='asis'}
+kable(miall, caption = "Missing values by column",
+      booktabs = T, longtable = T) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed", "responsive"),
+                full_width = T, position = "left") %>%
+  footnote(general = "Both NA and -99 are considered to be missing values.")
+```
+<br><br>
+
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+
+```{r recode1, message=FALSE, warning=FALSE}
+# replace -99 with NA
+school1 <- school0
+school1[school1 == -99 |school1 == '-99'] <- NA
+# remove rows that have wrong lunch data (percentage should be lower than 1)
+school1 <- school1[(school1$per_free_lunch < 1) & (school1$per_reduced_lunch < 1),]
+
+county1 <- county0
+county1[county1 == -99 |county1 == '-99'] <- NA
+# test
+# miss0 <- school1 %>% filter_all(any_vars(. %in% c('-99', -99) | is.na(.)))
+
+# group by county
+county2 <- county1 %>% group_by(county_name) %>% 
+  summarize(county_per_poverty = mean(county_per_poverty, na.rm = TRUE),
+            median_household_income = mean(median_household_income, na.rm = TRUE),
+            county_per_bach = mean(county_per_bach, na.rm = TRUE))
+
+# quantiles 3
+q3 <- quantile(county2$county_per_poverty, probs = c(0, 1/3, 2/3))
+q3 <- append(q3, 1)
+print(q3)
+county2$povlvl <- cut(county2$county_per_poverty, breaks = q3, labels = c('low', 'medium', 'high'),
+                      include.lowest = TRUE, right = FALSE)
+
+# scaling: z-score
+school2 <- school1 %>% group_by(year) %>% 
+  mutate(zmath = scale(mean_math_score), zeng = scale(mean_ela_score)) %>%
+  ungroup(year)
+```
+
+Poverty levels were recoded according to quantiles calculated using the r `quantile` function.
+<br><br>
+
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+
+<br><br>
+
+```{r merge0, message=FALSE, warning=FALSE}
+# group school by county name
+school3 <- school2 %>% group_by(county_name) %>%
+  summarize(total_enroll = mean(total_enroll, na.rm = TRUE),
+            per_free_lunch = mean(per_free_lunch, na.rm = TRUE),
+            per_reduced_lunch = mean(per_reduced_lunch, na.rm = TRUE),
+            mean_math_score = mean(mean_math_score, na.rm = TRUE),
+            mean_ela_score = mean(mean_ela_score, na.rm = TRUE),
+            zmath = mean(zmath, na.rm = TRUE),
+            zeng = mean(zeng, na.rm = TRUE))
+
+# inner join both data
+ctysch0 <- merge(county2, school3, by = "county_name", 
+                 all = FALSE, all.x = FALSE, all.y = FALSE)
+ctysch0 <- as.data.table(ctysch0)
+```
+
+<br><br>
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r table3, message=FALSE, warning=FALSE}
+ctysch0[, c("county_name", 'total_enroll', 'per_free_lunch', 'per_reduced_lunch', 
+            'county_per_poverty')] %>%
+  # change percentage format
+  mutate(per_free_lunch = scales::percent(per_free_lunch),
+       per_reduced_lunch = scales::percent(per_reduced_lunch),
+       county_per_poverty = scales::percent(county_per_poverty)
+       ) %>%
+  mutate_if(is.numeric, function(x) {format(x, digits = 1, big.mark = ",",
+                                          decimal.mark = ".")}) %>%
+  kable(caption = "County performance on student enrollment, lunch price reduction, and percent of poverty",
+        booktabs = T, longtable = T) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed", "responsive"),
+                full_width = T, position = "left")
+```
+
+<br><br>
+
+```{r table4, message=FALSE, warning=FALSE}
+top5 <- ctysch0[order(county_per_poverty, decreasing = TRUE),]
+top5 <- top5[1:5, c('county_name', 'county_per_poverty', 'per_free_lunch', 
+                    'per_reduced_lunch', 'mean_math_score', 'mean_ela_score')]
+
+top5 %>%
+  mutate(county_per_poverty = scales::percent(county_per_poverty),
+       per_free_lunch = scales::percent(per_free_lunch),
+       per_reduced_lunch = scales::percent(per_reduced_lunch)
+       ) %>%
+  kable(caption = "Top 5 Counties with the highest poverty percentage",
+        booktabs = T, longtable = T) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed", "responsive"),
+                full_width = T, position = "left") %>%
+  footnote(general = "Both NA and -99 are considered to be missing values.")
+# tables side by side:
+# list(top51, matrix(numeric(), nrow=0, ncol=1), bot51) %>%
+```
+
+```{r table5, message=FALSE, warning=FALSE}
+bot5 <- ctysch0[order(county_per_poverty)]
+bot5 <- bot5[1:5, c('county_name', 'county_per_poverty', 'per_free_lunch', 
+                    'per_reduced_lunch', 'mean_math_score', 'mean_ela_score')]
+bot5 %>%
+  mutate(county_per_poverty = scales::percent(county_per_poverty),
+       per_free_lunch = scales::percent(per_free_lunch),
+       per_reduced_lunch = scales::percent(per_reduced_lunch)
+       ) %>%
+  kable(caption = "Top 5 Counties with the lowest poverty percentage",
+        booktabs = T, longtable = T) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed", "responsive"),
+                full_width = T, position = "left") %>%
+  footnote(general = "Both NA and -99 are considered to be missing values.")
+```
+
+<br><br>
+
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r plot1, message=FALSE, warning=FALSE, fig.align="center", fig.width=12, fig.height=6}
+# group by school
+bysch0 <- school2 %>% group_by(school_name) %>% 
+  summarize(per_free_lunch = mean(per_free_lunch, na.rm = TRUE),
+            per_reduced_lunch = mean(per_reduced_lunch, na.rm = TRUE),
+            mean_math_score = mean(mean_math_score, na.rm = TRUE),
+            mean_ela_score = mean(mean_ela_score, na.rm = TRUE),
+            zmath = mean(zmath, na.rm = TRUE),
+            zeng = mean(zeng, na.rm = TRUE))
+# remove schools with NA 
+bysch1 <- na.omit(bysch0)
+
+sp1 <- ggplot(bysch1, aes(x=per_free_lunch, y=zmath)) + geom_point() +
+  geom_smooth(method=lm) + theme_classic() +
+  labs(title = 'Free lunch percentage and math score',
+       x = 'Free lunch percentage', y = 'Standardized math score')
+sp2 <- ggplot(bysch1, aes(x=per_free_lunch, y=zeng)) + geom_point() +
+  geom_smooth(method=lm) + theme_classic() +
+  labs(title = 'Free lunch percentage and reading score',
+       x = 'Free lunch percentage', y = 'Standardized reading score')
+sp3 <- ggplot(bysch1, aes(x=per_reduced_lunch, y=zmath)) + geom_point() +
+  geom_smooth(method=lm) + theme_classic() +
+  labs(title = 'Reduced lunch fee percentage and math score',
+       x = 'Reduced lunch fee percentage', y = 'Standardized math score')
+sp4 <- ggplot(bysch1, aes(x=per_reduced_lunch, y=zeng)) + geom_point() +
+  geom_smooth(method=lm) + theme_classic() +
+  labs(title = 'Reduced lunch fee percentage and math score',
+       x = 'Reduced lunch fee percentage', y = 'Standardized reading score')
+
+grid.arrange(sp1, sp2, sp3, sp4, ncol = 2, nrow = 2)
+```
+The above plots seemed to suggest that percentage of students with free lunch is negatively associated with standardized scores, while percentage of students with reduced lunch price is positively associated with standardized scores.
+<br><br>
+```{r plot2, message=FALSE, warning=FALSE, fig.align = "center", fig.width=12, fig.height=6}
+cp1 <- ggplot(ctysch0, aes(x=zmath, y=zeng, color=povlvl, shape=povlvl)) + 
+  geom_point(size = 5) +  theme_classic() +
+  # geom_text(label=ctysch0$county_name) + 
+  labs(title = 'County poverty level and student standardized scores', 
+       x = 'Standardized math score', y = 'Standardized reading score')
+cp2 <- ggplot(ctysch0, aes(x=zmath, y=zeng, color=povlvl, shape=povlvl)) +
+  geom_smooth(method=lm) +  theme_classic() +
+  labs(title = 'County poverty level associations with student standardized scores', 
+       x = 'Standardized math score', y = 'Standardized reading score')
+  
+grid.arrange(cp1, cp2, ncol = 2, nrow = 1)
+```
+The above plots indicates that low poverty levels are associated with higher math and reading standardized scores. While high poverty levels are associated with the reverse.
+<br><br>
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+<br><br>
+```{r plot3, message=FALSE, warning=FALSE, fig.align = "center", fig.width=12, fig.height=6}
+syear1 <- school2 %>% group_by(school_name, county_name, year) %>%
+  summarize(per_free_lunch = mean(per_free_lunch, na.rm = TRUE),
+            per_reduced_lunch = mean(per_reduced_lunch, na.rm = TRUE),
+            mean_math_score = mean(mean_math_score, na.rm = TRUE),
+            mean_ela_score = mean(mean_ela_score, na.rm = TRUE),
+            zmath = mean(zmath, na.rm = TRUE),
+            zeng = mean(zeng, na.rm = TRUE))
+
+cyear1 <- county1 %>% group_by(county_name, year) %>% 
+  summarize(county_per_poverty = mean(county_per_poverty, na.rm = TRUE))
+cyear2 <- merge(cyear1, county2[, c('county_name', 'povlvl')], by = "county_name", 
+                 all = FALSE, all.x = FALSE, all.y = FALSE)
+
+# inner join both data
+csyr1 <- merge(cyear2, syear1, by = c("county_name", 'year'), 
+               all = FALSE, all.x = FALSE, all.y = FALSE)
+csyr2 <- as.data.table(csyr1)
+csyr2 <- na.omit(csyr2)
+csyr2$years <- factor(csyr2$year)
+
+cs1 <- ggplot(csyr2, aes(x=zmath, y=zeng, color=years, shape=povlvl)) + 
+  geom_point(size = 5) +  theme_classic() +
+  # geom_text(label=ctysch0$county_name) + 
+  labs(title = 'County poverty level and student standardized scores by year', 
+       x = 'Standardized math score', y = 'Standardized reading score')
+cs2 <- ggplot(csyr2, aes(x=zmath, y=zeng, color=years, shape=povlvl)) +
+  geom_smooth(method=lm) +  theme_classic() +
+  labs(title = 'County poverty level associations with student standardized scores by year', 
+       x = 'Standardized math score', y = 'Standardized reading score')
+  
+grid.arrange(cs1, cs2, ncol = 2, nrow = 1)
+```
+The plots above revealed that poverty and standardized score associations did not have drastic changes from year to year. Thus, it would be appropriate to aggregate and analyze the above data without accounting for errors with time series structures.
+<br><br>
+
+```{r stats0, message=FALSE, warning=FALSE}
+# group by school
+school2$lunch <- school2$per_free_lunch + school2$per_reduced_lunch
+
+bysch2 <- school2 %>% group_by(school_name, county_name) %>% 
+  summarize(per_free_lunch = mean(per_free_lunch, na.rm = TRUE),
+            per_reduced_lunch = mean(per_reduced_lunch, na.rm = TRUE),
+            lunch = mean(lunch, na.rm = TRUE),
+            mean_math_score = mean(mean_math_score, na.rm = TRUE),
+            mean_ela_score = mean(mean_ela_score, na.rm = TRUE),
+            zmath = mean(zmath, na.rm = TRUE),
+            zeng = mean(zeng, na.rm = TRUE))
+# remove schools with NA 
+bysch3 <- as.data.table(na.omit(bysch2))
+
+county3 <- as.data.table(county2[, c('county_name', 'county_per_poverty', 'povlvl')])
+
+ctysch1 <- merge(bysch3, county3, by = "county_name", 
+                 all = FALSE, all.x = FALSE, all.y = FALSE)
+ctysch1 <- na.omit(ctysch1)
+
+# bivariate tests
+print(cor.test(ctysch1$county_per_poverty, ctysch1$zmath))
+print(cor.test(ctysch1$county_per_poverty, ctysch1$zeng))
+print(cor.test(ctysch1$per_free_lunch, ctysch1$zmath))
+print(cor.test(ctysch1$per_free_lunch, ctysch1$zeng))
+print(cor.test(ctysch1$per_reduced_lunch, ctysch1$zmath))
+print(cor.test(ctysch1$per_reduced_lunch, ctysch1$zeng))
+```
+
+Pearson correlation tests showed that there exists significant negative associations between county poverty levels and student standardized math and reading scores. In other words, the higher a county's percent of poverty, the lower its students score in math and reading. It's also interesting to note that the percentage of students with free lunch has a significant negative association with both standardized scores. Finally, the percentage of student with reduced lunch price is positively associated with both standardized scores. Although, the association between reading scores and reduced lunch price is low. 
+
+```{r stats1, message=FALSE, warning=FALSE}
+# multivariate linear regression
+lr1 <- lm(zmath ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data=ctysch1)
+summary(lr1)
+```
+
+The multivariate linear regression model showed that in the presence of the effects of the percentage of students with free or reduced lunch price, the association between county poverty and standardized math score is reversed. Associations between free lunch and reduced lunch price with math scores were not changed in the presence of county poverty.
+<br><br>
+```{r stats2, message=FALSE, warning=FALSE}
+# multivariate linear regression
+lr2 <- lm(zeng ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data=ctysch1)
+summary(lr2)
+```
+
+Standardized reading scores also have the similar associations with county poverty, free lunch and reduced lunch price.
+
+```{r inter0, message=FALSE, warning=FALSE}
+# multivariate linear regression
+lr3 <- lm(zmath ~ county_per_poverty + per_free_lunch + county_per_poverty*per_free_lunch, data=ctysch1)
+summary(lr3)
+lr4 <- lm(zmath ~ county_per_poverty + per_reduced_lunch + county_per_poverty*per_reduced_lunch, data=ctysch1)
+summary(lr4)
+
+lr5 <- lm(zeng ~ county_per_poverty + per_free_lunch + county_per_poverty*per_free_lunch, data=ctysch1)
+summary(lr5)
+lr6 <- lm(zeng ~ county_per_poverty + per_reduced_lunch + county_per_poverty*per_reduced_lunch, data=ctysch1)
+summary(lr6)
+```
+
+Regression models showed that the interaction between percent of students with free lunch and county poverty percentage is not significant. However, the interaction between percent of students with reduced lunch price and county poverty percentage is significant for both types of standardized scores. The coefficients for county poverty in all models were negative, this signifies that the association between poverty and standardized scores is negative when there is no lunch price reduction. However, since the coefficient of interaction is positive, this means that as the percentage of students with reduced lunch price increases, the negative association between poverty and scores also becomes less negative. In other words, as a school provides more students with reduced lunch the better the school's students score despite the school being located in a county with higher percentage of poverty. 
+<br><br>
+
+In order to illustrate the above models, percentage of students with reduced lunch price was recoded to a categorical variable with 4 levels based on quartiles. The resulting plots clearly showed that when percentage of students with reduced lunch price increases, the negative association between poverty and scores lessen. This lessening effect gradually reverses to a positive association when the percentage of students with reduced lunch price rises over 10%.
+
+```{r inter1, message=FALSE, warning=FALSE, fig.align = "center", fig.width=12, fig.height=6}
+# change reduced lunch to quartile
+q4 <- quantile(ctysch1$per_reduced_lunch)
+q4[5] <- 1
+print(q4)
+
+ctysch1$rlunchlvl <- cut(ctysch1$per_reduced_lunch, breaks = q4, labels = c('q1', 'q2', 'q3', 'q4'),
+                      include.lowest = TRUE, right = FALSE)
+
+in0 <- lm(zmath ~ county_per_poverty + rlunchlvl + county_per_poverty*rlunchlvl, data=ctysch1)
+in1 <- lm(zeng ~ county_per_poverty + rlunchlvl + county_per_poverty*rlunchlvl, data=ctysch1)
+
+ipl0 <- plot_model(in0, type = "pred", terms = c("county_per_poverty", "rlunchlvl"))
+ipl1 <- plot_model(in1, type = "pred", terms = c("county_per_poverty", "rlunchlvl"))
+
+grid.arrange(ipl0, ipl1, ncol = 2, nrow = 1, clip = FALSE)
+```
+
+<br><br>
+```{r stats3, message=FALSE, warning=FALSE}
+# Compute anova
+ano1 <- aov(zmath ~ povlvl, data = ctysch1)
+summary(ano1)
+# post hoc tests
+TukeyHSD(ano1)
+
+ano2 <- aov(zeng ~ povlvl, data = ctysch1)
+summary(ano2)
+TukeyHSD(ano2)
+```
+
+ANOVA tests and post hoc Tukey HSD tests between county poverty levels and standardized scores showed significant associations. These associations also align with previous test results.
+
+```{r stats4, message=FALSE, warning=FALSE}
+# multinomial logistic regression
+# Setting the basline 
+ctysch1$poverty <- relevel(ctysch1$povlvl, ref = "low")
+# Training the multinomial model
+mlog1 <- multinom(poverty ~ zmath + zeng + per_free_lunch + per_reduced_lunch, 
+                         data = ctysch1)
+ 
+# Checking the model
+print(summary(mlog1))
+print(exp(coef(mlog1)))
+
+# p-value
+z <- summary(mlog1)$coefficients/summary(mlog1)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+print(p)
+# https://towardsdatascience.com/a-deep-dive-on-vector-autoregression-in-r-58767ebb3f06
+```
+
+The multinomial logistic regression model showed similar results to the multivariate linear regression model. Of note is the lack of significance between the association of standardized reading scores and different levels of poverty. In other words, there were no significant differences between schools located within counties classified into different poverty levels and mean student standardized reading scores. There were also no difference between high and low poverty levels for reduced lunch price. This corroborates the results obtained above, when the effect of lunch subsidies are accounted for, scores have a weak positive association with poverty levels. An explanation of the positive association between lunch and poverty levels is that poorer counties were more likely to subsidies student lunches. 
+
+<br><br>
