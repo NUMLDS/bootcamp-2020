@@ -16,9 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
 
-```{r}
+```{r, results="hide"}
 library(tidyverse)# load the library needed
-
+```
+```{r}
 # read the datasets
 # here .. is added to the path because the working directory of my markdown file is in the submissions folder
 schools <- read.csv("../data/nys_schools.csv", stringsAsFactors = F)
@@ -60,26 +61,30 @@ any(is.na(acs))# we notice that only schools have missing values
 
 # drop rows with missing values
 schools <- na.omit(schools)
-any(is.na(schools))
+any(is.na(schools))# check all missing values have been dropped
 ```
 There are better ways to perform imputation (such as replacing by mean), but I choose the simplest way here by dropping the lines with missing data.
 
 2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
 ```{r}
-summary(acs$median_household_income)# use percentile as the breakdown criteria
+groups <- acs %>%
+  group_by(county_name) %>%
+  summarize(poverty_level = mean(county_per_poverty)) %>%
+  arrange(desc(poverty_level))
 
 obs <- 1:nrow(acs)
 for (i in obs){
-  if(acs[i,"median_household_income"] < 46347){
+  if(acs[i,"county_name"]%in% groups$county_name[1:21]){
     acs[i,"poverty_level"] <- "high"
-  } else if(acs[i,"median_household_income"] >= 46347 & acs[i,"median_household_income"] <= 56448){
+  } else if(acs[i,"county_name"]%in% groups$county_name[22:42]){
     acs[i,"poverty_level"] <- "medium"
   } else{
     acs[i,"poverty_level"] <- "low"
   }
+ 
 }
 ```
-Answer: Here I choose to look at the median household income of counties and use the 1st and 3rd percentile as the breakdown points, because income is a good indicator of how wealthy or poor a household is and hence overall a good indicator for the poverty level of the county.
+Answer: Here I choose to look at average county_per_poverty for each county and order them in descending order based on the poverty level. Since there are 62 counties, I divide them into 3 groups, with the top 31 counties selected as high poverty level, the next 31 counties as medium level and the rest 20 counties as low level.
 
 3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
 ```{r}
@@ -91,7 +96,15 @@ schools <- schools %>%
 
 Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
 ```{r}
-merged <- merge(schools, acs, by = c("county_name","year"))
+merged <- schools %>%
+  group_by(county_name, year) %>%
+  summarize(total_enroll = sum(total_enroll), 
+            per_free_lunch = mean(per_free_lunch),
+            per_reduced_lunch = mean(per_reduced_lunch), 
+            per_lep = mean(per_lep), 
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>% # first summarize the schools table by summing all enrollment across different schools, and get the mean of other numerical variables
+  merge(., acs, c("county_name","year")) # merge the two datasets by county and year
 ```
 
 #### Task 5: Create summary tables
@@ -102,16 +115,32 @@ Generate tables showing the following:
 ```{r}
 merged %>%
   group_by(county_name) %>%
-  summarize(total_county_enroll = sum(total_enroll), mean_per_free_lunch = mean(per_free_lunch), county_per_poverty = county_per_poverty)
+  summarize(total_enroll = sum(total_enroll), per_free_lunch = mean(per_free_lunch), county_per_poverty = mean(county_per_poverty))
+# this gives the total enrollment for each county over all schools and all recording years, and average level of per_free_lunch and county_per_poverty
 ```
 2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
 ```{r}
+# bottom 5 poverty rate
 merged %>%
   mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
-  group_by(county_name)%>%
-  summarize(per_poverty = mean(county_per_poverty),per_free_reduced_lunch = mean(per_free_reduced_lunch),mean_ela_score = mean(mean_ela_score), mean_math_score = mean(mean_math_score)) %>%
-  arrange(per_poverty)%>%
+  group_by(county_name) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            per_free_reduced_lunch = mean(per_free_reduced_lunch),
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>%
+  arrange(county_per_poverty)%>%
   slice(1:5)
+# top 5 poverty rate
+merged %>%
+  mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
+  group_by(county_name) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            per_free_reduced_lunch = mean(per_free_reduced_lunch),
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>%
+  arrange(desc(county_per_poverty)) %>%
+  slice(1:5)
+
 ```
 #### Task 6: Data visualization
 
@@ -119,48 +148,75 @@ Using `ggplot2`, visualize the following:
 
 1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
 ```{r}
-merged %>%
+schools %>%
   mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
-  mutate(test_performance = (math_z_score+ela_z_score)/2) %>%
+  mutate(test_performance = (ela_z_score + math_z_score)/2) %>%
   group_by(school_name)%>%
-  summarize(free_reduced_lunch = mean(per_free_reduced_lunch),mean_performance = mean(test_performance))%>%
+  summarize(free_reduced_lunch = mean(per_free_reduced_lunch),test_performance = mean(test_performance))%>%
   ggplot()+ 
-  geom_point(aes(x = free_reduced_lunch, y = mean_performance )) + 
-  labs(title = "Access to free reduced lunch vs test performance", x = "Percentage of students who have access to free or reduced lunch", y = "Test Performance")
+  geom_point(aes(x = free_reduced_lunch, y = test_performance )) + 
+  labs(title = "Access to free reduced lunch vs test performance", x = "access to free/reduced lunch", y = "Test Performance")
 ```
+
 2. Average test performance across *counties* with high, low, and medium poverty.
 ```{r}
-#to be finished
+level_order <- c('high', 'medium', 'low') 
+
+merged %>%
+  mutate(test_performance = mean_ela_score + mean_math_score) %>%
+  group_by(poverty_level) %>%
+  summarize(test_performance = mean(test_performance)) %>%
+  ggplot()+ 
+  geom_line(aes(x = factor(poverty_level, level = level_order), y = test_performance, group = 1)) +
+  labs(title = "Average Test Performance by County Poverty Level", x = "County Poverty Level", y = "Test Score") 
+
 ```
+
+
 #### Task 7: Answering questions
 
 Using the skills you have learned in the past three days, tackle the following question: 
 
 > What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
 
-Answer: to be finished.
+Answer: Based on previous graph, we can see that counties with lowest poverty level have the highest average test performance. We can also see from the first graph that schools that have higher proption of students who need free/reduced lunch have lower test performance. Based on these observations, we can deduce that poverty and test performance is negatively correlated. 
 
-You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+To see how these factors influence test performance, we can further build a linear regression model:
 
-Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
+```{r}
+merged <- merged %>%
+   mutate(test_performance = mean_ela_score + mean_math_score) %>%
+   mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch)
 
-## Github submission
-
-When you have completed the exercise, save your Markdown file in the `submissions` folder of your forked repo using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`. Commit changes periodically, and push commits when you are done.
-
-You can optionally create a pull request to submit this file (and other exercise files from the bootcamp sessions) to the base repo that lives in the MSiA organization. If you would like to do this, make sure that all new files you have created are in the `submissions` folder, and then create a pull request that asks to merge changes from your forked repo to the base repo. 
-
-
-
-
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+linearMod <- lm(test_performance ~ county_per_poverty + median_household_income + per_free_reduced_lunch, data=merged)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We saw by the coefficients that all three factors: county_per_poverty, median_household_income, and per_free_reduced_lunch are negatively correlated with test_performance. However, that does not mean that providing free/reduced lunch does not help with test performanc, this is because counties or schools with high percentage of student having free/reduced lunch means that those counties or schools are the ones that are less wealthy. We need test performance data before those policies are implemented to know the impact of the policies.
+
+To see how the relationship between poverty level and test performance has changed over time, let us graph its impact by calculating the linear regression coefficients over the years.
+
+```{r}
+summary(merged$year)
+
+y <- 2009:2016
+list <- c()
+
+for (i in y){
+  tmp <- filter(merged, year == i)
+  linearMod <- lm(test_performance ~ county_per_poverty, data=tmp)
+  sum <- summary(linearMod)
+  list <- c(list, sum$coefficients["county_per_poverty", "Estimate"])
+}
+
+df <- data.frame("year"=y, "coeff"=list)
+
+ggplot(df) + geom_line(aes(x = year, y = coeff)) +
+  labs(title = "Impact of poverty on performance over the years", x = "year", y = "linear regression coeff") 
+
+```
+
+Based on the graph above, we see that the impact of poverty level on students' test performance has been in a declining trend since 2012, although it increased during 2009-2012.
+
+#### Final Comments
+
+I did a lot of averaging in this exercise and some of the data treatment might not rigorous. Let me know if any of my answers is wrong or ways it can be improved. 
