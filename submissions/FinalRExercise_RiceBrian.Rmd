@@ -1,0 +1,464 @@
+---
+title: "Day 8 - Final Exercises"
+author: "Brian Rice"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(readxl)
+
+theme_set(theme_minimal())
+```
+
+# MSiA Boot Camp - Final R exercise
+
+You've learned quite a lot about R in a short time. Congratulations! This exercise is designed to give you some additional practice on the material we have discussed this week while the lectures are still fresh in your mind, and to integrate different tools and skills that you have learned.
+
+## Instructions
+
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset.
+
+```{r import-data}
+schools <- read_csv(here("data", "nys_schools.csv"),
+                    na = c("", "NA", "-99"))
+counties <- read_csv(here("data", "nys_acs.csv"),
+                     na = c("", "NA", "-99"))
+
+schools_raw <- read_csv(here("data", "nys_schools.csv"))
+counties_raw <- read_csv(here("data", "nys_acs.csv"))
+
+# preview data
+schools
+counties
+```
+
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+
+```{r rename-columns}
+schools <- schools %>% 
+  # dplyr::rename() syntax: new_name = old_name
+  rename(school_id = school_cd,
+         total_enrollment = total_enroll,
+         free_lunch_proportion = per_free_lunch,
+         reduced_lunch_proportion = per_reduced_lunch,
+         lep_proportion = per_lep,
+         mean_reading_score = mean_ela_score)
+
+counties <- counties %>% 
+  rename(poverty_proportion = county_per_poverty,
+         bachelors_proportion = county_per_bach)
+
+# preview data
+schools
+counties
+```
+
+First, a look at the `schools` dataset:
+
+```{r schools-missing-values}
+# what counties are there, and with what frequencies?
+# all seem reasonable except the first, "-99"
+schools %>% 
+  group_by(county_name) %>% 
+  summarize(count = n())
+
+# -99 is used to represent missing values in these datasets
+# -99 has already been converted to NA (from the initial read)
+# there are a few thousand rows with NA values:
+schools %>% 
+  filter(!complete.cases(.))
+
+# which rows contain any NA values?
+Filter(function(x) any(is.na(x)), schools)
+Filter(function(x) any(is.na(x)), counties)
+
+# do any rows contain only NA values?
+Filter(function(x) all(is.na(x)), schools)
+Filter(function(x) all(is.na(x)), counties)
+```
+
+```{r helper-generate-basic-histogram}
+create_hist <- function(dataset, variable) {
+  ggplot(dataset) +
+    geom_histogram(aes(x = variable)) +
+    labs(x = substitute(variable))
+}
+```
+
+```{r schools-distributions}
+# distributions of variables:
+
+# counties
+schools %>% 
+  group_by(county_name) %>% 
+  summarize(count = n())
+
+# years of available data
+schools %>% 
+  group_by(year) %>% 
+  summarize(count = n())
+
+# total enrollment
+schools %>% create_hist(schools$total_enrollment)
+
+# free lunch program
+schools %>% create_hist(schools$free_lunch_proportion)
+
+# reduced lunch program
+schools %>% create_hist(schools$reduced_lunch_proportion)
+
+# limited english proficiency proportion
+schools %>% create_hist(schools$lep_proportion)
+
+# avg reading scores
+schools %>% create_hist(schools$mean_reading_score)
+
+# avg math scores
+schools %>% create_hist(schools$mean_math_score)
+```
+
+Second, the `counties` dataset:
+
+```{r counties-distributions}
+# distribution of variables:
+
+# counties
+counties %>% 
+  group_by(county_name) %>% 
+  summarize(count = n())
+
+# years of available data
+counties %>% 
+  group_by(year) %>% 
+  summarize(count = n())
+
+# poverty_proportion
+counties %>% create_hist(counties$poverty_proportion)
+
+# median household incomes
+counties %>% create_hist(counties$median_household_income)
+
+# bachelors_proportion
+counties %>% create_hist(counties$bachelors_proportion)
+```
+
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+
+1. Missing values
+
+Which rows contain missing values ("-99")?
+
+```{r identify-missing-values}
+schools_raw %>% 
+  select(-school_cd) %>% 
+  filter_all(any_vars(str_detect(., "-99")))
+
+counties_raw %>% 
+  filter_all(any_vars(str_detect(., "-99")))
+```
+
+There are only a small subset of rows with `district_name == "-99"`. These are also the only records with `county_name = "-99"` or `region == "-99"`.
+
+There are also a small group with no enrollment data. These rows also miss free lunch data and more.
+
+```{r}
+schools_raw %>% 
+  filter(total_enroll == "-99")
+```
+
+It doesn't make sense to keep any records if all the numerical info is unavailable. So drop the rows with basically only school_name and year:
+
+```{r drop-missing-enrollment}
+# preview and confirm the rows we want to drop
+schools %>% 
+  filter(is.na(total_enrollment),
+         is.na(mean_reading_score))
+
+# drop in the primary table
+# the converse of (A and B) is (!A or !B)
+schools <- schools %>% 
+  filter(!is.na(total_enrollment))
+```
+
+In order to merge the `schools` dataset with `counties`, we're going to need `county_name` to be populated.
+
+```{r drop-missing-county-names}
+# preview the rows to drop
+schools %>% 
+  filter(is.na(county_name))
+
+# drop from the primary table
+schools <- schools %>% 
+  drop_na(county_name)
+```
+
+Additionally, since we are interested in analyzing the relationship between poverty, lunch programs, and test performance, we need only the entries which do not contain NA for these columns.
+
+```{r drop-missing-values-lunch-tests}
+# which features have this stricter requirement of non-missing values?
+vars_requiring_values <- c("free_lunch_proportion", "reduced_lunch_proportion", "mean_reading_score", "mean_math_score")
+
+schools <- schools %>% 
+  drop_na(all_of(vars_requiring_values))
+```
+
+Looks like we are already good on this front. Perfect. So where else still contains missing values?
+
+```{r check-remaining-missing-values}
+colSums(is.na(schools))
+```
+
+Finally, `district_name`. Does this column have any significance for our project?
+
+```{r district-name}
+schools %>% 
+  filter(is.na(district_name)) %>% 
+  group_by(school_name) %>% 
+  summarize(count = n())
+```
+
+It seems like they are almost exclusively charter schools, which are not confined to a single school district (rather, they typically have state or sometimes city requirements to attend). So we can leave them be for now.
+
+2. Poverty Levels
+
+Based on the information in the `counties` table, unfortunately it is difficult to get an accurate representation of the level of poverty in the county&mdash;the poverty line in the United States is dependent on the number of people in the household, but this information is not available in our dataset. 
+
+[One definition of poverty severity](https://en.wikipedia.org/wiki/Concentrated_poverty#History_of_concentrated_poverty_in_the_United_States) is the frequency with which poverty is experienced; in other words, the proportion of residents below the poverty line. Fortunately, our `counties` dataset provides this information in the `poverty_proportion` field.
+
+Although the Wikipedia article indicates they are disputed and/or arbitrary, we can use the following cutoffs:
+
+- High ("extreme") poverty: 40% and above
+- Medium: 20-39%
+- Low: below 20%
+
+In addition, I will rename the categories to prevent confusion; "low" poverty actually corresponds to high income, and "high" poverty actually corresponds to low income. Since it is a hardship, I will use "low", "moderate," and "severe" instead.
+
+```{r assign-poverty-categories}
+counties <- transform(counties,
+                      poverty_group = cut(poverty_proportion,
+                                          breaks = c(-Inf, 0.20, 0.40, Inf),
+                                          labels = c("low", "moderate", "severe")))
+
+counties
+```
+
+3. Scale math and reading scores for each year
+
+Since standardized tests can and do change each year they are administered, we will scale the scores of each year to correct for any bias (i.e. any exceptionally difficult or easy tests).
+
+```{r scale-test-scores}
+# passing no arguments is equivalent to standard z-distribution scaling
+standardized_test_scores <- schools %>% 
+  group_by(year) %>% 
+  transmute(mean_math_score = mean_math_score,       # keep for reference against standardized score
+            mean_reading_score = mean_reading_score, # keep for reference against standardized score
+            standardized_math_score = scale(mean_math_score),
+            standardized_reading_score = scale(mean_reading_score))
+
+schools <- left_join(schools, standardized_test_scores, by = c("year", "mean_reading_score", "mean_math_score"))
+
+schools
+```
+
+
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+
+
+```{r county_totals}
+county_totals <- inner_join(schools, counties, by = c("county_name", "year"))
+
+county_totals
+
+# total up our data for each county
+# we cannot (for example) average the median incomes and expect to get a meaningful result
+#     related: https://orangematter.solarwinds.com/2016/11/18/why-percentiles-dont-work-the-way-you-think/
+county_totals <- county_totals %>% 
+  group_by(county_name, year) %>% 
+  transmute(county_enrollment = sum(total_enrollment),
+            county_free_lunch_proportion = sum(free_lunch_proportion * total_enrollment) / county_enrollment,
+            county_reduced_lunch_proportion = sum(reduced_lunch_proportion * total_enrollment) / county_enrollment,
+            county_lep_proportion = sum(lep_proportion * total_enrollment) / county_enrollment,
+            mean_reading_score = sum(mean_reading_score * total_enrollment) / county_enrollment,
+            mean_math_score = sum(mean_math_score * total_enrollment) / county_enrollment,
+            bachelors_proportion = bachelors_proportion,
+            poverty_proportion = poverty_proportion,
+            poverty_group = poverty_group) %>% 
+  distinct() # collapse all the duplicate rows
+
+# again, scale test scores for each year
+county_totals <- county_totals %>% 
+  group_by(year) %>% 
+  mutate(standardized_math_score = scale(mean_math_score),
+         standardized_reading_score = scale(mean_reading_score))
+
+# check again for duplicates
+county_totals %>% 
+  group_by(county_name, year) %>% 
+  summarize(count = n()) %>% 
+  filter(count > 1)
+
+county_totals
+```
+
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r summary-table-1}
+county_totals %>% 
+  transmute(County = county_name,
+            `Total Enrollment` = county_enrollment,
+            `Percent of Students in Lunch Assistance Program` = 
+              100 * round(county_free_lunch_proportion + county_reduced_lunch_proportion, 4),
+            `Percent of Population in Poverty` = 100 * round(poverty_proportion, 4)) %>% 
+  knitr::kable()
+```
+
+```{r summary-table-2}
+# Highest poverty
+county_totals %>% 
+  transmute(County = county_name,
+            `Percent of Population in Poverty` = 100 * round(poverty_proportion, 4),
+            `Percent of Students in Lunch Assistance Program` = 
+              100 * round(county_free_lunch_proportion + county_reduced_lunch_proportion, 4),
+            `Average Reading Score` = round(mean_reading_score, 2),
+            `Average Math Score` = round(mean_math_score, 2)) %>%
+  arrange(desc(`Percent of Population in Poverty`)) %>% 
+  head(5) %>% 
+  knitr::kable()
+
+# Lowest poverty
+county_totals %>% 
+  transmute(County = county_name,
+            `Percent of Population in Poverty` = 100 * round(poverty_proportion, 4),
+            `Percent of Students in Lunch Assistance Program` = 
+              100 * round(county_free_lunch_proportion + county_reduced_lunch_proportion, 4),
+            `Average Reading Score` = round(mean_reading_score, 2),
+            `Average Math Score` = round(mean_math_score, 2)) %>%
+  arrange(`Percent of Population in Poverty`) %>% 
+  head(5) %>% 
+  knitr::kable()
+```
+
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r test-scores-vs-lunch-programs}
+# there really shouldn't be any x values above 1 (more than 100% of students)
+# I am going to ignore for now in the interest of time
+
+ggplot(schools) + 
+  geom_point(aes(x = free_lunch_proportion + reduced_lunch_proportion,
+                 y = standardized_math_score + standardized_reading_score),
+             alpha = 0.8, color = "steelblue") +
+  labs(title = "Relationship between schools' test scores and lunch assistance programs",
+       x = "Proportion of students in free or reduced lunch programs",
+       y = "Math + reading (standardized) test scores")
+```
+
+```{r test-scores-vs-poverty-level}
+ggplot(county_totals) +
+  geom_col(aes(x = poverty_group, y = standardized_math_score + standardized_reading_score)) +
+  labs(title = "Relationship between county test scores and poverty level",
+       x = "Poverty level",
+       y = "Math + reading (standardized) test scores")
+```
+
+I think it makes more sense to compare poverty frequency directly, instead of the buckets:
+
+```{r test-scores-vs-poverty-proportion}
+ggplot(county_totals) +
+  geom_point(aes(x = round(100 * poverty_proportion, 2),
+                 y = standardized_math_score + standardized_reading_score),
+             alpha = 0.8, color = "steelblue") +
+  labs(title = "Relationship between county test scores and poverty frequency",
+       x = "Percentage of population in poverty",
+       y = "Math + reading (standardized) test scores")
+```
+
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
+
+Answer:
+
+It seems clear based on the last graph that there is a fairly strong, negative relationship between test scores and poverty frequency. That is, counties with higher prevalence of poverty tend to score worse on standardized tests, after controlling for year-to-year fluctuations in the absolute scores of the tests. However, is this trend consistent over time? Again, it seems so:
+
+```{r test-scores-vs-poverty-over-time}
+ggplot(county_totals) +
+  geom_point(aes(x = round(100 * poverty_proportion, 2),
+                 y = standardized_math_score + standardized_reading_score,
+                 color = factor(year)),
+             alpha = 0.8) +
+  labs(title = "Relationship between county test scores and poverty frequency",
+       x = "Percentage of population in poverty",
+       y = "Math + reading (standardized) test scores")
+```
+
+Separating based on year (to see more clearly):
+
+```{r test-scores-vs-poverty-over-time-2}
+ggplot(county_totals) +
+  geom_point(aes(x = round(100 * poverty_proportion, 2),
+                 y = standardized_math_score + standardized_reading_score,
+                 color = factor(year)),
+             alpha = 0.8) +
+  facet_wrap(~ year) +
+  labs(title = "Relationship between county test scores and poverty frequency",
+       x = "Percentage of population in poverty",
+       y = "Math + reading (standardized) test scores")
+```
+
+Though, is this relationship affected by lunch assistance programs? We can see from the plot below that lunch assistance and poverty tend to occur together. In addition, the highest test scores are located in the bottom-left corner (lowest frequencies of both poverty and lunch assistance), and tend to decrease as poverty and/or lunch assistance increase.
+
+```{r poverty-vs-lunch-programs}
+ggplot(county_totals, aes(x = round(100 * poverty_proportion, 2),
+                          y = round(100 * county_free_lunch_proportion, 2),
+                          z = standardized_math_score + standardized_reading_score)) +
+  stat_summary_2d() +
+  geom_point(shape = 1, color = "white", alpha = 0) +
+  viridis::scale_fill_viridis(name = "Standardized test scores") +
+  labs(x = "Percent of county population in poverty",
+       y = "Percent of students receiving lunch assistance")
+```
+
+
+## Github submission
+
+When you have completed the exercise, save your Markdown file in the `submissions` folder of your forked repo using this naming convention: `FinalRExercise_LastnameFirstname.Rmd`. Commit changes periodically, and push commits when you are done.
+
+You can optionally create a pull request to submit this file (and other exercise files from the bootcamp sessions) to the base repo that lives in the MSiA organization. If you would like to do this, make sure that all new files you have created are in the `submissions` folder, and then create a pull request that asks to merge changes from your forked repo to the base repo. 
+
+## Reminders
+
+- Remember to **load necessary packages**.
+- Remember to **comment extensively** in your code. Since you will be working in an RMarkdown file, you can describe your workflow in the text section. But you should also comment within all of your code chunks.
+- Attempt to knit your Markdown file into HTML format before committing it to Github. Troubleshoot any errors with the knit process by checking the lines referred to in the error messages.
