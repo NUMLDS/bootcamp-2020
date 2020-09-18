@@ -1,0 +1,222 @@
+---
+title: "MSiA Bootcamp Final Exercises - Lanqi Fei"
+author: "Lanqi Fei"
+date: "9/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# MSIA Boot Camp - Final R exercise
+
+
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
+
+```{r, results="hide"}
+library(tidyverse)# load the library needed
+```
+```{r}
+# read the datasets
+# here .. is added to the path because the working directory of my markdown file is in the submissions folder
+schools <- read.csv("../data/nys_schools.csv", stringsAsFactors = F)
+acs <- read.csv("../data/nys_acs.csv", stringsAsFactors = F)
+```
+
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+
+```{r}
+# take a look at the datasets
+head(schools)
+head(acs)
+# find the types of variables
+str(schools)
+str(acs)
+# find the size of the datasets
+dim(schools)
+dim(acs)
+# find if there is any missing data
+any(is.na(schools))
+any(is.na(acs))
+```
+Answer:
+There are several types of variables: character, numerical, and integer. There are no NA values in the datasets. But later we will see that the missing values are coded as "-99". We have 35663 lines of data for schools and 496 lines of data for acs.
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+```{r}
+# code the missing values as NA
+schools[schools == -99 | schools == "-99"] <- NA
+acs[acs == -99 | acs == "-99"] <- NA
+
+# now the missinvalues can be detected 
+any(is.na(schools))
+any(is.na(acs))# we notice that only schools have missing values
+
+
+# drop rows with missing values
+schools <- na.omit(schools)
+any(is.na(schools))# check all missing values have been dropped
+```
+There are better ways to perform imputation (such as replacing by mean), but I choose the simplest way here by dropping the lines with missing data.
+
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+```{r}
+groups <- acs %>%
+  group_by(county_name) %>%
+  summarize(poverty_level = mean(county_per_poverty)) %>%
+  arrange(desc(poverty_level))
+
+obs <- 1:nrow(acs)
+for (i in obs){
+  if(acs[i,"county_name"]%in% groups$county_name[1:21]){
+    acs[i,"poverty_level"] <- "high"
+  } else if(acs[i,"county_name"]%in% groups$county_name[22:42]){
+    acs[i,"poverty_level"] <- "medium"
+  } else{
+    acs[i,"poverty_level"] <- "low"
+  }
+ 
+}
+```
+Answer: Here I choose to look at average county_per_poverty for each county and order them in descending order based on the poverty level. Since there are 62 counties, I divide them into 3 groups, with the top 31 counties selected as high poverty level, the next 31 counties as medium level and the rest 20 counties as low level.
+
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+```{r}
+schools <- schools %>%
+  group_by(year) %>%
+  mutate(ela_z_score = scale(mean_ela_score), math_z_score = scale(mean_math_score))
+```
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+```{r}
+merged <- schools %>%
+  group_by(county_name, year) %>%
+  summarize(total_enroll = sum(total_enroll), 
+            per_free_lunch = mean(per_free_lunch),
+            per_reduced_lunch = mean(per_reduced_lunch), 
+            per_lep = mean(per_lep), 
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>% # first summarize the schools table by summing all enrollment across different schools, and get the mean of other numerical variables
+  merge(., acs, c("county_name","year")) # merge the two datasets by county and year
+```
+
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+```{r}
+merged %>%
+  group_by(county_name) %>%
+  summarize(total_enroll = sum(total_enroll), per_free_lunch = mean(per_free_lunch), county_per_poverty = mean(county_per_poverty))
+# this gives the total enrollment for each county over all schools and all recording years, and average level of per_free_lunch and county_per_poverty
+```
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+```{r}
+# bottom 5 poverty rate
+merged %>%
+  mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
+  group_by(county_name) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            per_free_reduced_lunch = mean(per_free_reduced_lunch),
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>%
+  arrange(county_per_poverty)%>%
+  slice(1:5)
+# top 5 poverty rate
+merged %>%
+  mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
+  group_by(county_name) %>%
+  summarize(county_per_poverty = mean(county_per_poverty),
+            per_free_reduced_lunch = mean(per_free_reduced_lunch),
+            mean_ela_score = mean(mean_ela_score), 
+            mean_math_score = mean(mean_math_score)) %>%
+  arrange(desc(county_per_poverty)) %>%
+  slice(1:5)
+
+```
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+```{r}
+schools %>%
+  mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch) %>%
+  mutate(test_performance = (ela_z_score + math_z_score)/2) %>%
+  group_by(school_name)%>%
+  summarize(free_reduced_lunch = mean(per_free_reduced_lunch),test_performance = mean(test_performance))%>%
+  ggplot()+ 
+  geom_point(aes(x = free_reduced_lunch, y = test_performance )) + 
+  labs(title = "Access to free reduced lunch vs test performance", x = "access to free/reduced lunch", y = "Test Performance")
+```
+
+2. Average test performance across *counties* with high, low, and medium poverty.
+```{r}
+level_order <- c('high', 'medium', 'low') 
+
+merged %>%
+  mutate(test_performance = mean_ela_score + mean_math_score) %>%
+  group_by(poverty_level) %>%
+  summarize(test_performance = mean(test_performance)) %>%
+  ggplot()+ 
+  geom_line(aes(x = factor(poverty_level, level = level_order), y = test_performance, group = 1)) +
+  labs(title = "Average Test Performance by County Poverty Level", x = "County Poverty Level", y = "Test Score") 
+
+```
+
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+Answer: Based on previous graph, we can see that counties with lowest poverty level have the highest average test performance. We can also see from the first graph that schools that have higher proption of students who need free/reduced lunch have lower test performance. Based on these observations, we can deduce that poverty and test performance is negatively correlated. 
+
+To see how these factors influence test performance, we can further build a linear regression model:
+
+```{r}
+merged <- merged %>%
+   mutate(test_performance = mean_ela_score + mean_math_score) %>%
+   mutate(per_free_reduced_lunch = per_free_lunch + per_reduced_lunch)
+
+linearMod <- lm(test_performance ~ county_per_poverty + median_household_income + per_free_reduced_lunch, data=merged)
+```
+
+We saw by the coefficients that all three factors: county_per_poverty, median_household_income, and per_free_reduced_lunch are negatively correlated with test_performance. However, that does not mean that providing free/reduced lunch does not help with test performanc, this is because counties or schools with high percentage of student having free/reduced lunch means that those counties or schools are the ones that are less wealthy. We need test performance data before those policies are implemented to know the impact of the policies.
+
+To see how the relationship between poverty level and test performance has changed over time, let us graph its impact by calculating the linear regression coefficients over the years.
+
+```{r}
+summary(merged$year)
+
+y <- 2009:2016
+list <- c()
+
+for (i in y){
+  tmp <- filter(merged, year == i)
+  linearMod <- lm(test_performance ~ county_per_poverty, data=tmp)
+  sum <- summary(linearMod)
+  list <- c(list, sum$coefficients["county_per_poverty", "Estimate"])
+}
+
+df <- data.frame("year"=y, "coeff"=list)
+
+ggplot(df) + geom_line(aes(x = year, y = coeff)) +
+  labs(title = "Impact of poverty on performance over the years", x = "year", y = "linear regression coeff") 
+
+```
+
+Based on the graph above, we see that the impact of poverty level on students' test performance has been in a declining trend since 2012, although it increased during 2009-2012.
+
+#### Final Comments
+
+I did a lot of averaging in this exercise and some of the data treatment might not rigorous. Let me know if any of my answers is wrong or ways it can be improved. 
