@@ -9,6 +9,7 @@ output:
 
 <br><br>
 ```{r setup, message = FALSE, warning=FALSE}
+library(car)
 library(htmltools)
 library(rmarkdown)
 library(knitr)
@@ -407,17 +408,19 @@ Pearson correlation tests showed that there exists significant negative associat
 # multivariate linear regression
 lr1 <- lm(zmath ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data=ctysch1)
 summary(lr1)
+print(durbinWatsonTest(lr1))
 ```
 
-The multivariate linear regression model showed that in the presence of the effects of the percentage of students with free or reduced lunch price, the association between county poverty and standardized math score is reversed. Associations between free lunch and reduced lunch price with math scores were not changed in the presence of county poverty.
+The multivariate linear regression model showed that in the presence of the effects of the percentage of students with free or reduced lunch price, the association between county poverty and standardized math score is reversed. Associations between free lunch and reduced lunch price with math scores were not changed in the presence of county poverty. The Durbin Watson Test statistic indicated a slight positive autocorrelation within the residuals, this means that time series regression models might provide more accurate results.
 <br><br>
 ```{r stats2, message=FALSE, warning=FALSE}
 # multivariate linear regression
 lr2 <- lm(zeng ~ county_per_poverty + per_free_lunch + per_reduced_lunch, data=ctysch1)
 summary(lr2)
+print(durbinWatsonTest(lr2))
 ```
 
-Standardized reading scores also have the similar associations with county poverty, free lunch and reduced lunch price.
+Standardized reading scores also have the similar associations with county poverty, free lunch and reduced lunch price. The Durbin Watson Test statistic of this reading score regression model also indicated a slight positive autocorrelation within the residuals.
 
 ```{r inter0, message=FALSE, warning=FALSE}
 # multivariate linear regression
