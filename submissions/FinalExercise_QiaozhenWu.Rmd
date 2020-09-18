@@ -91,3 +91,11 @@ merge_group <- merge_school_acs %>% group_by(county_name) %>% summarise(., math_
 ggplot(merge_group, aes(x=county_name, y=ela_z_score, fill = income_div))+ geom_bar(stat= "identity") 
 ggplot(merge_group, aes(x=county_name, y=math_z_score, fill = income_div))+ geom_bar(stat= "identity") 
 ```
+
+## Questions 7:
+### The second graph above seems to suggests that the poorer the county the more likely that it may get low test score. The plot below shows that the relationship got better through out the year . And the first graph shows that reduced lunch cost positively mediated the relationship. 
+
+```{r}
+#plot years
+ggplot(merge_school_acs, aes(x=median_household_income, y= math_z_score, color = year, group=year))+ geom_point()+ geom_smooth(method='lm',se=FALSE)
+```
