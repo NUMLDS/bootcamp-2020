@@ -24,6 +24,8 @@ Read both California energy datasets. Make sure the `datetime` variable is in an
 
 ```{asis}
 ### Answer 
+read.csv(ca_energy_imports)
+
 ```
 
 ```{asis}
