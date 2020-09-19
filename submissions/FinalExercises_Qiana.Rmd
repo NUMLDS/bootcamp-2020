@@ -1,0 +1,187 @@
+---
+title: "FinalExercise_QianaYang"
+author: "Qiana Yang"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Task 1: Import Data
+
+```{r}
+library(tidyverse)
+schools <- read_csv(here::here("data/nys_schools.csv"))
+county <- read_csv(here::here("data/nys_acs.csv"))
+
+```
+
+
+Task 2: Examine Data
+
+```{r}
+str(schools)
+str(county)
+sum(is.na(schools))
+sum(is.na(county))
+## What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+## Variable types are characters and doubles. There is missing data in 'schools' - you can find it by using sum(is.na()). All NA's in the 'district_name' column, but some missing data is coded as '-99'.
+```
+
+Task 3:
+
+1. Deal with missing values.
+2. Create a categorical variable.
+3. Standardized z score.
+
+```{r}
+## Deal with missing values.
+schools[schools == -99] <- NA
+county[county == -99] <- NA
+
+## Check # of missing values.
+sum(is.na(schools))
+sum(is.na(county))
+
+## Create categorical variable based on percentiles (top 33% of counties with highest county_per_poverty scores are designated as "high", the middle 33% as "medium", and the rest as "low").
+
+county$poverty_level <- NULL
+
+for (i in 1:nrow(county)) {
+    if(county[i, "county_per_poverty"] >= quantile(county$county_per_poverty, 0.66)) {
+      county[i, "poverty_level"] <- "high"
+    } else if (county[i, "county_per_poverty"] >= quantile(county$county_per_poverty, 0.33)) {
+      county[i, "poverty_level"] <- "medium"
+    } else {
+      county[i, "poverty_level"] <- "low"
+    }
+}
+
+## Create z-score for math and ELA for each year and assign to new variable 'tmp'
+
+tmp <- 
+  schools %>%
+    group_by(year) %>%
+    mutate(z_math_score = (scale(mean_math_score, center = T, scale = T)), z_ela_score = (scale(mean_ela_score, center = T, scale = T)))
+
+```
+
+task 4: Merge the School and County datasets.
+
+```{r}
+## Merge the School and County datasets.
+merged <- merge(schools, county, by = c("county_name", "year"), all.x = T, all.y = T)
+```
+
+Task 5: Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r}
+## Subtask 1: select total enrollment and percent of students qualifying for free or reduced price lunch
+
+county_t1 <- 
+  merged %>%
+    group_by(county_name, year) %>% 
+    summarise(total_enrollment = sum(total_enroll), total_benefit_lunch = sum(total_enroll * (per_free_lunch + per_reduced_lunch)), total_per_benefit_lunch = total_benefit_lunch/total_enrollment) %>%
+    select(-total_benefit_lunch)
+
+## Subtask 1: merge with percent of population in poverty per county per year
+
+county_t1 <- merge(county_t1, select(county, county_name, year, county_per_poverty), by = c("county_name", "year"), all.x = T)
+
+## Subtask 2: Find the counties with the top 5 and bottom 5 poverty rate by adding the poverty rate for all years combined for each county
+
+tmp <- 
+  county %>%
+    group_by(county_name) %>%
+    summarize(sum_poverty = sum(county_per_poverty)) %>%
+    arrange(sum_poverty)
+
+tmp <- rbind(head(tmp, 5), tail(tmp, 5))
+
+## Subtask 2: Find average poverty rate across all years for each selected county in 'tmp'. Merge it with relevant data in 'county_t1' and 'merged'.
+
+county_t2 <- 
+  tmp %>%
+    right_join(county_t1, by = "county_name") %>%
+    select(county_name, year, county_per_poverty, total_per_benefit_lunch)
+
+tmp <-
+  merged %>%
+    group_by(county_name, year) %>%
+    summarize(mean_reading = mean(mean_ela_score, na.rm = T), mean_math = mean(mean_math_score, na.rm = T))
+
+county_t2 <- merge(county_t2, tmp, by = c("county_name", "year"))
+    
+```
+
+Task 6: Using `ggplot2`, visualize the following:
+
+The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+```{r}
+
+schools %>%
+  #aggregate data by individual schools. For each school, find the average percentage of students receiving lunch aid and average test scores across all years. Round the percentages to 2 digits.
+  group_by(school_name) %>%
+  summarize(lunch_benefit = round(mean(per_free_lunch + per_reduced_lunch, na.rm = T), digits = 2), math_score = round(mean(mean_math_score, na.rm = T), digits = 0), reading_score = round(mean(mean_ela_score, na.rm = T), digits = 0)) %>%
+  #aggregate data by the percentage of students receiving lunch aid, so that the graph would not look messy (our goal here is to have one test score associated with each unique percentage). Find the average test scores for each percentage across all schools.
+  group_by(lunch_benefit) %>%
+  summarize(math_score = mean(math_score, na.rm = T), reading_score = mean(reading_score, na.rm = T)) %>%
+  #merge data into long form. Our goal here is to "melt" the data so that we can visually compare math and reading scores in ggplot.
+  gather(key = "score_type", value = "score", -lunch_benefit) %>%
+  #make the final graph!
+  ggplot() + geom_point(aes(x = lunch_benefit, y = score, group = score_type, col = score_type)) + geom_smooth(aes(x = lunch_benefit, y = score, group = score_type, col = score_type)) + scale_x_binned(n.breaks = 100, labels = NULL, limits = c(0, 1.2)) + labs(title = "Lunch vs. Test Scores", x = "Percent of Students Receiving Lunch Benefit", y = "Average Test Score")
+
+```
+
+Use ggplot, visualize the following:
+
+Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+merged %>%
+  #aggregate 'county' data. Find average test performances by poverty level.
+  group_by(poverty_level) %>%
+  summarize(math_score = mean(mean_math_score, na.rm = T), reading_score = mean(mean_ela_score, na.rm = T)) %>%
+  #melt data into long form for graphing purposes.
+  gather(key = "score_type", value = "score", -poverty_level) %>%
+  #drop rows with missing values.
+  drop_na()%>%
+  #Plot!
+  ggplot() + geom_col(aes(x = factor(poverty_level, levels = c("low", "medium", "high")), y = score, group = score_type, col = score_type), position = "dodge") + labs(title = "Poverty Level vs. Test Score", x = "Poverty Level", y = "Test Score")
+
+```
+Task 7:
+
+What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+A: This is by no means a complete answer, but as poverty level increases, test performance decreases across all years, counties and schools. The relationship in general has not changed much, but we've seen increasing variability within poverty vs. test performance over the years, possibly affected by free/reduced price lunch. From two graphs above, it does seem that access to lunch is positively correlated to test scores after a certain percentage threshold.
+
+```{r}
+
+# Well, let's run the same ggplots by year...
+
+#function - ggplot for one year.
+plot_one_year <- function(input) {
+  #relationship of poverty vs. test score for one year
+  merged %>%
+    filter(year == input) %>%
+    mutate(poverty = round(county_per_poverty, digits = 2)) %>%
+    group_by(poverty) %>%
+    summarize(test_score = mean(c(mean_math_score, mean_ela_score), na.rm = T)) %>%
+    ggplot() + geom_point(aes(x = poverty, y = test_score)) + labs(title = paste(input, "Poverty vs. Test Score"), x = "Percent of Poverty", y = "Test Score")
+}
+
+plot_one_year(2009)
+plot_one_year(2010)
+plot_one_year(2011)
+plot_one_year(2012)
+plot_one_year(2013)
+plot_one_year(2014)
+```
+
