@@ -1,0 +1,370 @@
+---
+title: "FinalRExercise_KeTiffany"
+author: "Tiffany Ke"
+date: "9/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Task 1 
+### Import data 
+```{r, results='hide'}
+nys_acs<- read.csv(here::here("data/","nys_acs.csv"))
+nys_schools<- read.csv(here::here("data/","nys_schools.csv"))
+library(tidyverse)
+```
+
+$~$
+
+## Task 2 and 3
+### Clean missing values (-99) to NA
+```{r}
+nys_schools[nys_schools == -99] <- NA # to change -99 to NA
+nys_acs[nys_acs == -99] <- NA 
+```
+
+$~$
+
+(1) Check percentage of NA values in nys_schools.csv and nys_acs.csv to determine significance
+
+```{r}
+mean(is.na(nys_schools)) 
+mean(is.na(nys_acs))
+```
+
+Since missing values account for only 1 percent of the data in the school's data, decide to omit NA values from further calculations for ease of use. 
+
+$~$
+
+(2) Create new df by omitting NA values
+```{r}
+#omit NA values from nys_schools data to create new data table
+clean_nys_schools<- na.omit(nys_schools) 
+```
+
+$~$
+
+(3) Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups.
+
+```{r}
+#create a new variable with all missing values
+nys_acs$poverty_level<- NA
+```
+
+```{r}
+nys_acs$poverty_level[nys_acs$county_per_poverty >quantile(nys_acs$county_per_poverty, 0.75)] <- "High"
+nys_acs$poverty_level[quantile(nys_acs$county_per_poverty, 0.75)>nys_acs$county_per_poverty 
+                      & nys_acs$county_per_poverty>quantile(nys_acs$county_per_poverty, 0.25)] <- "Medium"
+nys_acs$poverty_level[nys_acs$county_per_poverty<quantile(nys_acs$county_per_poverty, 0.25)] <- "Low"
+```
+
+$~$
+
+(4) Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year 
+
+```{r}
+clean_nys_schools <- clean_nys_schools %>%
+  group_by(year) %>% 
+  mutate(z_ela_score = scale(mean_ela_score)) %>% 
+  mutate(z_math_score = scale(mean_math_score)) 
+```
+
+$~$
+
+## Task 4
+### Create a county-level dataset that merges variables from the schools dataset and the ACS dataset.
+
+$~$
+
+(1) Organize nys_schools data by formatting into "by county" values
+```{r}
+  #Simplify school dataset and change into sum for by county
+  new_nys_schools <- clean_nys_schools %>% 
+  select(county_name, year, total_enroll, per_free_lunch, per_reduced_lunch, per_lep, mean_ela_score, mean_math_score) %>%
+  group_by(county_name, year) %>% 
+  mutate(ttl_enroll = sum(total_enroll)) %>% 
+  mutate(ttl_free_lunch = sum(total_enroll*per_free_lunch))%>% 
+  mutate(ttl_reduced_lunch = sum(total_enroll*per_reduced_lunch)) %>% 
+  mutate(ttl_students_lep = sum(total_enroll*per_lep)) %>% 
+  mutate(average_ela_score = mean(mean_ela_score))%>% 
+  mutate(average_math_score = mean(mean_math_score))%>% 
+  select(-per_free_lunch, -per_reduced_lunch, -per_lep, -total_enroll,-mean_math_score, -mean_ela_score)
+  
+  unique_new_nys_schools<- unique(new_nys_schools)
+  
+  #Calculate Z score for math and Ela (by year)
+  unique_new_nys_schools <- unique_new_nys_schools %>% 
+  group_by(year) %>% 
+  mutate(z_score_math = scale(average_math_score)) %>% 
+  mutate(z_score_ela = scale(average_ela_score))
+
+  head(unique_new_nys_schools)
+```
+
+$~$
+
+(2) Merge new dataset and ACS dataset
+
+```{r}
+  #Merge schools and ACS dataset
+school_and_ACS <- merge(unique_new_nys_schools,nys_acs,by=c("county_name","year"))
+```
+
+$~$
+
+## Task 5: Create summary tables
+
+$~$
+
+### Table 1
+```{r}
+#calculate percent of students qualifying for free or reduced price lunch
+school_and_ACS$per_free_reduced<- (school_and_ACS$ttl_free_lunch + school_and_ACS$ttl_reduced_lunch)/school_and_ACS$ttl_enroll 
+```
+
+```{r}
+#generate Table 1: For each county (per year): total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+Table_1 <- school_and_ACS %>% 
+select(county_name, year, ttl_enroll, county_per_poverty, per_free_reduced)
+head(Table_1)
+```
+
+$~$
+
+### Table 2
+
+```{r}
+#generate Table 2:percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+Table_2<- school_and_ACS %>% 
+    select(county_name, year, county_per_poverty, per_free_reduced, average_ela_score, average_math_score)
+head(Table_2)
+```
+
+$~$
+
+##### *Lowest 5 for poverty results*
+```{r echo=FALSE, results = 'asis'}
+#lowest 5 for poverty levels
+bottom_five_Table_2 <- slice_min(Table_2, order_by = county_per_poverty, n= 5)
+library(knitr)
+kable(bottom_five_Table_2)
+```
+
+$~$
+
+##### *Highest 5 for poverty results*
+```{r echo=FALSE, results = 'asis'}
+#highest 5 for poverty levels
+top_five_Table_2 <- slice_min(Table_2, order_by = county_per_poverty, n= 5)
+library(knitr)
+kable(top_five_Table_2)
+```
+
+$~$
+
+## Task 6
+
+### Using `ggplot2`, visualize the following:
+```{r}
+  #import ggplot2
+  library(ggplot2)
+```
+
+$~$
+
+#### 1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+$~$
+
+(1) Create new dataset
+```{r}
+#Create new variable for percentage of students that have access to free or reduced lunch
+clean_nys_schools$access_to_lunch_per<- clean_nys_schools$per_free_lunch + clean_nys_schools$per_reduced_lunch
+
+#Create dataset of school, year, free/reduced price lunch, z-ela score, z-math score
+lunch_test_performance_school <- clean_nys_schools %>% 
+  select(school_name, year, access_to_lunch_per, z_ela_score, z_math_score)
+```
+ 
+$~$
+
+(2) Plot for relationship between math Z score and access to free or reduced lunch
+```{r}
+ #create plot (per school per year) for relationship between math score and access to free or reduced lunch
+lunch_test_performance_school %>% 
+  ggplot() + 
+  geom_point(aes(x = access_to_lunch_per,y = z_math_score))+
+               labs(title="Access to free/reduced price lunch and test performance", subtitle="Math", 
+                    x="Percentage of students that qualify for free or reduced price lunch", y="Math Z score")
+```
+
+$~$
+
+(3) Plot for relationship between Ela Z score and access to free or reduced lunch
+```{r}
+#create plot (per school per year) for relationship between ela score and access to free or reduced lunch
+lunch_test_performance_school %>% 
+  ggplot() + 
+  geom_point(aes(x = access_to_lunch_per,y = z_ela_score))+
+              labs(title="Access to free/reduced price lunch and test performance", subtitle="Ela", 
+                    x="Percentage of students that qualify for free or reduced price lunch", y="ELA Z score")
+```
+
+$~$
+
+#### 2. Average test performance per year across *counties* with high, low, and medium poverty.
+
+$~$
+
+(1) Create boxplot for relationship between math Z score and poverty level
+```{r}
+#create plot (per poverty level per year) for relationship between math score and poverty level
+ school_and_ACS$poverty_level <- factor(school_and_ACS$poverty_level , levels=c("High", "Medium", "Low")) #specify column order
+school_and_ACS %>%
+  ggplot() + 
+  geom_boxplot(aes(x=poverty_level, y= z_score_math)) +
+  labs(title="Test performance across *counties* with high, low, and medium poverty levels.", 
+       x="Poverty Level", y="Math score")
+```
+
+$~$
+
+(2) Create boxplot for relationship between math Z score and poverty level
+```{r}
+#create plot (per poverty level per year) for relationship between ELA score and poverty level
+school_and_ACS %>%
+  ggplot() + 
+  geom_boxplot(aes(x=poverty_level, y= z_score_ela)) +
+  labs(title="Test performance across *counties* with high, low, and medium poverty levels.", 
+       x="Poverty Level", y="ELA score")
+```
+
+$~$
+
+## Task 7 
+
+$~$
+
+#### What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? 
+$~$
+
+1. Create line plot for relationship betweeen poverty and test performance (z scores of math and ela)
+
+```{r}
+# create new dataset that includes poverty levels and testscores
+merged_pov <-merge(clean_nys_schools, nys_acs, by = c("county_name", "year"))
+```
+
+```{r}
+# create new dataset that includes poverty levels and test z scores
+score_poverty<- merged_pov%>% 
+  select(year, mean_ela_score, mean_math_score, poverty_level) %>% 
+  group_by(year) %>% 
+  mutate(test_z_math = scale(mean_math_score)) %>% 
+  mutate(test_z_ela = scale(mean_ela_score)) %>% 
+  group_by(year, poverty_level) %>% 
+  mutate(z_math = mean(test_z_math)) %>% 
+  mutate(z_ela = mean(test_z_ela)) %>% 
+  select(-mean_ela_score, -mean_math_score,-test_z_ela,-test_z_math)
+score_poverty<-unique(score_poverty)
+```
+
+$~$
+
+2. PLot line plot for average z math score and poverty levels
+```{r}
+  plot_1<- score_poverty %>% 
+  ggplot()+
+  geom_line(aes(x = year, y= z_math, group = poverty_level, col = poverty_level))+
+  labs(title="Average Z Math Score between high, low, and medium poverty levels",subtitle = "2009-2016",
+       x="Poverty Level", y="Math Z Score")
+  plot_1
+```
+
+$~$
+
+3. Plot line plot for average z ela score and poverty levels
+```{r}
+  plot_2<- score_poverty %>% 
+  ggplot()+
+  geom_line(aes(x = year, y= z_ela, group = poverty_level, col = poverty_level))+
+  labs(title="Average Z ELA Score between high, low, and medium poverty levels",subtitle = "2009-2016", 
+       x="Poverty Level", y="ELA Z Score")
+  plot_2
+```
+
+$~$
+
+##### From the last two plots, one can clearly see there is a negative relationship between the z scores and the poverty levels, with higher poverty levels possessing a lower average z score for both math and ELA scores. Spanning across from 2009 to 2016,  we see that test scores are going up for the high poverty level group, meaning that the relationship between poverty level and test scores are not as highly related as before.
+
+$~$
+
+#### Is this relationship at all moderated by access to free/reduced price lunch?
+
+```{r}
+# Create new df to see access to lunch and poverty levels
+merged_lunch_score<- merged_pov%>% 
+  select(year, mean_ela_score, mean_math_score, poverty_level, access_to_lunch_per) %>% 
+  group_by(year) %>% 
+  mutate(test_z_math = scale(mean_math_score)) %>% 
+  mutate(test_z_ela = scale(mean_ela_score)) %>% 
+  group_by(year, poverty_level) %>% 
+  mutate(z_math = mean(test_z_math)) %>% 
+  mutate(z_ela = mean(test_z_ela)) %>% 
+  mutate(mean_free_reduced_lunch_per = mean(access_to_lunch_per)) %>%  
+  select(-mean_ela_score, -mean_math_score,-test_z_ela,-test_z_math,-access_to_lunch_per)
+merged_lunch_score<-unique(merged_lunch_score)
+```
+
+$~$
+
+##### Here we plot two graphs together: Poverty levels vs. percentage of students that receive free lunch (DASHED LINE); and Poverty levels vs. z math scores (FILLED LINE) to see if there are any correlation effects.
+```{r}
+intercept = -0.52
+coeff <- 1.5
+
+merged_lunch_score %>% 
+  ggplot()+
+  geom_line(aes(x=year, y= mean_free_reduced_lunch_per, group = poverty_level, col = poverty_level), linetype="dashed") + 
+  geom_line(aes(x=year, y= z_math/coeff - intercept, group = poverty_level, col = poverty_level)) + 
+  scale_y_continuous(
+    name = "Free/Reduced Lunch Percentage",
+    sec.axis = sec_axis(~(.+intercept)*coeff, name="Math Z-Score")
+  )
+```
+
+$~$
+
+##### Here we plot two graphs together: Poverty levels vs. percentage of students that receive free lunch (DASHED LINE); and Poverty levels vs. z ela scores (FILLED LINE) to see if there are any correlation effects.
+
+```{r}
+intercept = -0.52
+coeff <- 1.5
+
+merged_lunch_score %>% 
+  ggplot()+
+  geom_line(aes(x=year, y= mean_free_reduced_lunch_per, group = poverty_level, col = poverty_level), linetype="dashed") + 
+  geom_line(aes(x=year, y= z_ela/coeff - intercept, group = poverty_level, col = poverty_level)) + 
+  scale_y_continuous(
+    name = "Free/Reduced Lunch Percentage",
+    sec.axis = sec_axis(~(.+intercept)*coeff, name="Ela Z-Score")
+  )
+```
+
+$~$
+
+
+##### As we see from the graphs above, there are different relationships between the percentage of students that have free or reduced price lunch access and the respective test scores. 
+
+##### For the medium poverty level group, the relationship between the access of free or reduced price and test scores is positive and highly correlated. 
+
+##### For low level and high level poverty groups however, the relationship between the access of free or reduced price and test scores is negative and highly correlated.
+
+$~$
+
+$~$
+
