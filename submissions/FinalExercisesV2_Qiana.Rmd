@@ -1,0 +1,188 @@
+---
+title: "Final Exercises Version 2"
+author: "Qiana Yang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo=answers, eval=answers,
+                      warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+This time, let's try using data.table
+
+## Import the data 'schools' and 'county'
+
+```{r}
+library(data.table)
+library(tidyverse)
+schools <- fread(here::here("data/nys_schools.csv"), na.strings = c("", NA))
+county <- fread(here::here("data/nys_acs.csv"), na.strings = c("", NA))
+```
+
+
+## Examine the datasets
+
+```{r}
+str(schools)
+str(county)
+
+## check for missing values
+sum(is.na(schools))
+sum(is.na(county))
+## 1706 missing values in 'schools'. Data types include characters, numericals, and integers.  
+```
+
+## Deal with missing values, coded as '-99'. Check for inaccurate percentages.
+
+
+```{r}
+
+schools[schools == -99] <- NA
+sum(is.na(schools))
+
+county[county == -99] <- NA
+sum(is.na(county))
+
+##Note that some percentages in 'schools' are > 1. 
+
+range(schools$per_free_lunch, na.rm = T)
+range(schools$per_reduced_lunch, na.rm = T)
+range(county$county_per_poverty, na.rm = T)
+range(county$county_per_bach, na.rm = T)
+
+
+
+```
+
+## Create categorical variables for poverty level. I'm dividing county_per_poverty into three sections based on percentiles. Datasets with percentiles below 33% are designated as low poverty. Datasets above 66% are designated as high poverty. The rest are medium.
+
+```{r}
+
+county[county_per_poverty >=  quantile(county_per_poverty, 0.66), poverty_level := "high"]
+
+county[county_per_poverty >= quantile(county_per_poverty, 0.33) & is.na(poverty_level), poverty_level := "medium"]
+
+county[is.na(poverty_level), poverty_level := "low"]
+```
+
+
+## Standardize the test scores for each year using scale()
+
+```{r}
+
+z_score <-
+  schools %>%
+  group_by(year) %>%
+  mutate(reading_z_score = scale(mean_ela_score), math_z_score = scale(mean_math_score)) %>%
+  select(school_name, year, reading_z_score, math_z_score)
+z_score
+
+```
+
+## Merge 'schools' and 'county' datasets. On the county level, group by county_name and year, and select the mean of per_free_lunch, per_reduced_lunch, test scores, and population in poverty, and sum of total enrollment.
+
+```{r}
+
+merged <- county[schools, on = c("county_name", "year")]
+
+merged <-
+merged %>%
+  group_by(county_name, year) %>%
+  summarize(average_free_lunch = mean(per_free_lunch, na.rm = T), average_reduced_lunch = mean(per_reduced_lunch, na.rm = T), average_reading_score = mean(mean_ela_score, na.rm = T), average_math_score = mean(mean_math_score, na.rm = T), total_enrollment = sum(total_enroll, na.rm = T), average_poverty_level = mean(county_per_poverty, na.rm = T)) 
+setDT(merged)
+
+```
+
+## For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+
+```{r}
+
+## Drop NA rows in county_name.
+merged <- drop_na(merged,county_name)
+
+## Checking to make sure all NA rows in county_name are dropped.
+sum(is.na(merged$county_name))
+
+## Add a variable to account for sum of average_free_lunch and average_reduced_lunch.
+merged[, sum_lunch_benefit := average_free_lunch + average_reduced_lunch]
+
+## Select county_name, year, total_enroll, average_free_lunch + average_reduced_lunch, and average_poverty_level.
+select(merged, county_name, year, total_enrollment, sum_lunch_benefit, average_poverty_level)
+```
+
+## For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+```{r}
+
+## Find the counties with the largest and smallest sums of average poverty rate across all years.
+rich_poor_counties <- merged[, .(county_total_poverty = sum(average_poverty_level, na.rm = T)), by = .(county_name = county_name)]
+
+## In the 'merged' table, filter for these counties. Name the new table 'top_bottom_county'.
+top_bottom_poverty <-
+merged %>%
+  filter(county_name %in% rich_poor_counties$county_name)
+
+## Select county_name, year, average_poverty_level, sum_lunch_benefit, average_reading_score, and average_math_score.
+select(top_bottom_poverty, county_name, year, average_poverty_level, sum_lunch_benefit, average_reading_score, average_math_score) 
+
+```
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+
+```{r}
+## Add a column to the 'schools' table for sum of per_free_lunch and per_reduced_lunch.
+schools[, sum_per_lunch := per_free_lunch + per_reduced_lunch]
+
+## Add a column to the 'schools' table for sum of mean_ela_score and mean_math_score.
+schools[, sum_mean_score := mean_ela_score + mean_math_score]
+
+## Aggregate data based on sum_per_lunch and year, so that for each value in x (sum_per_lunch), there is a unique value of y (mean of sum_mean_score).
+ggplot_schools <- schools[, .(sum_mean_score = mean(sum_mean_score, na.rm = T)), by = .(sum_per_lunch = sum_per_lunch, year = year)]
+
+## Use ggplot to visualize the relationship between sum_per_lunch and sum_mean_score, grouped by year.
+ggplot_schools %>%
+  ggplot() + geom_point(aes(x = sum_per_lunch, y = sum_mean_score, group = year, col = factor(year))) + scale_color_discrete(name = "year") + scale_x_binned(n.breaks = 100, labels = NULL, limits = c(0,2)) + labs(title = "Access to Lunch Aid & Test Score", x = "Percentage of Students with Lunch Aid (0-20%)", y = "Average Test Score")
+
+##Looks like there's been a change in test score scale in 2013. Just to double check, let's look at the range of test scores before and after 2013.
+range(schools[year < 2013]$mean_ela_score, na.rm = T)
+range(schools[year >= 2013]$mean_ela_score, na.rm = T)
+range(schools[year < 2013]$mean_math_score, na.rm = T)
+range(schools[year >= 2013]$mean_math_score, na.rm = T)
+```
+## Using `ggplot2`, visualize the following:
+
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+```{r}
+## Perform a merge by county_name and year. Append "county"'s "poverty_level" column to "schools".
+schools %>% 
+  left_join(county[, c("poverty_level", "county_name", "year")], by = c("county_name", "year")) %>%
+  drop_na(poverty_level) %>%
+## For each poverty level, find average test scores by year. Calculate average test scores by finding the mean of sum_mean_score by poverty level and year. 
+  group_by(poverty_level, year) %>%
+  summarize(mean_sum_score_by_poverty = mean(sum_mean_score, na.rm = T)) %>%
+  
+## Visualize the relationship between poverty level and test scores with ggplot, grouped by year. 
+  ggplot() + geom_line(aes(x = factor(poverty_level, levels = c("low", "medium", "high")), y = mean_sum_score_by_poverty, group = year, col = factor(year) )) + scale_color_discrete(name = "year") + ylim(550, 650) + labs(title = "Poverty Level & Test Score", x = "Poverty Level", y = "Average Test Score") ## I would run the same code with ylim(1350, 1450) to see the pre-2013 relationships.
+
+## If you run the same code with different ylim's, you'll find that the slope for the recent years is flatter - possibly correlated with increased access to free lunch.
+
+```
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+```{r}
+
+## Poverty seems to affect test performance. This relationship has not changed significantly over time, but it does seem that counties with medium and low levels of poverty have increasingly similar average test scores in recent years. 
+
+## From the two ggplots above, it's hard to tell how much of change the test performance is affected by access to free lunch. It does seem that there's a large percentage of students who have access to lunch aid in 2012 and 2013, and the average test performance of the corresponding schools vary - there could be a policy in some schools to lower the threshold for students who qualify for free/reduced lunch. 
+
+```
+
