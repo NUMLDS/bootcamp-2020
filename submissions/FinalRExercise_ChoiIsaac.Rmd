@@ -1,0 +1,437 @@
+---
+title: "day8_final-excercise-Isaac_Choi"
+author: "Isaac Choi"
+date: "9/18/2020"
+output: html_document
+---
+
+# MSIA Boot Camp - Final R exercise
+
+#### Libraries used:
+tidyverse,dplyr,readr,reshape2,ggplot2,gridExtra
+
+```{r message=FALSE,results="hide"}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(reshape2)
+library(lubridate)
+library(ggplot2)
+library(gridExtra)
+```
+
+
+#### Task 1: Import your data 
+```{r message=FALSE}
+acs <- read.csv(file = 'C:/Users/jisaa/Documents/bootcamp-2020/data/nys_acs.csv',
+                stringsAsFactors = F)
+schools <- read.csv(file = 'C:/Users/jisaa/Documents/bootcamp-2020/data/nys_schools.csv',
+                    stringsAsFactors = F)
+```
+
+#### Task 2: Explore your data
+
+First look at how many rows
+```{r message=FALSE}
+nrow(acs)
+nrow(schools)
+```
+
+Then look at structure
+```{r message=FALSE}
+str(acs)
+str(schools)
+```
+
+Then observe summary stats for two datasets
+```{r message=FALSE}
+summary(acs)
+summary(schools)
+```
+All value columns other than year and id seems to have -99 as their min.
+I also found some outliers in percentage columns. Per_free_lunch column has value above 100%, but nothing no value should be above 1.
+```{r message=FALSE}
+nrow(schools %>%
+        filter(per_free_lunch > 1|per_reduced_lunch > 1|per_lep > 1))
+```
+
+I wanted to visualize the dataset
+```{r message=FALSE}
+schools_melt <- melt(
+   schools,
+   id.vars = c(
+      'school_cd',
+      'school_name',
+      'district_name',
+      'county_name',
+      'region',
+      'year'
+   ),
+   variable.name = 'measure',
+   value.name = 'value'
+)
+
+tmp1<-schools_melt %>%
+   filter(
+      measure == 'total_enroll'
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+tmp2<-schools_melt %>%
+   filter(
+         measure %in% c('per_free_lunch', 'per_reduced_lunch', 'per_lep')
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+tmp3<-schools_melt %>%
+   filter(
+         measure %in% c('mean_math_score','mean_ela_score')
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+grid.arrange(tmp1, tmp2, tmp3, nrow=3)
+```
+
+
+#### Task 3: Recoding and variable manipulation
+1. Deal with missing values, which are currently coded as `-99`
+
+In schools dataset not all missing values are coded as '-99' some are coded as ''. 
+I want to first find out number of rows with blanks.
+```{r message=FALSE}
+nrow(schools %>%
+        filter_all(any_vars(. == "")))
+
+nrow(schools %>%
+        filter_all(any_vars(. == -99)))
+
+nrow(schools %>%
+        filter_all(any_vars(. == "" | . == -99)))
+```
+
+Create subset of schools data with only records with -99 and name it blankschools
+```{r message=FALSE}
+blankschools <- schools %>%
+   filter_all(any_vars(. == ""))
+```
+
+Compare stats
+```{r message=FALSE}
+summary(blankschools)
+summary(schools)
+```
+
+Realizing this is not enough, I wanted to find out how blank cells are spread across columns
+
+First I created a function that can create the comparison table.
+```{r message=FALSE}
+comptablegen <- function(x, y, columnname)
+{
+   tmp1 <- x %>%
+      count(x[!!columnname], sort = TRUE, name = 'TotalCount')
+   tmp2 <- y %>%
+      count(y[!!columnname], sort = TRUE, name = 'SubsetCount')
+   compare <- inner_join(tmp1, tmp2, by = columnname) %>%
+      mutate(percentage = round(SubsetCount / TotalCount * 100, 2)) %>%
+      filter(.[!!columnname] != -99) %>%
+      arrange(desc(percentage))
+   return(compare)
+}
+```
+
+Then pass in schools and blankschools dataset and a column name to the function. 
+```{r message=FALSE}
+#It looks like all blank values are coming from district_name column
+comptablegen(schools, blankschools, 'district_name') %>%
+   slice_max(percentage, n = 5)
+#New York City has by far the highest percentage of records with blank, but they are relatively low all across
+comptablegen(schools, blankschools, 'region') %>%
+   slice_max(percentage, n = 5)
+#missing records even across years
+comptablegen(schools, blankschools, 'year') %>%
+   slice_max(percentage, n = 5)
+#New York has the highest number of records with blank values
+comptablegen(schools, blankschools, 'county_name') %>%
+   slice_max(percentage, n = 5)
+```
+
+I am going to do the same analysis for subset with records with '-99'. 
+```{r message=FALSE}
+neg99schools <- schools %>%
+   filter_all(any_vars(. == -99))
+```
+
+Compare stats
+```{r message=FALSE}
+summary(neg99schools)
+summary(schools)
+```
+
+```{r message=FALSE}
+comptablegen(schools, neg99schools, 'district_name') %>%
+   slice_max(percentage, n = 5)
+#Finger Lakes region have the highest percentage of records with -99, but they are relatively low all across
+comptablegen(schools, neg99schools, 'region') %>%
+   slice_max(percentage, n = 5)
+#missing records even across years
+comptablegen(schools, neg99schools, 'year') %>%
+   slice_max(percentage, n = 5)
+#27% of Schyler have -99 in their records
+comptablegen(schools, neg99schools, 'county_name') %>%
+   slice_max(percentage, n = 5)
+```
+
+After comparing summaries of subset with blank value and entire schools set, I decided to drop any records with -99 and blank values. Even though some of the districts will be dropped off the records, the problematic records are spread out evenly across, and removing them will not create any bias. And since these records only represent 10% of the total, without these records, the data set will still be large enough to get valuable insights.
+
+```{r message=FALSE}
+acs <- acs %>%
+   filter_all(all_vars(. != -99)) %>%
+   filter_all(all_vars(. != ''))
+
+schools <- schools %>%
+   filter_all(all_vars(. != -99)) %>%
+   filter_all(all_vars(. != '')) %>%
+   filter(per_free_lunch < 1 & per_reduced_lunch<1 & per_lep < 1)
+```
+Display this dataset again using box plots.
+
+```{r message=FALSE}
+schools_melt <- melt(
+   schools,
+   id.vars = c(
+      'school_cd',
+      'school_name',
+      'district_name',
+      'county_name',
+      'region',
+      'year'
+   ),
+   variable.name = 'measure',
+   value.name = 'value'
+)
+
+tmp1<-schools_melt %>%
+   filter(
+      measure == 'total_enroll'
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+tmp2<-schools_melt %>%
+   filter(
+      measure %in% c('per_free_lunch', 'per_reduced_lunch', 'per_lep')
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+tmp3<-schools_melt %>%
+   filter(
+      measure %in% c('mean_math_score','mean_ela_score')
+   ) %>%
+   ggplot(mapping = aes(x = measure, y = value)) +
+   geom_boxplot()+
+   labs(x = "")
+
+grid.arrange(tmp1, tmp2, tmp3, nrow=3)
+```
+
+
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision.
+
+I believe percentile is the most dynamic and accurate methods to breakdown median income column
+```{r message=FALSE}
+pct <- quantile(acs$median_household_income, c(.333, .666, 1))
+
+acs <- acs %>%
+   mutate(.,
+          incomecategory =
+             ifelse(
+                median_household_income <= pct["33.3%"],
+                "Low",
+                ifelse(median_household_income <= pct["66.6%"], "Medium", "High")
+             ))
+```
+
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year -to - year. Create a new variable that is the standardized z - score for math and English Language Arts (ELA) for each year (hint:group by year and use the `scale()` function)
+```{r message=FALSE}
+schools <- schools %>%
+   group_by(year) %>%
+   mutate(scale_mean_ela_score = scale(mean_ela_score)) %>%
+   mutate(scale_mean_math_score = scale(mean_math_score))
+```
+
+
+#### Task 4: Merge datasets
+
+Create a county - level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+
+First check if county_name name conventions are equal and two sets are able to be joined without dropping significant amount of data
+```{r message=FALSE}
+nrow(schools)
+nrow(inner_join(schools, acs, keep = TRUE, by = 'county_name'))
+```
+After evaluating, I determined that joining table would be fine
+```{r message=FALSE}
+combined <- inner_join(schools, acs, by = c('county_name', 'year'))
+head(combined)
+```
+
+#### Task 5: Create summary tables
+```{r message=FALSE}
+summary(combined)
+```
+Generate tables showing the following:
+
+1. For each county, total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+```{r message=FALSE}
+combined_county <- combined %>%
+   group_by(county_name) %>%
+   summarize(
+      per_free_lunch = sum(total_enroll * per_free_lunch) / sum(total_enroll),
+      per_reduced_lunch = sum(total_enroll * per_reduced_lunch) /
+         sum(total_enroll),
+      per_free_lunch = sum(total_enroll * per_free_lunch) / sum(total_enroll),
+      per_poverty = sum(total_enroll * county_per_poverty) / sum(total_enroll),
+      mean_math_score = mean(mean_math_score),
+      mean_ela_score = mean(mean_ela_score)
+   ) %>%
+   mutate(scale_mean_ela_score = scale(mean_ela_score)) %>%
+   mutate(scale_mean_math_score = scale(mean_math_score))
+```
+2. For the counties with the top 5 and bottom 5 poverty rate:percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+```{r message=FALSE}
+tmp1 <- combined_county %>%
+   slice_max(per_poverty, n = 5) %>%
+   mutate(top_bottom = "top5")
+tmp2 <- combined_county %>%
+   slice_min(per_poverty, n = 5) %>%
+   mutate(top_bottom = "bottom5")
+
+topbottom5_combined_county <- union(tmp1, tmp2) %>%
+   relocate(top_bottom)
+head(topbottom5_combined_county,10)
+```
+
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free / reduced price lunch and test performance, at the * school * level.
+```{r message=FALSE}
+tmp1 <- combined %>%
+   select(
+      county_name,
+      year,
+      county_per_poverty,
+      incomecategory,
+      scale_mean_math_score,
+      scale_mean_ela_score,
+      per_free_lunch,
+      per_reduced_lunch
+   )
+
+combined_melt <- melt(
+   tmp1,
+   id.vars = c(
+      'county_name',
+      'year',
+      'county_per_poverty',
+      'incomecategory',
+      'scale_mean_math_score',
+      'scale_mean_ela_score'
+   ),
+   variable.name = 'measure',
+   value.name = 'value'
+)
+
+plt1<-ggplot(data = combined_melt,
+       aes(x = value, y = scale_mean_math_score)) +
+   geom_point(mapping = aes(color = measure),
+              position = "jitter")+
+   geom_smooth(method = "lm")+
+   ylim(-4,4)+
+   theme_light()+
+   labs(x = "Percentage of population")
+
+
+plt2<-ggplot(data = combined_melt,
+       aes(x = value, y = scale_mean_ela_score)) +
+   geom_point(mapping = aes(color = measure),
+              position = "jitter")+
+   geom_smooth(method = "lm")+
+   ylim(-4,4)+
+   theme_light()+
+   labs(x = "Percentage of population")
+
+
+grid.arrange(plt1, plt2, nrow=2)
+```
+
+
+2. Average test performance across * counties * with high, low, and medium poverty.
+```{r message=FALSE}
+tmp1<-combined%>%
+   mutate(incomecategory=factor(incomecategory, level = c("High", "Medium", "Low")))%>%
+   group_by(incomecategory)%>%
+   summarize(mean_math_by_income_category=mean(scale_mean_math_score),
+             mean_ela_by_income_category=mean(scale_mean_ela_score))
+   
+
+tmp2<-melt(tmp1,id.vars='incomecategory',variable.name="measure",value.name='value')
+
+ggplot(data=tmp2,mapping=aes(x=incomecategory,y=value))+
+   geom_bar(aes(fill=measure),stat="identity",position="dodge")+
+   labs(y = "Scaled mean scores")
+```
+
+
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question:
+
+1. What can the data tell us about the relationship between poverty and test performance in New York public schools?
+
+2. Has this relationship changed over time ?
+
+3. Is this relationship at all moderated by access to free / reduced price lunch ?
+
+```{r message=FALSE}
+pairdata<-combined %>%
+   select(county_name,year,county_per_poverty,per_free_lunch,
+          per_reduced_lunch,scale_mean_math_score,scale_mean_ela_score) %>%
+   group_by(county_name,year)%>%
+   summarize(mean(county_per_poverty),mean(per_free_lunch),
+             mean(per_reduced_lunch),mean(scale_mean_math_score),
+             mean(scale_mean_ela_score))%>%
+   ungroup()%>%
+   select(-county_name)
+
+pairs(pairdata,panel=panel.smooth,main = "Exhibit 1")
+```
+
+```{r}
+plt1<-ggplot(data=combined,aes(x=county_per_poverty,y=scale_mean_math_score))+
+   geom_point()+
+   geom_smooth(method=lm)+
+   facet_wrap(~year,nrow=1)+
+   ggtitle("Exhibit 2")
+
+plt2<-ggplot(data=combined,aes(x=county_per_poverty,y=scale_mean_ela_score))+
+   geom_point()+
+   geom_smooth(method=lm)+
+   facet_wrap(~year,nrow=1)
+
+grid.arrange(plt1, plt2, nrow=2)
+```
+
+
+A relationship between poverty and test performance on both subjects can be seen: higher the poverty rate, lower the testing scores. And this relationship is true for all years. As apparent in the second graphs, the negative correlation is apparent for all years, and there doesn't seem a dramatic change over the years. It seems the negative relationship weakens as the years go by, but without regression equation, it is just an conjecture. Finally, the data does not explain the relationship between poverty and test scores moderated by free / reduced price lunch. Free/reduced price lunch rate is correlated with poverty rate (as seen by Exhibit 1), and without comparing test scores of schools with free/reduced lunch program and without in same similar poverty rate, the data cannot conclusively explain the effect of free/reduced price lunch on test scores.
+
