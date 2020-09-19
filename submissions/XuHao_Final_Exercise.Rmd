@@ -1,0 +1,312 @@
+# MSIA Boot Camp - Final R exercise
+```{r setup}
+```
+
+It was nice to learn all the stuff during the past couple weeks, Thank you Ali and all other instructors:)
+
+## Tasks
+#### Task 1: Import your data 
+
+Read the data files `nys_schools.csv` and `nys_acs.csv` into R. These data come from two different sources: one is data on *schools* in New York state from the [New York State Department of Education](http://data.nysed.gov/downloads.php), and the other is data on *counties* from the American Communities Survey from the US Census Bureau. Review the codebook file so that you know what each variable name means in each dataset. 
+
+```{r}
+#Import libraries
+library(data.table,warn.conflicts=F, quietly=T)
+library(lubridate,warn.conflicts=F, quietly=T)
+library(tidyverse,warn.conflicts=F, quietly=T)
+
+#Read data
+nys_schools <- fread(here::here('data/nys_schools.csv'))
+nys_acs <- fread(here::here('data/nys_acs.csv'))
+```
+<p>&nbsp;</p>
+#### Task 2: Explore your data
+
+Getting to know your data is a critical part of data analysis. Take the time to explore the structure of the two dataframes you have imported. What types of variables are there? Is there any missing data? How can you tell? What else do you notice about the data?
+
+```{r}
+#EDA
+str(nys_schools)
+str(nys_acs)
+
+sum(is.na(nys_schools))
+sum(is.na(nys_acs))
+
+summary(nys_schools)
+summary(nys_acs)
+```
+There are int, num, and char variables, there are no missing values according to is.na() function. 
+Yet there are negative values (-99) exist in the nys_schools dataset and that's probably the placeholder for missing values.
+
+<p>&nbsp;</p>
+#### Task 3: Recoding and variable manipulation
+
+1. Deal with missing values, which are currently coded as `-99`.
+2. Create a categorical variable that groups counties into "high", "medium", and "low" poverty groups. Decide how you want to split up the groups and briefly explain your decision. 
+3. The tests that the NYS Department of Education administers changes from time to time, so scale scores are not directly comparable year-to-year. Create a new variable that is the standardized z-score for math and English Language Arts (ELA) for each year (hint: group by year and use the `scale()` function)
+
+##### First Question: 
+There are both character -99 as well as numerical 99, so I replaced both of them. 
+For now, I replace the missing values with NA just as a placeholder, and I will make changes in the following steps if necessary.
+
+```{r}
+#Fill NA
+nys_schools[nys_schools == -99 | nys_schools == '99'] <- NA
+```
+
+##### Second Question:
+Because the overall poverty level should be determined by the average income level in a period of time instead of a specific time point, I took the mean of income for all the counties across time to decide which group I will put them in. (Divided all the counties to 3 groups equally: Low, Medium, High.)
+
+```{r}
+#Covert median income to wide table:
+median_income_by_county <- dcast(nys_acs, county_name ~ year, value.var = 'median_household_income')
+
+#Calculated average mean income over the years as poverty cannot be measured merely by one single year's income condition, it's a accumulated problem.
+median_income_by_county[,mean_income_over_years := rowMeans(.SD), by = county_name]
+
+#Separated the data set to 3 levels according to average income overtime.
+threshold1 = quantile(median_income_by_county$mean_income_over_years, 0.33)
+threshold2 = quantile(median_income_by_county$mean_income_over_years, 0.66)
+
+#Define classifier function which seperates the counties to 3 equal sections.
+classifier <- function(income) {
+  if (income > threshold2) {
+    return('High') 
+  } else if (income < threshold1) {
+    return('Low')
+  } else {
+    return('Medium')
+  }
+}
+
+#Create new column for poverty group
+median_income_by_county$poverty_group <- unlist(lapply(median_income_by_county$mean_income_over_years, classifier), use.names=FALSE)
+
+#assign the group information back to a new column in asc dataset
+nys_acs[,poverty_group := median_income_by_county[county_name,poverty_group]]
+head(nys_acs)
+```
+
+##### Third Question
+```{r}
+nys_schools[, standardized_ela_score := scale(mean_ela_score), by = year]
+nys_schools[, standardized_math_score := scale(mean_math_score), by = year]
+head(nys_schools)
+```
+<p>&nbsp;</p>
+#### Task 4: Merge datasets
+
+Create a county-level dataset that merges variables from the schools dataset and the ACS dataset. Remember that you have learned multiple approaches on how to do this, and that you will have to decide how to summarize data when moving from the school to the county level.
+
+Summarizing method: 
+1. For percentage variables: calculated the actual numbers for each variable (for each school), then sum up the actual numbers for each school in the same county and calculated overall percentage value for each county.
+2. For scores: used mean value for each county.
+
+```{r}
+#Add columns to calculate actual number for percentages
+nys_schools[, free_lunch := total_enroll * per_free_lunch]
+nys_schools[, reduced_lunch := total_enroll * per_reduced_lunch]
+nys_schools[, lep := total_enroll * per_lep]
+
+#Create county level table
+county_level_nys_schools <-
+  nys_schools[, 
+            .(county_total_enroll = sum(total_enroll), 
+              county_free_lunch = sum(free_lunch), 
+              county_reduced_lunch = sum(reduced_lunch),
+              county_lep = sum(lep),
+              county_mean_ela_score = mean(mean_ela_score, na.rm = T),
+              county_mean_standard_ela_score = mean(standardized_ela_score, na.rm = T),
+              county_mean_math_score = mean(mean_math_score, na.rm = T),
+              county_mean_standard_math_score = mean(standardized_math_score, na.rm = T)              
+              ),
+            by = c('county_name', 'year')]
+
+
+#Create county level percentage columns
+county_level_nys_schools[,county_per_free_lunch := county_free_lunch / county_total_enroll]
+county_level_nys_schools[,county_per_reduced_lunch := county_reduced_lunch / county_total_enroll]
+county_level_nys_schools[,county_per_lep := county_lep / county_total_enroll]
+
+#Merge data
+merged_data <- merge(county_level_nys_schools, nys_acs, by = c('county_name', 'year'))
+head(merged_data)
+```
+<p>&nbsp;</p>
+#### Task 5: Create summary tables
+
+Generate tables showing the following:
+
+1. For each county: total enrollment, percent of students qualifying for free or reduced price lunch, and percent of population in poverty.
+2. For the counties with the top 5 and bottom 5 poverty rate: percent of population in poverty, percent of students qualifying for free or reduced price lunch, mean reading score, and mean math score.
+
+##### First Question:
+```{r}
+#To create a summarized table, I aggregated data from different years by calculating the mean value
+Table1 <- 
+  merged_data[, .(total_enrollment = mean(county_total_enroll, na.rm = T),
+                percent_free_lunch = mean(county_per_free_lunch, na.rm = T),
+                percent_reduced_lunch = mean(county_per_reduced_lunch, na.rm = T),
+                percent_poverty = mean(county_per_poverty, na.rm = T)
+                ), by = county_name]
+head(Table1)
+```
+##### Second Question:
+```{r}
+#Calculate Top/Bot 5 list:
+ranked_county <- Table1$county_name[order(Table1$percent_poverty, decreasing = T)]
+Top5 <- head(ranked_county, 5)
+Bot5 <- tail(ranked_county, 5)
+
+Table2Top <-
+  merged_data[county_name %in% Top5, 
+              .(percent_free_lunch = mean(county_per_free_lunch, na.rm = T),
+                percent_reduced_lunch = mean(county_per_reduced_lunch, na.rm = T),
+                percent_poverty = mean(county_per_poverty, na.rm = T),
+                mean_math_score = mean(county_mean_math_score, na.rm = T),
+                mean_ela_score = mean(county_mean_ela_score, na.rm = T),
+                mean_standard_math_score = mean(county_mean_standard_ela_score, na.rm = T),
+                mean_standard_ela_score = mean(county_mean_standard_math_score, na.rm = T)
+                ), by = county_name]
+head(Table2Top)
+Table2Bot <-
+  merged_data[county_name %in% Bot5, 
+              .(percent_free_lunch = mean(county_per_free_lunch, na.rm = T),
+                percent_reduced_lunch = mean(county_per_reduced_lunch, na.rm = T),
+                percent_poverty = mean(county_per_poverty, na.rm = T),
+                mean_math_score = mean(county_mean_math_score, na.rm = T),
+                mean_ela_score = mean(county_mean_ela_score, na.rm = T),
+                mean_standard_math_score = mean(county_mean_standard_ela_score, na.rm = T),
+                mean_standard_ela_score = mean(county_mean_standard_math_score, na.rm = T)
+              ), by = county_name]
+head(Table2Bot)
+```
+<p>&nbsp;</p>
+#### Task 6: Data visualization
+
+Using `ggplot2`, visualize the following:
+
+1. The relationship between access to free/reduced price lunch and test performance, at the *school* level.
+2. Average test performance across *counties* with high, low, and medium poverty.
+
+##### First Question:
+Used scatter plot to show relationships: It seems that there is a negative corrolation between these 2 varibales.
+```{r, warning = FALSE}
+nys_schools[,.(mean_accessibility = per_free_lunch + per_reduced_lunch, 
+               mean_math_score = standardized_math_score,
+               mean_ela_score = standardized_ela_score)] %>% 
+  melt(id.vars = 'mean_accessibility',
+       variable.name = 'mean_score',
+       value.name = 'points') %>% 
+  ggplot(aes(x = mean_accessibility, y = points, colour = mean_score)) +
+  geom_point(alpha = 0.015) +
+  labs(title="Accessibility to lunch discout v.s. Mean score", x="Percentage_discounted_lunch(%)", y="Mean_score(z-score)") +
+  xlim(0,1) +
+  geom_smooth(method = lm) +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"))
+```
+
+##### Second Question:
+Plotted both a scatter plot and a box plot. We can see from the plots that poverty level has a big impact on overall performance of exams. Students who are living in a county with better economy tends to have better scores. Both math score and ela score show this pattern. 
+
+```{r, warning = FALSE}
+merged_data[, .(mean_math_score = county_mean_standard_math_score, mean_ela_socre = county_mean_standard_ela_score, poverty = poverty_group)] %>% 
+ggplot() +
+  geom_point(aes(x = mean_math_score, y = mean_ela_socre, color = poverty)) +
+  labs(title="Score Scatter Plot by Poverty Level", x="Math_score(z-score)", y="Ela_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) 
+
+merged_data[, .(ela_score = county_mean_standard_ela_score, poverty = poverty_group)] %>% 
+  ggplot() +
+  geom_boxplot(aes(x = poverty, y = ela_score)) +
+  labs(title="Overall Ela Score v.s. Poverty", x="Poverty_group", y="Ela_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"))
+
+merged_data[, .(math_score = county_mean_standard_math_score, poverty = poverty_group)] %>% 
+  ggplot() +
+  geom_boxplot(aes(x = poverty, y = math_score)) +
+  labs(title="Overall Math Score v.s. Poverty", x="Poverty_group", y="Math_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold"))
+```
+<p>&nbsp;</p>
+#### Task 7: Answering questions
+
+Using the skills you have learned in the past three days, tackle the following question: 
+
+> What can the data tell us about the relationship between poverty and test performance in New York public schools? Has this relationship changed over time? Is this relationship at all moderated by access to free/reduced price lunch?
+
+You may use summary tables, statistical models, and/or data visualization in pursuing an answer to this question. Feel free to build on the tables and plots you generated above in Tasks 5 and 6.
+
+Given the short time period, any answer will of course prove incomplete. The goal of this task is to give you some room to play around with the skills you've just learned. Don't hesitate to try something even if you don't feel comfortable with it yet. Do as much as you can in the time allotted.
+
+
+##### Question1: 
+From the charts we get from task 6 we can see a clear diverge in test performance among different poverty groups. Here we can also use t test to see that there are significant difference between each of two poverty groups:
+```{r, warning = FALSE}
+#t test for mean score difference among povety groups
+score_v_poverty <- merged_data[, .(overall_score = (county_mean_standard_math_score + county_mean_standard_ela_score), poverty = poverty_group)] 
+high <- score_v_poverty$overall_score[score_v_poverty$poverty == 'High']
+medium <- score_v_poverty$overall_score[score_v_poverty$poverty == 'Medium']
+low <- score_v_poverty$overall_score[score_v_poverty$poverty == 'Low']
+t.test(high, medium)
+t.test(high, low)
+t.test(low, medium)
+```
+
+##### Question2:
+For both of the test, students from counties that are better off in economy have higher scores. 
+For math scores, there isn't a clear change in this parttern over time. But we can see in for ela scores, the gap between Medium income counties and Low income counties is narrowing.
+
+```{r, warning = FALSE}
+#map school data to corrsponding poverty group
+school_data_with_poverty <- merge(nys_schools, nys_acs, by = c('county_name', 'year'))[,c('year', 'poverty_group', 'standardized_math_score', 'standardized_ela_score')]
+timseries_math <- school_data_with_poverty[, .(math_score = mean(standardized_math_score, na.rm = T)), by = c('year','poverty_group')]
+timseries_ela <- school_data_with_poverty[, .(ela_score = mean(standardized_ela_score, na.rm = T)), by = c('year','poverty_group')]
+
+#plot charts for both math and ela data
+timseries_math %>% 
+  ggplot() +
+  geom_col(aes(x = year, y = math_score, fill = poverty_group),position="dodge") +
+  labs(title="Overall Math Score by Poverty Groups", x="Year", y="Overall_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  scale_color_discrete(name = "Poverty Group")
+
+timseries_ela %>% 
+  ggplot() +
+  geom_col(aes(x = year, y = ela_score, fill = poverty_group),position="dodge") +
+  labs(title="Overall Ela Score by Poverty Groups", x="Year", y="Overall_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  scale_color_discrete(name = "Poverty Group")
+```
+
+
+##### Question3:
+If we plot the scatter plot for all the schools in "Low" income counties, we can see there is actually a negative relationship between the accessibility to free/reduced lunch and the overall test performance. So I won't say that the test performance gap between High and Low counties is not moderated by access to free/reduced price lunch.
+```{r, warning = FALSE}
+school_data_with_poverty_and_lunch <- merge(nys_schools, nys_acs, by = c('county_name', 'year'))[,c('year', 'poverty_group', 'standardized_math_score', 'standardized_ela_score', 'per_reduced_lunch', 'per_free_lunch')]
+score_v_lunch_Low <- school_data_with_poverty_and_lunch[poverty_group == 'Low', .(standardized_ela_score, standardized_math_score, per_lunch = per_reduced_lunch + per_free_lunch)]
+
+ggplot(score_v_lunch_Low, aes(x = per_lunch, y = standardized_math_score)) +
+  geom_point() +
+  labs(title="Math Score v.s. Accessibility to Cheaper Lunch", x="Reduced/Free Lunch(%)", y="Math_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  geom_smooth(method = lm) +
+  xlim(0,1)
+
+ggplot(score_v_lunch_Low, aes(x = per_lunch, y = standardized_ela_score)) +
+  geom_point() +
+  labs(title="Ela Score v.s. Accessibility to Cheaper Lunch", x="Reduced/Free Lunch(%)", y="Ela_score(z-score)") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  geom_smooth(method = lm) +
+  xlim(0,1)
+```
+
+
+
+
+
+
+
+
+
+
