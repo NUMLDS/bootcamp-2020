@@ -1,0 +1,158 @@
+---
+title: "MSiA 400 Lab Assignment 1"
+subtitle: "Due Oct 13 at 5pm"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#\underline{Instructions:} Please submit a report file that includes: a short answer, related code, printouts, etc. for each problem (where necessary). Push your answers to Github. All programming must be in R (or R Markdown).
+
+## Problem 1
+
+#You will analyze data from a website with 8 pages (plus a 9th state, indicating that the user has left the website). Formulate a Markov chain for this website where each state $\{S_i\ |\ i=1,\cdots,9\}$ corresponds to a page. Each visitor starts at the home page (Page 1), then browses from page-to-page until he/she leaves the website. So, a sample path may be $S_1\to S_3\to S_5\to S_9$, corresponding to a visitor starting on the home page, moving to Page 3, then Page 5, then leaving the website.
+
+#Attached is the dataset `webtraffic.txt`, which records the paths of 1000 visitors (rows). The data has 81 columns labeled $t11,t12,\cdots,t19,t21,t22,\cdots,t99$, where $t_{ij}$ represents a transition from State $i$ to State $j$, for $i,j\in\{1,\cdots,9\}$. Each visitor has a 1 in column $t_{ij}$ if the visitor clicked from Page $i$ to Page $j$, and 0 elsewhere. For example, the aforementioned sample path would have 1's in columns $t_{13}$, $t_{35}$, and $t_{59}$ and 0's elsewhere.
+
+### Problem 1a
+
+#Construct a 9 by 9 matrix `Traffic` that counts total traffic from State $i$ to State $j$, for $i,j\in\{1,\cdots,9\}$. Note that `Traffic` has 0's in row 9 and column 1. Set `Traffic[9,1]=1000`. (This is equivalent to making each user return to the home page after they leave the website.) Display `Traffic`. \underline{Hint:} `colSums()` adds all rows for each column.
+```{r}
+web <- read.table("data/webtraffic.txt", header=T)
+data <- colSums(web)
+Traffic <- matrix(data, nrow = 9, byrow =T)
+Traffic[9,1] = 1000
+Traffic
+```
+
+### Problem 1b
+#Draw a directed graph where each node represents a state, and each arrow from State $i$ to State $j$ has positive (non-zero) traffic (i.e., `Traffic[i,j]>0`). This may be submitted as a TikZ graph (or using your graphing program of choice) or a picture of a hand-drawn graph (provided it is legible). Is the Markov chain irreducible? Is the Markov chain ergodic? Explain.
+
+#see picture attached  
+
+### Problem 1c
+#Construct and display the one-step transition probability matrix `P` (using the Maximum Likelihood estimate, i.e., $p_{ij}=\frac{\text{Traffic}[i,j]}{\sum\limits_{j=1}^9\text{Traffic}[i,j]}$).
+```{r}
+P= Traffic/rowSums(Traffic)
+```
+
+### Problem 1d
+#What is the probability of a visitor being on Page 5 after 5 clicks?
+```{r}
+start = c(1,rep(0,8))
+prob5 = start%*%P%*%P%*%P%*%P%*%P
+prob5[5]  #0.1315178
+```
+### Problem 1e
+#Compute and display the steady-state probability vector `Pi`, solving the system of equations (as demonstrated in lab).
+```{r}
+P[9,1]=1; P[9,9]=0 
+Q=t(P)-diag(9)
+Q[9,]=rep(1,9)
+rhs=c(rep(0,8),1)
+Pi=solve(Q,rhs)
+Pi
+#0.15832806 0.10085497 0.13077897 0.14012033 0.08058898 0.07583914 0.05446485 0.10069664 0.15832806
+```
+### Problem 1f
+
+#The following table represents the average time (in minutes) that a visitor spends on each page:
+#|Page|1|2|3|4|5|6|7|8|
+#|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+#|Min|0.1|2|3|5|5|3|3|2|
+#What is the average time a visitor spends on the website (until he/she first leaves)? \underline{Hint:} Modify the mean first passage time equations, with time spent at each state.
+```{r}
+B=P[1:8,1:8]
+Q=diag(8)-B
+rhs= c(0.1,2,3,5,5,3,3,2)
+m=solve(Q,rhs)
+m[1] # 14.563
+
+```
+## Problem 2
+
+#Use Monte Carlo integration to estimate the integral $\int\limits_0^\infty e^{-\lambda x} \sin x dx$ for $\lambda>0$. Use the exponential distribution $p(x)=\lambda e^{-\lambda x}$ for $x\ge0$, which has variance $\text{var}\left[p(x)\right]=\frac{1}{\lambda^2}$. Note, here $g(x)=\frac{\sin x}{\lambda}$. To generate random variables from the exponential distribution, you may first draw $X\sim\text{unif}(0,1)$, then let $Y=-\frac{\ln X}{\lambda}$. x <- runif(1,0,1)
+
+## Problem 2a
+#Determine the number of samples required to achieve an error tolerance of $10^{-3}$ with 99\% confidence.
+```{r}
+#Answer:  n >= 1000^2 * 100 / lambda ^ 2 
+#(lambda = 1,2,4)
+lam_1 = 1
+lam_2 = 2
+lam_3 = 4
+n1 <- 1000^2 * 100 / 1 ^ 2 
+n2 <- 1000^2 * 100 / 2 ^ 2 
+n3 <- 1000^2 * 100 / 4 ^ 2 
+```
+
+
+## Problem 2b
+#Compute the approximation (using the number of samples obtained in Problem 2a) and verify that it is within tolerance by comparing to the exact solution: $\int\limits_0^\infty e^{-\lambda x} \sin x dx=\frac{1}{1+\lambda^2}$. Numerically evaluate for each of $\lambda=1,2,4$.
+```{r}
+set.seed(42)
+x1 <- runif(n1,0,1)
+z1 = sin(-log(x1)/lam_1)/lam_1
+sum(z1)/n1
+#0.5000058 = 1/(1+lam1^2) = 1/(1+1^2)
+x2 <- runif(n2,0,1)
+z2 = sin(-log(x2)/lam_2)/lam_2
+sum(z2)/n2
+#0.1999886 = 1/(1+lam_2^2) = 1/5
+x3 <- runif(n3,0,1)
+z3 = sin(-log(x3)/lam_3)/lam_3
+sum(z3)/n3
+# 0.05879712 = 1/(1+lam_3^2) = 1/17
+```
+
+## Problem 3
+#Obtain draws from the gamma distribution $p(x)=\frac{x^{k-1}}{\Gamma(k)\theta^k}\exp\left(-\frac{x}{\theta}\right)$ using MCMC. Use the exponential distribution $q(x|\lambda)=\lambda e^{-\lambda x}$ as $q$, with your previous iterate as $\lambda$.
+
+## Problem 3a
+
+#Which MCMC algorithm (Metropolis, Metropolis-Hastings, or Gibbs) is better suited for this problem?
+```{r}
+#distribution I will use is Metropolis-Hastings
+# The exponential distribution we have is not symmetric
+#large-multivariate distribution: Gibbs
+#Exponential distribution symmetric: Metropolis
+#Exponential distribution not symmetric: Metropolis-Hastings
+```
+
+## Problem 3b
+
+#Using a burn-in period of 5000 samples and keeping every 100 samples, generate 100 samples from the gamma distribution with shape $k=2$ and scale $\theta=2$. Use the algorithm you chose in Problem 3a and write your own sampler (as opposed to using a function from a package).
+```{r}
+x <- c()
+x[1] = 1
+qfunction <- function(lambda, X){
+return (lambda * exp(-1*lambda*X))
+}
+p_function <- function(x){
+return (1/4*x*exp(-x/2))
+}
+
+for (t in 1:15000){
+xprime <- rexp(1, x[t])
+a = p_function(xprime)*qfunction(x[t],xprime) / (p_function(x[t])*qfunction(xprime,x[t]))
+u = runif(1,0,1)
+if (u<= a){
+x[t+1] = xprime
+} else {x[t+1] = x[t]
+}
+}
+distribution_estimates = x[-(1:5000)]
+selected = distribution_estimates[seq(1,10000,100)]
+
+```
+## Problem 3c
+#Are the samples generated in Problem 3b sufficiently random? How can you tell?
+
+```{r}
+acf(selected, plot = TRUE)
+# auto correlation for 1, which is normal
+#the sample generated is sufficiently random
+```
+
