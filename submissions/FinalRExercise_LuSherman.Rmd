@@ -1,0 +1,178 @@
+---
+title: "Bootcamp Final R Exercise-Sherman Lu"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r warning=FALSE, include=TRUE}
+library(tidyverse)
+library(dplyr)
+```
+
+## Task 1: Import data
+```{r warning=FALSE, include=TRUE}
+schools <- read.csv('./data/nys_schools.csv')
+acs <- read.csv('./data/nys_acs.csv')
+head(schools)
+head(acs)
+```
+
+## Task 2: Explore data
+```{r}
+summary(schools)
+```
+There are  -99/missing values scattered throughout the data, specifically the continuous variables. There are also outliers in the per lunch categories, but this could be due to a data entering error. 
+
+```{r}
+summary(acs)
+```
+There is no data for 2008 and 2017, creating an imbalance between the two datasets.
+
+## Task 3
+
+### Deal with missing values
+We choose to omit the rows with NAs, and set the missing values as NA rather than -99. This way, it will be easier to omit the missing data when it comes to analysis. We also deal with the outliers in the per lunch columns by setting any value greater than 1 as NA (since you cant have over 100% of students qualifying for a free/reduced lunch).
+```{r}
+schools$district_name[schools$district_name==-99] <- NA
+schools$county_name[schools$county_name==-99] <- NA
+schools$region[schools$region==-99] <- NA
+
+schools <- na.omit(schools) #omit the NAs from the categorical variables
+
+schools$total_enroll[schools$total_enroll==-99] <- NA
+schools$per_free_lunch[schools$per_free_lunch==-99 | schools$per_free_lunch>1] <- NA
+schools$per_reduced_lunch[schools$per_reduced_lunch==-99 | schools$per_reduced_lunch>1] <- NA
+schools$per_lep[schools$per_lep==-99] <- NA
+schools$mean_ela_score[schools$mean_ela_score==-99] <- NA
+schools$mean_math_score[schools$mean_math_score==-99] <- NA
+```
+
+### Create poverty level category
+
+To split the counties into povery levels, we use the county_per_poverty statistic. We choose to split the counties into thirds by poverty percentage, so the bottom third in this statistic is a "high" poverty group, the top third is a "low" group, and the middle third is the "middle" group. To achieve this, we use quantiles to get the 33rd percentile and 67th percentile values. We also do the split by year, since it would be inaccurate to compare one county's 2010 statistics with a different county's 2015 statistics.
+```{r}
+years <- unique(acs$year)
+acs$poverty_level <- NA
+for (acs_year in years){
+  
+  #get the 33 and 67th percentile values per year
+  splits <- quantile(acs[acs$year == acs_year,]$county_per_poverty, c(0.33,0.67))
+  
+  acs[acs$year == acs_year,]$poverty_level[acs[acs$year == acs_year,]$county_per_poverty>splits[1] & acs[acs$year == acs_year,]$county_per_poverty<splits[2]] <- "medium"
+  
+  acs[acs$year == acs_year,]$poverty_level[acs[acs$year == acs_year,]$county_per_poverty>splits[2]] <- "high"
+  
+  acs[acs$year == acs_year,]$poverty_level[acs[acs$year == acs_year,]$county_per_poverty<splits[1]] <- "low"
+}
+```
+
+### Rescale test scores
+
+Rescale the math/ela score by year
+```{r}
+schools <- schools %>% 
+  group_by(year) %>% 
+  mutate(ela_z_score = scale(mean_ela_score), math_z_score = scale(mean_math_score))
+```
+
+
+## Task 4: Merge data
+
+Merge the two dataframes by both county name and year. We don't use any other parameters so that the years that don't appear in the acs data won't appear in the merged dataset. In this case, we don't want 2008 and 2017 data since it's not provided in acs. We also set the year as a factor because it is a category in this context.
+```{r}
+data_merged <- merge(schools, acs, by = c("county_name", "year"))
+data_merged$year <- as.factor(data_merged$year) #set year as factor
+```
+
+
+## Task 5: Tables
+
+We set up the table by finding the necessary statistics for each county per year, since it would be bad practice to treat every year as the same.
+```{r warning=FALSE}
+grouped_data <- data_merged %>% 
+      group_by(county_name, year) %>% #groups the data by county name and year
+      summarise(county_enroll = sum(total_enroll), 
+                per_free_red_lunch = sum(total_enroll*(per_free_lunch+per_reduced_lunch)), 
+                county_per_poverty = mean(county_per_poverty))
+grouped_data
+```
+
+
+We first properly group the table with the necessary columns, then find the minimum and maximum poverty levels for every year.
+```{r warning=FALSE}
+grouped_data <- data_merged %>% 
+      group_by(county_name, year) %>% #groups the data by county name and year
+      summarise(county_per_poverty = mean(county_per_poverty), 
+                per_free_red_lunch = sum(total_enroll*(per_free_lunch+per_reduced_lunch)), 
+                ela_z_score = mean(ela_z_score, na.rm = TRUE), 
+                math_z_score = mean(math_z_score, na.rm = TRUE))
+
+#bottom 5 in poverty rate per year
+min_pov <- grouped_data%>% 
+      group_by(year) %>%
+      slice_min(order_by=county_per_poverty, n = 5)
+
+#top 5 in poverty rate per year
+max_pov <- grouped_data %>% 
+      group_by(year) %>%
+      slice_max(order_by=county_per_poverty, n = 5)
+
+min_max_pov <- rbind(min_pov, max_pov)
+min_max_pov
+```
+
+
+## Task 6: Visuals
+
+### Lunch & test visualization
+
+We visualize this by only showing the trend lines for the relationship by year. Since there are over 20K data points, plotting every point would just result in a blob and the visualization won't be any help in analysis.
+```{r warning=FALSE}
+plt <- ggplot(data_merged, aes(x=per_free_lunch+per_reduced_lunch, color = year))
+plt + geom_smooth(aes(y=ela_z_score), method=lm, se=FALSE) + ggtitle("ELA Score")
+plt + geom_smooth(aes(y=math_z_score), method=lm, se=FALSE) + ggtitle("Math Score")
+```
+For both ela and math, as the percentage of total free and reduced lunches increases, the score decreases. 
+
+### Poverty level & test visualization
+We choose to look at this by using year as our x-axis and labeling every point based on the poverty level (low-medium-high). This way, we can see the difference poverty level has on test score while also looking at how this relationship changes over time.
+```{r}
+binded_data <- data.frame(county_name=NA, ela_z_score=NA, math_z_score=NA, poverty_level=NA, year=NA)[numeric(0), ]
+for (y in unique(data_merged$year)){
+  
+  #get mean test scores for a county in a given year
+  grouped_data <- data_merged[data_merged$year == y,] %>%
+            group_by(county_name) %>%
+            summarise_at(c("ela_z_score", "math_z_score"), mean, na.rm=TRUE)
+  
+  #isolate the poverty level for a county in a given year
+  pov_level_year <- acs[acs$year==y,c("county_name", "poverty_level", "year")] 
+  
+  #join the two tables together by county name
+  year_data <- merge(grouped_data, pov_level_year, by = c("county_name"))
+  
+  #add the cleaned up year data to the overall data frame
+  binded_data <- rbind(binded_data, year_data)
+}
+
+#set the poverty level as a factor to properly order the legend
+binded_data$poverty_level<-factor(binded_data$poverty_level, levels = c("low", "medium", "high"))
+
+plt <- ggplot(binded_data, aes(x=year, color=poverty_level))
+plt + geom_point(aes(y=ela_z_score)) + geom_smooth(aes(y=ela_z_score), method=lm) + ggtitle("ELA")
+plt + geom_point(aes(y=math_z_score)) + geom_smooth(aes(y=math_z_score), method=lm) + ggtitle("Math")
+```
+
+
+### Task 7: Answering questions
+There is definitely a negative correlation between poverty and overall test performance. If you are in a low poverty category, you will score higher than those in medium, and those in medium will score higher than high poverty. Interestingly, ELA scores have gone down across the board over the years for every single poverty category at nearly the same rate. This is unlike math scores, where the scores for low poverty have stayed relatively constant, but those in medium and high poverty communities have seen their scores go up over time. Although the percentage of students with access to free/reduced price lunch increases with poverty level, the analysis done here doesn't prove that there is a definite causation between free/reduced lunch and test scores. 
+
+
+
+
