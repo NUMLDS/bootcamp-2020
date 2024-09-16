@@ -1,0 +1,73 @@
+#0.
+library(data.table)
+library(tidyverse)
+
+#1.
+schools <- read_csv("data/nys_schools.csv")
+acs <- read_csv("data/nys_acs.csv")
+
+#2.
+view(schools)
+view(acs)
+summary(schools)
+summary(acs)
+
+#3.
+#3-1
+colSums(acs==-99)
+#no missing variables
+colSums(schools==-99)
+#lots of missing variables. Had I had the mastery in R, I would have probably imputed 
+# values for all columns. But for this exercise, I would ignore the rows with NAs
+schools[schools == -99] <- NA
+schools <-na.omit(schools)
+#3-2
+#summary(acs) function tells us that Q1 of median household_income is 46347
+# and Q3 is 56449. Anything below Q1 is low, anything above Q3 would be high
+setDT(acs)
+acs[, poverty_group := ifelse(median_household_income >56449, 'high', 'medium')]
+acs[, poverty_group := ifelse(median_household_income <46347, 'low', 'medium')]
+#3-3
+new <- scale(schools[, mean_ela_score, by=year])
+schools[, standardized_ela_score := new[,2]]
+new <- scale(schools[, mean_math_score, by=year])
+schools[, standardized_math_score := new[,2]]
+
+#4
+#to merge school data into asc data, I grouped the data by year, county_name and school_cd 
+# and took a mean of all other variables. I named the new data.table newschool
+tmp <- names(schools)[7:14]
+newschool <- schools[,lapply(.SD,mean,na.rm=TRUE),by= c("county_name","year","school_cd"),.SDcols=tmp]
+newdata <- acs[newschool, on= c("county_name","year")]
+newdata[,per_free_and_reduced_lunch:= per_free_lunch+per_reduced_lunch]
+
+newschool2 <- schools[,lapply(.SD,mean,na.rm=TRUE),by= county_name,.SDcols=tmp]
+tmp2 <- names(acs)[3:5]
+newacs <- acs[,lapply(.SD,mean,na.rm=TRUE),by=county_name,.SDcols=tmp2]
+newdata2 <- newacs[newschool2, on = county_name]
+newdata2[,per_free_and_reduced_lunch:= per_free_lunch+per_reduced_lunch]
+
+#5
+#5-1
+newdata2[,c("total_enroll","per_free_and_reduced_lunch","county_per_poverty")]
+#5-2 
+head(newdata2[order(county_per_poverty), c("county_per_poverty","per_free_and_reduced_lunch","mean_math_score","mean_ela_score" )])
+head(newdata2[order(-county_per_poverty), c("county_per_poverty","per_free_and_reduced_lunch","mean_math_score","mean_ela_score" )])
+
+#6
+#6-1
+schools_county <- schools[,lapply(.SD,mean,na.rm=TRUE),by=c("school_cd","county_name"),.SDcols=tmp]
+acs_county <- acs[,lapply(.SD,mean,na.rm=TRUE), by=county_name,.SDcols=tmp2]
+by_school <- schools_county[acs_county, on = "county_name"]
+by_school[,per_free_and_reduced_lunch:= per_free_lunch+per_reduced_lunch]
+ggplot(data = by_school) + geom_point(aes(x=per_free_and_reduced_lunch, y=mean_ela_score))
+ggplot(data = by_school) + geom_point(aes(x=per_free_and_reduced_lunch, y=mean_math_score))
+
+#6-2
+newdata2[, poverty_group := ifelse(median_household_income >56768, 'high', ifelse(median_household_income <46731, 'low', 'medium'))]
+ggplot(data = newdata2) + geom_point(aes(x=county_name, y=mean_ela_score, group=poverty_group, col=poverty_group))
+ggplot(data = newdata2) + geom_point(aes(x=county_name, y=mean_math_score, group=poverty_group, col=poverty_group))
+
+#7
+#looking at the plots from 6-1, we see a bit of decreasing trend in mean test scores
+#when per free and reduced lunch increases 
